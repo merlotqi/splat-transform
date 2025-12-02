@@ -4,12 +4,17 @@ project(splat-transform)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
-# find_package(Eigen3 CONFIG REQUIRED)
+find_package(Eigen3 CONFIG REQUIRED)
 
 add_library(splat_trans STATIC)
 
 add_subdirectory(utils)
 add_subdirectory(readers)
+add_subdirectory(maths)
 
-# target_link_libraries(splat_trans Eigen3::Eigen)
+target_link_libraries(splat_trans Eigen3::Eigen)
+if(WIN32)
+    target_compile_definitions(splat_trans PUBLIC _USE_MATH_DEFINES)
+endif()
+
+add_subdirectory(app)
