@@ -191,8 +191,7 @@ PlyData readPly(const std::string& filename) {
       buffers.emplace_back(columns.back().rawPointer());
     }
 
-    size_t rowSize = std::accumulate(sizes.begin(), sizes.end(), 0);
-    ;
+    size_t rowSize = std::reduce(sizes.begin(), sizes.end(), 0);
 
     // read data in chunks of 1024 rows at a time
     const size_t chunkSize = 1024;
@@ -220,7 +219,7 @@ PlyData readPly(const std::string& filename) {
         }
       }
     }
-    elements.emplace_back(element.name, DataTable(columns));
+    elements.push_back({element.name, DataTable(columns)});
   }
   return PlyData{header.comments, elements};
 }

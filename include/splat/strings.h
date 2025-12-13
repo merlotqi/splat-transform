@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <string>
+#include <sstream>
 
 namespace splat {
 namespace strings {
@@ -50,6 +51,20 @@ inline bool startsWith(const std::string& str, const std::string& prefix) {
 inline bool endsWith(const std::string& str, const std::string& suffix) {
   return (str.size() >= suffix.size()) && (str.rfind(suffix, str.size() - suffix.size()) != std::string::npos);
 }
+
+std::string join(const std::vector<std::string>& strings, const std::string& delimiter) {
+    if (strings.empty()) {
+        return "";
+    }
+    
+    std::ostringstream oss;
+    std::copy(strings.begin(), strings.end() - 1,
+              std::ostream_iterator<std::string>(oss, delimiter.c_str()));
+    oss << strings.back();
+    
+    return oss.str();
+}
+
 
 }  // namespace strings
 }  // namespace splat

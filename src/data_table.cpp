@@ -114,7 +114,7 @@ Column& DataTable::getColumn(size_t index) {
 int DataTable::getColumnIndex(const std::string& name) const {
   for (size_t i = 0; i < columns.size(); ++i) {
     if (columns[i].name == name) {
-      return i;
+      return (int)i;
     }
   }
   return -1;
@@ -147,7 +147,7 @@ void DataTable::addColumn(const Column& column) {
 }
 
 bool DataTable::removeColumn(const std::string& name) {
-  auto it = std::remove_if(columns.begin(), columns.end(), [&name](const auto& col) { return col->name == name; });
+  auto it = std::remove_if(columns.begin(), columns.end(), [&name](const auto& col) { return col.name == name; });
   if (it == columns.end()) {
     return false;
   }
@@ -249,7 +249,7 @@ std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32
   }
 
   // Helper to safely retrieve coordinate values using the DataTable interface
-  auto getVal = [&](const std::string& name, size_t index) -> double {
+  auto getVal = [&](const std::string& name, size_t index) -> float {
     Column col = dataTable.getColumnByName(name);
     return col.getValue(index);
   };
@@ -263,8 +263,8 @@ std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32
       return;
     }
 
-    double mx, my, mz;  // Minimum extent
-    double Mx, My, Mz;  // Maximum extent
+    float mx, my, mz;  // Minimum extent
+    float Mx, My, Mz;  // Maximum extent
 
     // 1. Calculate scene extents across the current set of indices
 
@@ -275,9 +275,9 @@ std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32
 
     for (size_t i = 1; i < currentIndices.size(); ++i) {
       const size_t ri = currentIndices[i];  // Row index in the DataTable
-      const double x = getVal("x", ri);
-      const double y = getVal("y", ri);
-      const double z = getVal("z", ri);
+      const float x = getVal("x", ri);
+      const float y = getVal("y", ri);
+      const float z = getVal("z", ri);
 
       if (x < mx)
         mx = x;
@@ -293,9 +293,9 @@ std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32
         Mz = z;
     }
 
-    const double xlen = Mx - mx;
-    const double ylen = My - my;
-    const double zlen = Mz - mz;
+    const float xlen = Mx - mx;
+    const float ylen = My - my;
+    const float zlen = Mz - mz;
 
     // Check for invalid (non-finite) extents
     if (!std::isfinite(xlen) || !std::isfinite(ylen) || !std::isfinite(zlen)) {
@@ -310,24 +310,24 @@ std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32
     }
 
     // 2. Calculate scaling multipliers (to map extents to [0, 1024])
-    const double MAX_MORTON_COORD = 1024.0;
+    const float MAX_MORTON_COORD = 1024.0f;
 
-    const double xmul = (xlen == 0.0) ? 0.0 : MAX_MORTON_COORD / xlen;
-    const double ymul = (ylen == 0.0) ? 0.0 : MAX_MORTON_COORD / ylen;
-    const double zmul = (zlen == 0.0) ? 0.0 : MAX_MORTON_COORD / zlen;
+    const float xmul = (xlen == 0.0f) ? 0.0f : MAX_MORTON_COORD / xlen;
+    const float ymul = (ylen == 0.0f) ? 0.0f : MAX_MORTON_COORD / ylen;
+    const float zmul = (zlen == 0.0f) ? 0.0f : MAX_MORTON_COORD / zlen;
 
     // 3. Calculate Morton codes for all points in the current batch
     std::vector<uint32_t> morton(currentIndices.size());
     for (size_t i = 0; i < currentIndices.size(); ++i) {
       const size_t ri = currentIndices[i];
-      const double x = getVal("x", ri);
-      const double y = getVal("y", ri);
-      const double z = getVal("z", ri);
+      const float x = getVal("x", ri);
+      const float y = getVal("y", ri);
+      const float z = getVal("z", ri);
 
       // Scale and clamp to [0, 1023] (integer space)
-      uint32_t ix = static_cast<uint32_t>(std::min(1023.0, (x - mx) * xmul));
-      uint32_t iy = static_cast<uint32_t>(std::min(1023.0, (y - my) * ymul));
-      uint32_t iz = static_cast<uint32_t>(std::min(1023.0, (z - mz) * zmul));
+      uint32_t ix = static_cast<uint32_t>(std::min(1023.0f, (x - mx) * xmul));
+      uint32_t iy = static_cast<uint32_t>(std::min(1023.0f, (y - my) * ymul));
+      uint32_t iz = static_cast<uint32_t>(std::min(1023.0f, (z - mz) * zmul));
 
       morton[i] = encodeMorton3(ix, iy, iz);
     }
@@ -396,19 +396,19 @@ const std::vector<std::string> shNames = []() {
  * @param s Global uniform scale factor (float).
  * @throws std::runtime_error if dataTable operations fail.
  */
-void transform(DataTable& dataTable, const Eigen::Vector3d& t, const Eigen::Quaterniond& r, float s) {
+void transform(DataTable& dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s) {
   // 1. Pre-calculate global transformation matrices and SH rotation utility
 
   // Mat4: Global Transformation Matrix (TRS)
   // Eigen uses Column-Major by default. PlayCanvas's setTRS results in a matrix that,
   // when applied to a vector (v' = M * v), performs T * R * S.
-  Eigen::Matrix4d mat = Eigen::Matrix4d::Identity();
+  Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
   mat.block<3, 3>(0, 0) = r.toRotationMatrix() * s;  // R * S
   mat.block<3, 1>(0, 3) = t;                         // T (translation column)
 
   // Mat3: Pure Rotation Matrix for SH rotation
-  Eigen::Matrix3d mat3 = r.toRotationMatrix();
-  RotateSH rotateSH(mat3.cast<double>());  // Use double for Eigen's RotateSH as per assumed definition
+  Eigen::Matrix3f mat3 = r.toRotationMatrix();
+  RotateSH rotateSH(mat3.cast<float>());  // Use float for Eigen's RotateSH as per assumed definition
 
   // 2. Determine which components exist in the DataTable (Optimization)
 
@@ -463,7 +463,7 @@ void transform(DataTable& dataTable, const Eigen::Vector3d& t, const Eigen::Quat
   }
 
   // Temporary buffer for SH coefficients of one color channel
-  std::vector<double> shCoeffs(shCoeffsPerChannel);
+  std::vector<float> shCoeffs(shCoeffsPerChannel);
 
   // 3. Iterate and Transform Rows
   for (size_t i = 0; i < dataTable.getNumRows(); ++i) {
@@ -472,7 +472,7 @@ void transform(DataTable& dataTable, const Eigen::Vector3d& t, const Eigen::Quat
 
     // --- A. Translation (Position) ---
     if (hasTranslation) {
-      Eigen::Vector3d pos(row["x"], row["y"], row["z"]);
+      Eigen::Vector3f pos(row["x"], row["y"], row["z"]);
 
       // Transform point: v' = M * v
       // Since Eigen's Mat4 * Vec3 (implicitly converting Vec3 to Vec4(v, 1))
@@ -491,14 +491,14 @@ void transform(DataTable& dataTable, const Eigen::Vector3d& t, const Eigen::Quat
       // then multiplies by the global rotation 'r' (Quat).
       // Original: q.set(row.rot_1, row.rot_2, row.rot_3, row.rot_0).mul2(r, q);
       // Eigen stores Quat as (x, y, z, w) in memory/coefficients.
-      Eigen::Quaterniond q_local(row["rot_0"],  // w
+      Eigen::Quaternionf q_local(row["rot_0"],  // w
                                  row["rot_1"],  // x
                                  row["rot_2"],  // y
                                  row["rot_3"]   // z
       );
 
       // The combined rotation: q_global * q_local
-      Eigen::Quaterniond q_combined = r * q_local;
+      Eigen::Quaternionf q_combined = r * q_local;
 
       // Re-normalize might be a good idea, though quaternion multiplication should maintain unit length
       q_combined.normalize();
@@ -531,7 +531,7 @@ void transform(DataTable& dataTable, const Eigen::Vector3d& t, const Eigen::Quat
           shCoeffs[k] = row[colName];
         }
 
-        // 2. Apply rotation (RotateSH is assumed to operate on the double vector)
+        // 2. Apply rotation (RotateSH is assumed to operate on the float vector)
         rotateSH.apply(shCoeffs);
 
         // 3. Store rotated SH coefficients back to the row

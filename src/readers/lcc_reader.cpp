@@ -23,37 +23,4 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
-#pragma once
-
-#include <splat/data_table.h>
-
-namespace splat {
-
-struct PlyProperty {
-  std::string name;  // 'x', 'f_dc_0', etc
-  std::string type;  // 'float' 'char', etc
-  ColumnType dataType;
-};
-
-struct PlyElement {
-  std::string name;  // 'vertex', 'face', etc
-  size_t count;      // number of items in this element
-  std::vector<PlyProperty> properties;
-};
-
-struct PlyHeader {
-  std::vector<std::string> comments;
-  std::vector<PlyElement> elements;
-};
-
-struct PlyElementData {
-  std::string name;
-  const DataTable& dataTable;
-};
-
-struct PlyData {
-  std::vector<std::string> comments;
-  std::vector<PlyElementData> elements;
-};
-
-}  // namespace splat
+#include <splat/readers/lcc_reader.h>

@@ -30,13 +30,13 @@
 namespace splat {
 
 struct RotateSH {
-  double sh1[3][3];
-  double sh2[5][5];
-  double sh3[7][7];
+  float sh1[3][3];
+  float sh2[5][5];
+  float sh3[7][7];
 
   // rotate spherical harmonic coefficients, up to band 3
-  void apply(std::vector<double>& result, std::vector<double> src = {});
-  RotateSH(const Eigen::Matrix3d& mat);
+  void apply(std::vector<float>& result, std::vector<float> src = {});
+  RotateSH(const Eigen::Matrix3f& mat);
 };
 
 }  // namespace splat

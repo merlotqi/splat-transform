@@ -61,9 +61,9 @@ static std::array<std::vector<uint16_t>, 3> decodeMeans(const std::vector<uint8_
   return {xs, ys, zs};
 }
 
-static double invLogTransform(double v) {
-  const double a = abs(v);
-  const double e = exp(a) - 1;
+static float invLogTransform(float v) {
+  const float a = abs(v);
+  const float e = exp(a) - 1;
   return v < 0 ? -e : e;
 }
 
@@ -87,8 +87,8 @@ static inline std::array<float, 4> unpackQuat(uint8_t px, uint8_t py, uint8_t pz
   return comps;
 }
 
-static inline double sigmoidInv(double y) {
-  const double e = std::min(1 - 1e-6, std::max(1e-6, y));
+static inline float sigmoidInv(float y) {
+  const float e = std::min(1.0f - 1e-6f, std::max(1e-6f, y));
   return log(e / (1 - e));
 }
 
@@ -187,7 +187,7 @@ DataTable read_sog(std::filesystem::path file, const std::string& sourceName) {
   const auto meansLoWebp = load(meta.means.files[0]);
   const auto meansHiWebp = load(meta.means.files[1]);
   const auto& [lo, width, height] = webpCodec::decodeRGBA(meansHiWebp);
-  const auto& [hi, _, _] = webpCodec::decodeRGBA(meansLoWebp);
+  const auto& [hi, _hw, _hh] = webpCodec::decodeRGBA(meansLoWebp);
   const auto total = width * height;
   if (total < count) {
     throw std::runtime_error("SOG means texture too small for count");
@@ -204,9 +204,9 @@ DataTable read_sog(std::filesystem::path file, const std::string& sourceName) {
   const auto zScale = (maxs[2] - mins[2]) || 1;
 
   for (int i = 0; i < count; ++i) {
-    const auto lx = xMin + xScale * (xs[i] / 65535.0);
-    const auto ly = yMin + yScale * (ys[i] / 65535.0);
-    const auto lz = zMin + zScale * (zs[i] / 65535.0);
+    const auto lx = xMin + xScale * (xs[i] / 65535.0f);
+    const auto ly = yMin + yScale * (ys[i] / 65535.0f);
+    const auto lz = zMin + zScale * (zs[i] / 65535.0f);
     xCol.setValue<float>(i, invLogTransform(lx));
     yCol.setValue<float>(i, invLogTransform(ly));
     zCol.setValue<float>(i, invLogTransform(lz));
@@ -261,7 +261,7 @@ DataTable read_sog(std::filesystem::path file, const std::string& sourceName) {
     dc0.setValue<float>(i, cCode[c0[o + 0]]);
     dc1.setValue<float>(i, cCode[c0[o + 1]]);
     dc2.setValue<float>(i, cCode[c0[o + 2]]);
-    opCol.setValue<float>(i, sigmoidInv(c0[o + 3] / 255.0));
+    opCol.setValue<float>(i, sigmoidInv(c0[o + 3] / 255.0f));
   }
 
   // Note: If present, SH higher bands (shN) are reconstructed into columns below.
@@ -276,7 +276,7 @@ DataTable read_sog(std::filesystem::path file, const std::string& sourceName) {
       const auto centroidsWebp = load(meta.shN->files[0]);
       const auto labelsWebp = load(meta.shN->files[1]);
       const auto& [centroidsRGBA, cW, cH] = webpCodec::decodeRGBA(centroidsWebp);
-      const auto& [labelsRGBA, _, _] = webpCodec::decodeRGBA(labelsWebp);
+      const auto& [labelsRGBA, _lw, _lh] = webpCodec::decodeRGBA(labelsWebp);
 
       // Prepare f_rest_i columns
       static constexpr auto baseIdx = 14;
@@ -287,7 +287,7 @@ DataTable read_sog(std::filesystem::path file, const std::string& sourceName) {
       const int stride = 4;
       auto getCentroidPixel = [&](int centroidIndex, int coeff) -> std::array<uint8_t, 3> {
         const int cx = (centroidIndex % 64) * shCoffs + coeff;
-        const int cy = floor(centroidIndex / 64);
+        const int cy = (int)floor(centroidIndex / 64.0f);
         if (cx >= cW || cy >= cH) return {0u, 0u, 0u};
 
         const auto idx = (cy * cW + cx) * stride;

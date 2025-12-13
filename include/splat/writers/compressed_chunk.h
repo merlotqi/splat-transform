@@ -25,35 +25,28 @@
 
 #pragma once
 
-#include <splat/data_table.h>
+#include <map>
+#include <string>
+#include <tuple>
+#include <vector>
 
 namespace splat {
 
-struct PlyProperty {
-  std::string name;  // 'x', 'f_dc_0', etc
-  std::string type;  // 'float' 'char', etc
-  ColumnType dataType;
-};
+class CompressedChunk {
+  std::map<std::string, std::vector<float>> data;
+  size_t size;
 
-struct PlyElement {
-  std::string name;  // 'vertex', 'face', etc
-  size_t count;      // number of items in this element
-  std::vector<PlyProperty> properties;
-};
+ public:
+  CompressedChunk(size_t size = 256);
+  void set(size_t index, const std::map<std::string, float>& dataMap);
+  void pack();
 
-struct PlyHeader {
-  std::vector<std::string> comments;
-  std::vector<PlyElement> elements;
-};
-
-struct PlyElementData {
-  std::string name;
-  const DataTable& dataTable;
-};
-
-struct PlyData {
-  std::vector<std::string> comments;
-  std::vector<PlyElementData> elements;
+  // compressed data
+  std::vector<uint32_t> position;
+  std::vector<uint32_t> rotation;
+  std::vector<uint32_t> color;
+  std::vector<uint32_t> scale;
+  std::vector<float> chunkData;
 };
 
 }  // namespace splat

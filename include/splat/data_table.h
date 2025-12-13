@@ -36,7 +36,7 @@
 
 namespace splat {
 
-using Row = std::map<std::string, double>;
+using Row = std::map<std::string, float>;
 
 enum class ColumnType {
   INT8,
@@ -104,18 +104,28 @@ struct Column {
       throw std::out_of_range("Index out of range in getValue.");
     }
 
-    return std::visit(
-        [index](const auto& vec) -> T {
-          using InternalType = typename std::decay_t<decltype(vec)>::value_type;
-          // Compile-time check: Ensure the internal type is convertible to T
-          if constexpr (!std::is_convertible_v<InternalType, T>) {
-            throw std::runtime_error("Internal type cannot be safely converted to requested type T.");
-          }
-          // Note: Range/precision loss checks for the *internal* value (e.g., int32_t to int8_t)
-          // are omitted here, as the focus is on the T return type.
-          return static_cast<T>(vec[index]);
-        },
-        data);
+    if constexpr (std::is_same_v<T, std::string>) {
+      return std::visit(
+          [index](const auto& vec) -> std::string {
+            using InternalType = typename std::decay_t<decltype(vec)>;
+            return std::to_string(vec[index]);
+          },
+          data);
+
+    } else {
+      return std::visit(
+          [index](const auto& vec) -> T {
+            using InternalType = typename std::decay_t<decltype(vec)>;
+            // Compile-time check: Ensure the internal type is convertible to T
+            if constexpr (!std::is_convertible_v<InternalType, T>) {
+              throw std::runtime_error("Internal type cannot be safely converted to requested type T.");
+            }
+            // Note: Range/precision loss checks for the *internal* value (e.g., int32_t to int8_t)
+            // are omitted here, as the focus is on the T return type.
+            return static_cast<T>(vec[index]);
+          },
+          data);
+    }
   }
 
   template <typename T>
@@ -124,56 +134,98 @@ struct Column {
       throw std::out_of_range("Column index out of range for setValue.");
     }
 
-    std::visit(
-        [index, value](auto& vec) {
-          // InternalType is the actual storage type (e.g., int32_t, float)
-          using InternalType = typename std::decay_t<decltype(vec)>::value_type;
+    auto visitor = [index, value](auto& vec) {
+      using VectorType = std::decay_t<decltype(vec)>;
+      using InternalType = typename VectorType::value_type;
 
-          // Ensures T can be converted to InternalType syntactically.
-          if constexpr (!std::is_convertible_v<T, InternalType>) {
-            throw std::runtime_error("Input type T cannot be safely converted to internal column type.");
+      if constexpr (std::is_same_v<T, std::string>) {
+        // Handle string input
+        const std::string& str_value = value;
+        try {
+          if constexpr (std::is_same_v<InternalType, int8_t> || std::is_same_v<InternalType, int16_t> ||
+                        std::is_same_v<InternalType, int32_t>) {
+            // For signed integers
+            long long temp = std::stoll(str_value);
+            if (temp > static_cast<long long>(std::numeric_limits<InternalType>::max()) ||
+                temp < static_cast<long long>(std::numeric_limits<InternalType>::min())) {
+              throw std::range_error("String value out of range for signed integer type.");
+            }
+            vec[index] = static_cast<InternalType>(temp);
+          } else if constexpr (std::is_same_v<InternalType, uint8_t> || std::is_same_v<InternalType, uint16_t> ||
+                               std::is_same_v<InternalType, uint32_t>) {
+            // For unsigned integers
+            unsigned long long temp = std::stoull(str_value);
+            if (temp > static_cast<unsigned long long>(std::numeric_limits<InternalType>::max())) {
+              throw std::range_error("String value out of range for unsigned integer type.");
+            }
+            vec[index] = static_cast<InternalType>(temp);
+          } else if constexpr (std::is_same_v<InternalType, float>) {
+            vec[index] = std::stof(str_value);
+          } else if constexpr (std::is_same_v<InternalType, double>) {
+            vec[index] = std::stod(str_value);
+          } else {
+            throw std::runtime_error("Unsupported type for string conversion.");
           }
+        } catch (const std::invalid_argument&) {
+          throw std::runtime_error("Invalid argument for string to number conversion.");
+        } catch (const std::out_of_range&) {
+          throw std::range_error("String value out of range.");
+        }
+      } else {
+        // Handle non-string input
+        using ValueType = std::decay_t<T>;
 
-          // Case 1: Target is an Integer (High risk of overflow/truncation)
-          if constexpr (std::is_integral_v<InternalType>) {
-            // B1. Check for value overflow/underflow against the limits of the InternalType
-            if (value > (T)std::numeric_limits<InternalType>::max() ||
-                value < (T)std::numeric_limits<InternalType>::min()) {
+        if constexpr (!std::is_convertible_v<ValueType, InternalType>) {
+          throw std::runtime_error("Input type cannot be converted to internal column type.");
+        }
+
+        // Check for potential overflow/truncation
+        if constexpr (std::is_integral_v<InternalType>) {
+          // Check if value fits in internal type
+          if constexpr (std::is_integral_v<ValueType>) {
+            // Both are integral types
+            if (value > static_cast<ValueType>(std::numeric_limits<InternalType>::max()) ||
+                value < static_cast<ValueType>(std::numeric_limits<InternalType>::min())) {
               throw std::range_error("Value exceeds range of internal integer type.");
             }
-
-            // B2. Check for floating-point to integer truncation (loss of fractional data)
-            if constexpr (std::is_floating_point_v<T>) {
-              // Check if the value has a significant fractional part
-              if (std::abs(value - std::round(value)) > 1e-6) {
-                throw std::range_error(
-                    "Floating-point value cannot be exactly represented in internal integer type (truncation risk).");
-              }
+          } else if constexpr (std::is_floating_point_v<ValueType>) {
+            // Floating point to integer conversion
+            // Check for overflow
+            if (value > static_cast<ValueType>(std::numeric_limits<InternalType>::max()) ||
+                value < static_cast<ValueType>(std::numeric_limits<InternalType>::min())) {
+              throw std::range_error("Value exceeds range of internal integer type.");
+            }
+            // Check for truncation
+            if (std::abs(value - std::round(value)) > std::numeric_limits<ValueType>::epsilon() * 10) {
+              throw std::range_error("Floating-point value cannot be exactly represented in internal integer type.");
             }
           }
-          // Case 2: Target is a Float (Risk of precision loss)
-          else if constexpr (std::is_floating_point_v<InternalType>) {
-            // Check for precision loss when converting from double (T) to float (InternalType)
-            if constexpr (std::is_same_v<T, double> && std::is_same_v<InternalType, float>) {
-              // This check is complex and often left out, but for strictness:
-              // If the double value is outside the representable float range (though rare), or if
-              // significant precision is lost, we could flag it. For simplicity, standard cast is often accepted here.
+        } else if constexpr (std::is_floating_point_v<InternalType>) {
+          // Floating point to floating point conversion
+          if constexpr (std::is_same_v<InternalType, float> && std::is_same_v<ValueType, double>) {
+            // double to float conversion - check for overflow
+            if (std::abs(value) > std::numeric_limits<float>::max()) {
+              throw std::range_error("Double value exceeds float range.");
             }
           }
+        }
 
-          vec[index] = static_cast<InternalType>(value);
-        },
-        data);
+        // Safe to assign
+        vec[index] = static_cast<InternalType>(value);
+      }
+    };
+
+    std::visit(visitor, data);
   }
 
-  double getValue(size_t index) const { return getValue<double>(index); }
+  float getValue(size_t index) const { return getValue<float>(index); }
 
-  void setValue(size_t index, double value) { setValue<double>(index, value); }
+  void setValue(size_t index, float value) { setValue<float>(index, value); }
 
   size_t bytePreElement() const {
     return std::visit(
         [](const auto& vec) -> size_t {
-          using T = typename std::decay_t<decltype(vec)>::value_type;
+          using T = typename std::decay_t<decltype(vec)>;
           return sizeof(T);
         },
         data);
@@ -230,7 +282,7 @@ class DataTable {
 
     try {
       return std::get<std::vector<T>>(col.data);
-    } catch (const std::bad_variant_access& e) {
+    } catch (const std::bad_variant_access&) {
       throw std::runtime_error(
           "Column type mismatch for '" + name + "'. Expected type index " +
           std::to_string(
@@ -250,9 +302,9 @@ class DataTable {
 
     try {
       return std::get<std::vector<T>>(col.data);
-    } catch (const std::bad_variant_access& e) {
+    } catch (const std::bad_variant_access&) {
       throw std::runtime_error(
-          "Column type mismatch for '" + name + "'. Expected type index " +
+          "Column type mismatch for '" + col.name + "'. Expected type index " +
           std::to_string(
               std::variant<std::vector<int8_t>, std::vector<uint8_t>, std::vector<int16_t>, std::vector<uint16_t>,
                            std::vector<int32_t>, std::vector<uint32_t>, std::vector<float>, std::vector<double>>(
@@ -260,14 +312,14 @@ class DataTable {
                   .index()) +
           ", got index " + std::to_string(col.data.index()));
     } catch (...) {
-      throw std::runtime_error("Unknown error while getting raw column data for '" + name + "'.");
+      throw std::runtime_error("Unknown error while getting raw column data for '" + col.name + "'.");
     }
   }
 };
 
 std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32_t>& indices);
 
-void transform(DataTable& dataTable, const Eigen::Vector3d& t, const Eigen::Quaterniond& r, float s);
+void transform(DataTable& dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s);
 
 }  // namespace splat
 

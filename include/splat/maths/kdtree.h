@@ -37,6 +37,9 @@ struct KdTreeNode {
   size_t count;
   std::unique_ptr<KdTreeNode> left;
   std::unique_ptr<KdTreeNode> right;
+
+  KdTreeNode(size_t index, size_t count, std::unique_ptr<KdTreeNode> left, std::unique_ptr<KdTreeNode> right)
+      : index(index), count(count), left(std::move(left)), right(std::move(right)) {}
 };
 
 class KdTree {

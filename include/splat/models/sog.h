@@ -37,8 +37,8 @@ struct Meta {
   int count;
 
   struct {
-    std::vector<double> mins;
-    std::vector<double> maxs;
+    std::vector<float> mins;
+    std::vector<float> maxs;
     std::vector<std::string> files;
   } means;
 

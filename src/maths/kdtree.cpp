@@ -47,7 +47,7 @@ std::tuple<int, float, size_t> KdTree::findNearest(const std::vector<float>& poi
 
   const size_t numColumns = centroids.getNumColumns();
 
-  auto calcDistance = [&](uint32_t index) -> float {
+  auto calcDistance = [&](size_t index) -> float {
     float l = 0.0f;
     for (size_t i = 0; i < numColumns; ++i) {
       float v = centroids.columns[i].getValue<float>(index) - point[i];
@@ -120,13 +120,13 @@ std::unique_ptr<KdTreeNode> KdTree::build(std::vector<size_t>& indices, size_t s
     return std::make_unique<KdTreeNode>(indices[0], 1, nullptr, nullptr);
   } else if (indices.size() == 2) {
     if (length == 2) {
-      auto right_node = std::make_unique<KdTreeNode>(indices[mid], 1, nullptr, nullptr, axis);
-      return std::make_unique<KdTreeNode>(indices[start], 2, nullptr, std::move(right_node), axis);
+      auto right_node = std::make_unique<KdTreeNode>(indices[mid], 1, nullptr, nullptr);
+      return std::make_unique<KdTreeNode>(indices[start], 2, nullptr, std::move(right_node));
     }
   }
 
-  const auto left = build(indices, start, mid, depth + 1);
-  const auto right = build(indices, mid + 1, end, depth + 1);
+  auto left = build(indices, start, mid, depth + 1);
+  auto right = build(indices, mid + 1, end, depth + 1);
 
   return std::make_unique<KdTreeNode>(indices[mid], 1 + left->count + right->count, std::move(left), std::move(right));
 }

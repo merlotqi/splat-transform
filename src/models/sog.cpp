@@ -40,8 +40,8 @@ Meta Meta::parseFromJson(const std::vector<uint8_t>& json) {
     meta.version = j["version"].get<int>();
     meta.count = j["count"].get<int>();
 
-    meta.means.mins = j["means"]["mins"].get<std::vector<double>>();
-    meta.means.maxs = j["means"]["maxs"].get<std::vector<double>>();
+    meta.means.mins = j["means"]["mins"].get<std::vector<float>>();
+    meta.means.maxs = j["means"]["maxs"].get<std::vector<float>>();
     meta.means.files = j["means"]["files"].get<std::vector<std::string>>();
 
     meta.scales.codebook = j["scales"]["codebook"].get<std::vector<float>>();

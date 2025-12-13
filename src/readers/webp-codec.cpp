@@ -64,7 +64,7 @@ std::tuple<std::vector<uint8_t>, int, int> decodeRGBA(const std::vector<uint8_t>
   return {resultData, width, height};
 }
 
-std::vector<uint8_t> encodeLosslessRGBA(const std::vector<uint8_t>& rgba, int width, int height, int stride = 0) {
+std::vector<uint8_t> encodeLosslessRGBA(const std::vector<uint8_t>& rgba, int width, int height, int stride) {
   if (stride == 0) {
     stride = width * 4;
   }

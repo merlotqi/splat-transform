@@ -38,9 +38,9 @@ namespace splat {
  * @param k The index (0-based) of the element to select (e.g., k=indices.size()/2 for median).
  * @return The value of the k-th element in the original index array (before partitioning).
  */
-uint32_t quickselect(const std::vector<double>& data, std::vector<uint32_t>& idx, size_t k) {
+uint32_t quickselect(const std::vector<float>& data, std::vector<uint32_t>& idx, size_t k) {
   // Utility functions to handle value access and index swapping
-  auto valAt = [&](size_t p) -> double {
+  auto valAt = [&](size_t p) -> float {
     // idx[p] contains the original index, which is used to look up the actual value in data.
     return data[idx[p]];
   };
@@ -132,7 +132,7 @@ uint32_t quickselect(const std::vector<double>& data, std::vector<uint32_t>& idx
     }
   }
 }
-AABB::AABB(const std::vector<double>& min, const std::vector<double>& max) : min(min), max(max) {}
+AABB::AABB(const std::vector<float>& min, const std::vector<float>& max) : min(min), max(max) {}
 
 /**
  * @brief Calculates the index (0-based) of the largest axis (dimension) of the AABB.
@@ -141,10 +141,10 @@ AABB::AABB(const std::vector<double>& min, const std::vector<double>& max) : min
 int AABB::largestAxis() const {
   const size_t length = min.size();
   if (length == 0) return -1;
-  auto l = -std::numeric_limits<double>::infinity();
+  auto l = -std::numeric_limits<float>::infinity();
   int result = -1;
   for (size_t i = 0; i < length; i++) {
-    const double e = max[i] - min[i];
+    const float e = max[i] - min[i];
     if (e > l) {
       l = e;
       result = static_cast<int>(i);
@@ -157,8 +157,8 @@ int AABB::largestAxis() const {
  * @brief Calculates the length of the AABB along its largest dimension.
  * @return The largest dimension size, or 0 if empty.
  */
-double AABB::largestDim() const {
-  const double a = largestAxis();
+float AABB::largestDim() const {
+  const auto a = largestAxis();
   return max[a] - min[a];
 }
 
@@ -172,11 +172,11 @@ double AABB::largestDim() const {
 AABB& AABB::fromCentroids(const DataTable& centroids, const std::vector<uint32_t>& indices) {
   for (size_t i = 0; i < centroids.getNumColumns(); i++) {
     const auto data = centroids.getColumn(i);
-    double m = std::numeric_limits<double>::infinity();
-    double n = -std::numeric_limits<double>::infinity();
+    float m = std::numeric_limits<float>::infinity();
+    float n = -std::numeric_limits<float>::infinity();
 
     for (auto index : indices) {
-      const double v = data.getValue(index);
+      const float v = data.getValue(index);
       m = std::min(v, m);
       n = std::max(v, n);
     }
@@ -237,7 +237,7 @@ std::unique_ptr<BTreeNode> BTree::recurse(std::vector<uint32_t> indices) {
 
   // Get the data array for the splitting dimension
   // Assumes column data structure is consistent (e.g., floatData for X, Y, Z)
-  const auto& values = centroids.getRawColumnData<double>(col);
+  const auto& values = centroids.getRawColumnData<float>(col);
 
   // Partition the 'indices' vector in place around the median (k = mid)
   // This sorts the indices based on the values in 'values'

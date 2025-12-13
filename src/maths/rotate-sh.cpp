@@ -56,8 +56,8 @@ constexpr auto kSqrt15_16 = 0.9682458365518543;   // sqrt(15/16)
 constexpr auto kSqrt01_18 = 0.2357022603955158;   // sqrt(1/18)
 constexpr auto kSqrt01_60 = 0.1290994448735806;   // sqrt(1/60)
 
-static inline double dp(int n, int start, double* a, double* b) {
-  double sum = 0.0;
+static inline float dp(int n, int start, float* a, float* b) {
+  float sum = 0.0;
   for (int i = 0; i < n; ++i) {
     sum += a[start + i] * b[i];
   }
@@ -65,7 +65,7 @@ static inline double dp(int n, int start, double* a, double* b) {
 }
 
 // rotate spherical harmonic coefficients, up to band 3
-void RotateSH::apply(std::vector<double>& result, std::vector<double> src = {}) {
+void RotateSH::apply(std::vector<float>& result, std::vector<float> src) {
   if (src.empty()) {
     src = result;
   }
@@ -100,8 +100,8 @@ void RotateSH::apply(std::vector<double>& result, std::vector<double> src = {}) 
   result[14] = dp(7, 8, src.data(), sh3[6]);
 }
 
-RotateSH::RotateSH(const Eigen::Matrix3d& mat) {
-  const double* rot = mat.data();
+RotateSH::RotateSH(const Eigen::Matrix3f& mat) {
+  const float* rot = mat.data();
 
   // clang-format off
     // band 1

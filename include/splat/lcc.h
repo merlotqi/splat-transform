@@ -72,7 +72,7 @@ struct ProcessUnitContext {
   std::string dataFile;
   std::string shFile;
   CompressInfo compressInfo;
-  double propertyOffset;
+  float propertyOffset;
   std::map<std::string, std::vector<float>> properties;
   std::vector<float> properties_f_rest;
 };

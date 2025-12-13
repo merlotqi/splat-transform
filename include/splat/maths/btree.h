@@ -33,18 +33,18 @@
 namespace splat {
 
 struct AABB {
-  std::vector<double> min;
-  std::vector<double> max;
+  std::vector<float> min;
+  std::vector<float> max;
 
-  AABB(const std::vector<double>& min, const std::vector<double>& max);
+  AABB(const std::vector<float>& min = {}, const std::vector<float>& max = {});
 
   int largestAxis() const;
-  double largestDim() const;
+  float largestDim() const;
   AABB& fromCentroids(const DataTable& centroids, const std::vector<uint32_t>& indices);
 };
 
 struct BTreeNode {
-  int count;
+  size_t count;
   AABB aabb;
   std::vector<uint32_t> indices;
   std::unique_ptr<BTreeNode> left;
