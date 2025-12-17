@@ -48,7 +48,7 @@ struct PlyHeader {
 
 struct PlyElementData {
   std::string name;
-  const DataTable& dataTable;
+  DataTable dataTable;
 };
 
 struct PlyData {

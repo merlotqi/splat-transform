@@ -137,6 +137,7 @@ static PlyHeader parseHeader(const std::vector<uint8_t>& data) {
       throw std::runtime_error("unrecognized header value '" + keyword + "' in ply header");
     }
   }
+  return header;
 }
 
 PlyData readPly(const std::string& filename) {

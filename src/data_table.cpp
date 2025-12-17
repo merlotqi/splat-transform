@@ -67,6 +67,15 @@ Row DataTable::getRow(size_t index) const {
   return row;
 }
 
+void DataTable::getRow(size_t index, Row& row) const {
+  if (index >= getNumRows()) {
+    throw std::out_of_range("index out of range");
+  }
+  for (const auto& column : columns) {
+    row[column.name] = column.getValue(index);
+  }
+}
+
 void DataTable::setRow(size_t index, const Row& row) {
   if (index >= getNumRows()) {
     throw std::out_of_range("Row index out of bounds in setRow");

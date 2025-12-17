@@ -33,6 +33,7 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
+#include <cmath>
 
 namespace splat {
 
@@ -107,7 +108,7 @@ struct Column {
     if constexpr (std::is_same_v<T, std::string>) {
       return std::visit(
           [index](const auto& vec) -> std::string {
-            using InternalType = typename std::decay_t<decltype(vec)>;
+            using Q = typename std::decay_t<decltype(vec)>::value_type;
             return std::to_string(vec[index]);
           },
           data);
@@ -115,9 +116,9 @@ struct Column {
     } else {
       return std::visit(
           [index](const auto& vec) -> T {
-            using InternalType = typename std::decay_t<decltype(vec)>;
+            using Q = typename std::decay_t<decltype(vec)>::value_type;
             // Compile-time check: Ensure the internal type is convertible to T
-            if constexpr (!std::is_convertible_v<InternalType, T>) {
+            if constexpr (!std::is_convertible_v<Q, T>) {
               throw std::runtime_error("Internal type cannot be safely converted to requested type T.");
             }
             // Note: Range/precision loss checks for the *internal* value (e.g., int32_t to int8_t)
@@ -225,7 +226,7 @@ struct Column {
   size_t bytePreElement() const {
     return std::visit(
         [](const auto& vec) -> size_t {
-          using T = typename std::decay_t<decltype(vec)>;
+          using T = typename std::decay_t<decltype(vec)>::value_type;
           return sizeof(T);
         },
         data);
@@ -250,14 +251,15 @@ class DataTable {
   DataTable() = default;
   DataTable(const std::vector<Column>& columns);
 
-  DataTable(const DataTable& other) = delete;
-  DataTable& operator=(const DataTable& other) = delete;
+  DataTable(const DataTable& other) = default;
+  DataTable& operator=(const DataTable& other) = default;
 
   DataTable(DataTable&& other) = default;
   DataTable& operator=(DataTable&& other) = default;
 
   size_t getNumRows() const;
   Row getRow(size_t index) const;
+  void getRow(size_t index, Row& row) const;
   void setRow(size_t index, const Row& row);
   size_t getNumColumns() const;
 

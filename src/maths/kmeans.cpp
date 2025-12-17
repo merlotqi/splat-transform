@@ -25,13 +25,14 @@
 
 #include <splat/maths/kmeans.h>
 
+#include <iostream>
 #include <numeric>
 #include <random>
 #include <set>
 
 namespace splat {
 
-static void initializeCentroids(const DataTable& dataTable, DataTable& centroids) {
+static void initializeCentroids(const DataTable& dataTable, DataTable& centroids, Row& row) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<size_t> dis(0, dataTable.getNumRows() - 1);
@@ -44,7 +45,7 @@ static void initializeCentroids(const DataTable& dataTable, DataTable& centroids
     } while (chosenRows.count(candidateRow));
 
     chosenRows.insert(candidateRow);
-    Row row = dataTable.getRow(candidateRow);
+    dataTable.getRow(candidateRow, row);
     centroids.setRow(i, row);
   }
 }
@@ -74,8 +75,9 @@ static void calcAverage(const DataTable& dataTable, const std::vector<int>& clus
     row[keys[i]] = 0.f;
   }
 
+  Row dataRow;
   for (size_t i = 0; i < cluster.size(); ++i) {
-    auto dataRow = dataTable.getRow(cluster[i]);
+    dataTable.getRow(cluster[i], dataRow);
 
     for (size_t j = 0; j < keys.size(); ++j) {
       const auto key = keys[i];
@@ -90,18 +92,25 @@ static void calcAverage(const DataTable& dataTable, const std::vector<int>& clus
   }
 }
 
-static void clusterKdTreeCpu(const DataTable& points, DataTable &centroids, std::vector<uint32_t>& labels) {
+static void clusterKdTreeCpu(const DataTable& points, DataTable& centroids, std::vector<uint32_t>& labels) {}
 
+static std::vector<std::vector<int>> groupLabels(const std::vector<uint32_t>& labels, int k) {
+  std::vector<std::vector<int>> groups(k);
+  for (uint32_t i = 0; i < labels.size(); ++i) {
+    groups[labels[i]].push_back(i);
+  }
+  return groups;
 }
 
-std::pair<DataTable, std::vector<int>> kmeans(const DataTable& points, int k, int iterations) {
+std::pair<DataTable, std::vector<uint32_t>> kmeans(const DataTable& points, int k, int iterations) {
   // too few data points
   if (points.getNumRows() < k) {
-    std::vector<int> labels(points.getNumRows(), 0);
+    std::vector<uint32_t> labels(points.getNumRows(), 0);
     std::iota(labels.begin(), labels.end(), 0);
     return {points.clone(), labels};
   }
 
+  Row row;
   DataTable centroids;
   for (auto& c : points.columns) {
     centroids.addColumn({c.name, std::vector<float>(k, 0)});
@@ -110,7 +119,50 @@ std::pair<DataTable, std::vector<int>> kmeans(const DataTable& points, int k, in
   if (points.getNumColumns() == 1) {
     initializeCentroids1D(points, centroids);
   } else {
-    initializeCentroids(points, centroids);
+    initializeCentroids(points, centroids, row);
   }
+
+  const bool gpuClustering = false;  // TODO: implement gpu clustering
+  std::vector<uint32_t> labels(points.getNumRows(), 0);
+
+  bool converged = false;
+  size_t steps = 0;
+
+  std::cout << "Running k-means clustering: dims=" << points.getNumColumns() << " points=" << points.getNumRows()
+            << " clusters=" << k << " iterations=" << iterations << "..." << std::endl;
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<size_t> dis(0, points.getNumRows() - 1);
+  while (!converged) {
+    clusterKdTreeCpu(points, centroids, labels);
+
+    // calculate the new centroid positions
+    auto groups = groupLabels(labels, k);
+    for (size_t i = 0; i < centroids.getNumRows(); ++i) {
+      if (groups[i].size() == 0) {
+        // re-seed this centroid to a random point to avoid zero vector
+        const auto idx = dis(gen);
+        points.getRow(idx, row);
+        centroids.setRow(i, row);
+      } else {
+        calcAverage(points, groups[i], row);
+        centroids.setRow(i, row);
+      }
+    }
+
+    steps++;
+
+    if (steps >= iterations) {
+      converged = true;
+    }
+
+    std::cout << "#" << std::endl;
+  }
+
+  std::cout << u8"done 🎉" << std::endl;
+
+  return {centroids, labels};
 }
+
 }  // namespace splat

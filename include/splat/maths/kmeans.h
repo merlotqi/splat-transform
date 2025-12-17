@@ -29,6 +29,6 @@
 
 namespace splat {
 
-std::pair<DataTable, std::vector<int>> kmeans(const DataTable& points, int k, int iterations);
+std::pair<DataTable, std::vector<uint32_t>> kmeans(const DataTable& points, int k, int iterations);
 
 }  // namespace splat

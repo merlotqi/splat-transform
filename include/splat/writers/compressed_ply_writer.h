@@ -25,8 +25,10 @@
 
 #pragma once
 
-#define SPLAT_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
-#define SPLAT_VERSION_MINOR @PROJECT_VERSION_MINOR@
-#define SPLAT_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#include <splat/data_table.h>
 
-#define SPLAT_VERSION "@PROJECT_VERSION@"
+namespace splat {
+
+void writeCompressedPly(const std::string& filename, DataTable dataTable);
+
+}  // namespace splat

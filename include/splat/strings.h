@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
+#include <vector>
 
 namespace splat {
 namespace strings {

@@ -1,6 +1,9 @@
 #include <gflags/gflags.h>
 #include <splat/splat_version.h>
 
+#include <splat/readers/ply_reader.h>
+#include <splat/writers/sog_writer.h>
+
 #include <iostream>
 
 
@@ -22,12 +25,8 @@ DEFINE_int32(lod_chunk_count, 512, "Approximate number of Gaussians per LOD chun
 DEFINE_double(lod_chunk_extent, 16.0, "Approximate size of an LOD chunk in world units (m). Default: 16");
 
 int main(int argc, char** argv) {
-  gflags::SetVersionString("0.1.0");
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  if (FLAGS_quiet) {
-    std::cout << "Running in quiet mode..." << std::endl;
-  }
+  auto ply = splat::readPly("D:/01code/splat_transform/examples/qiantai.ply");
 
   return 0;
 }
