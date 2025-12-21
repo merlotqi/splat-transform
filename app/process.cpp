@@ -23,11 +23,12 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
-
 #include "process.h"
+
 #include <algorithm>
 #include <cmath>
 #include <set>
+
 
 namespace splat {
 
@@ -47,7 +48,6 @@ static DataTable filter(const DataTable& dataTable, std::function<bool(const Row
 
   return dataTable.permuteRows(indices);
 }
-
 
 DataTable processDataTable(DataTable& dataTable, const std::vector<ProcessAction>& processActions) {
   return DataTable();

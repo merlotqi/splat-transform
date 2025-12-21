@@ -23,19 +23,21 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
+#include <absl/strings/ascii.h>
+#include <absl/strings/match.h>
 #include <splat/maths/kmeans.h>
-#include <splat/strings.h>
+#include <splat/maths/maths.h>
+#include <splat/models/sog.h>
 #include <splat/webp-codec.h>
 #include <splat/writers/sog_writer.h>
 #include <splat/zip_writer.h>
-#include <splat/maths/maths.h>
-#include <splat/models/sog.h>
 
 #include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <numeric>
 #include <optional>
+
 
 namespace fs = std::filesystem;
 
@@ -139,7 +141,7 @@ static std::tuple<DataTable, DataTable> cluster1d(const DataTable& dataTable, in
 
 void writeSog(const std::string& filename, DataTable& dataTable, const std::string& outputFilename,
               const Options& options) {
-  const auto isBundle = strings::endsWith(strings::toLowerCase(filename), ".sog");
+  const auto isBundle = absl::EndsWith(absl::AsciiStrToLower(filename), ".sog");
   std::unique_ptr<ZipWriter> zipWriter = isBundle ? std::make_unique<ZipWriter>(outputFilename) : nullptr;
 
   // generateIndices
@@ -406,8 +408,7 @@ void writeSog(const std::string& filename, DataTable& dataTable, const std::stri
 
   if (zipWriter) {
     zipWriter->writeFile("meta.json", meta.encodeToJson());
-  }
-  else {
+  } else {
     std::ofstream out(fs::path(outputFilename).parent_path() / "meta.json");
     out << meta.encodeToJson();
   }

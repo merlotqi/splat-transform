@@ -23,30 +23,26 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
-#include <splat/splat_version.h>
-
-#include <splat/types.h>
-#include <splat/logger.h>
-#include <splat/readers/ply_reader.h>
-#include <splat/writers/sog_writer.h>
-
-#include <iostream>
-#include <vector>
-#include <string>
-#include <filesystem>
-
 #include <absl/flags/flag.h>
 #include <absl/flags/parse.h>
 #include <absl/flags/usage.h>
-
-#include <absl/strings/str_split.h>
-#include <absl/strings/numbers.h>
-#include <absl/strings/strip.h>
 #include <absl/strings/match.h>
+#include <absl/strings/numbers.h>
+#include <absl/strings/str_split.h>
+#include <absl/strings/strip.h>
+#include <splat/logger.h>
+#include <splat/readers/ply_reader.h>
+#include <splat/splat_version.h>
+#include <splat/types.h>
+#include <splat/writers/sog_writer.h>
 
-#include "process.h"
+#include <filesystem>
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include "gpudevice.h"
-
+#include "process.h"
 
 namespace fs = std::filesystem;
 
@@ -128,7 +124,6 @@ EXAMPLES
     splat-transform -O 0,1,2 -C 1024 -X 32 input.lcc output/lod-meta.json
 )";
 
-
 static std::tuple<std::vector<File>, Options> parseArguments(int argc, char** argv) {
   auto parseNumber = [](absl::string_view value) {
     float result;
@@ -191,7 +186,6 @@ static std::tuple<std::vector<File>, Options> parseArguments(int argc, char** ar
       options.lodSelect.push_back(parseInteger(s));
     }
   }
-
 
   std::vector<File> files;
   for (size_t i = 1; i < remaining_args.size(); ++i) {
@@ -284,13 +278,11 @@ static std::string getOutputFormat(std::string filename) {
 
 static std::vector<DataTable> readFile(const std::string& filename, const Options& options,
                                        const std::vector<Param>& params) {
-
+  return std::vector<DataTable>();
 }
 
-static void writeFile(const std::string& filename, const DataTable& dataTable, DataTable* envDataTable, const Options& options)
-{
-
-}
+static void writeFile(const std::string& filename, const DataTable& dataTable, DataTable* envDataTable,
+                      const Options& options) {}
 
 static bool isGSDataTable(const DataTable& dataTable) {
   static std::vector<std::string> required_columns = {
@@ -303,7 +295,6 @@ static bool isGSDataTable(const DataTable& dataTable) {
 }
 
 static DataTable combine(const std::vector<DataTable>& dataTables) { return DataTable(); }
-
 
 int main(int argc, char** argv) {
   std::chrono::time_point startTime = std::chrono::high_resolution_clock::now();
@@ -382,8 +373,7 @@ int main(int argc, char** argv) {
   }
 
   try {
-
-      std::vector<DataTable> inputDataTables;
+    std::vector<DataTable> inputDataTables;
 
     for (const auto& inputArg : inputArgs) {
       std::vector<Param> params;
@@ -429,8 +419,7 @@ int main(int argc, char** argv) {
 
     writeFile(outputFilename.string(), dataTable, &envDataTable, options);
 
-
-  } catch (const std::exception&e) {
+  } catch (const std::exception& e) {
     LOG_ERROR(e.what());
     std::exit(1);
   }

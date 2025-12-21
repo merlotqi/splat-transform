@@ -31,9 +31,9 @@
 namespace splat {
 namespace webpCodec {
 
-std::tuple<std::vector<uint8_t>, int, int> decodeRGBA(const std::vector<uint8_t> &webp);
+std::tuple<std::vector<uint8_t>, int, int> decodeRGBA(const std::vector<uint8_t>& webp);
 
-std::vector<uint8_t> encodeLosslessRGBA(const std::vector<uint8_t> &rgba, int width, int height, int stride = 0);
+std::vector<uint8_t> encodeLosslessRGBA(const std::vector<uint8_t>& rgba, int width, int height, int stride = 0);
 
 }  // namespace webpCodec
 }  // namespace splat

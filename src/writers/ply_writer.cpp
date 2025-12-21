@@ -86,7 +86,7 @@ void writePly(const std::string& filename, const PlyData& plyData) {
     const auto& columns = table.columns;
     std::vector<const uint8_t*> buffers;
     std::vector<size_t> sizes;
-    for(const auto& column : columns) {
+    for (const auto& column : columns) {
       sizes.push_back(column.bytePreElement());
       buffers.push_back(column.rawPointer());
     }

@@ -25,12 +25,14 @@
 
 #pragma once
 
-#include <string>
-#include <string_view>
+#include <absl/strings/str_format.h>
+
+#include <filesystem>
 #include <iostream>
 #include <mutex>
-#include <filesystem>
-#include <absl/strings/str_format.h>
+#include <string>
+#include <string_view>
+
 
 namespace splat {
 
@@ -64,8 +66,7 @@ class Logger {
   }
 
  public:
-  static Logger& instance()
-  {
+  static Logger& instance() {
     static Logger instance;
     return instance;
   }

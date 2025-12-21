@@ -23,10 +23,11 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
+#include <absl/strings/str_join.h>
 #include <splat/splat_version.h>
-#include <splat/strings.h>
 #include <splat/writers/compressed_chunk.h>
 #include <splat/writers/compressed_ply_writer.h>
+
 
 namespace splat {
 
@@ -119,7 +120,7 @@ void writeCompressedPly(const std::string& filename, DataTable dataTable) {
   headerTexts.emplace_back(shHeader);
   headerTexts.emplace_back("end_header");
 
-  std::string headerText = strings::join(headerTexts, "\n");
+  std::string headerText = absl::StrJoin(headerTexts, "\n");
   std::vector<float> chunkData(numChunks * chunkProps.size(), 0.0f);
   std::vector<uint32_t> splatIData(numChunks * vertexProps.size(), 0);
   std::vector<uint8_t> shData(numSplats * outputSHCoeffs * 3, 0);
@@ -155,7 +156,7 @@ void writeCompressedPly(const std::string& filename, DataTable dataTable) {
     for (size_t j = 0; j < CHUNK_SIZE; j++) {
       chunk.set(j, row);
     }
-    
+
     // pack the chunk
     chunk.pack();
   }

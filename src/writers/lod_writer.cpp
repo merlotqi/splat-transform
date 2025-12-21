@@ -31,9 +31,10 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <nlohmann/json.hpp>
 #include <numeric>
 #include <optional>
-#include <nlohmann/json.hpp>
+
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;

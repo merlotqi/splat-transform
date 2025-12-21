@@ -25,11 +25,10 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
 #include <iostream>
 #include <stdexcept>
-
+#include <string>
+#include <vector>
 
 struct AdapterInfo {
   int index;

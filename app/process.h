@@ -29,7 +29,6 @@
 #include <string>
 #include <variant>
 
-
 namespace splat {
 
 struct Translate {

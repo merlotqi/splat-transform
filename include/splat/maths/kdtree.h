@@ -57,7 +57,8 @@ class KdTree {
     count,
     findNearestMaxIndex = 3
   };
-  std::tuple<int, float, size_t> findNearest(const std::vector<float>& point, std::function<bool(size_t)> filterFunc = nullptr);
+  std::tuple<int, float, size_t> findNearest(const std::vector<float>& point,
+                                             std::function<bool(size_t)> filterFunc = nullptr);
 };
 
 }  // namespace splat

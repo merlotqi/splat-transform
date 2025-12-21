@@ -23,11 +23,12 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
+#include <absl/strings/ascii.h>
+#include <absl/strings/match.h>
 #include <math.h>
 #include <splat/models/sog.h>
 #include <splat/readers/sog_reader.h>
 #include <splat/webp-codec.h>
-#include <splat/strings.h>
 #include <splat/zip_reader.h>
 
 #include <array>
@@ -38,6 +39,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+
 
 namespace splat {
 
@@ -94,8 +96,8 @@ static inline float sigmoidInv(float y) {
 
 DataTable read_sog(std::filesystem::path file, const std::string& sourceName) {
   std::map<std::string, std::vector<uint8_t>> entries;
-  const std::string lowerName = strings::toLowerCase(sourceName);
-  if (strings::endsWith(lowerName, ".sog")) {
+  const std::string lowerName = absl::AsciiStrToLower(sourceName);
+  if (absl::EndsWith(lowerName, ".sog")) {
     ZipReader zr(file.string());
     const auto list = zr.list();
     for (const auto& e : list) {

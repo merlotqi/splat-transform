@@ -26,6 +26,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <algorithm>
 #include <cmath>
 #include <map>
 #include <memory>
@@ -34,7 +35,7 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
-#include <algorithm>
+
 
 namespace splat {
 

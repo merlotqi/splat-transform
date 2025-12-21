@@ -29,7 +29,6 @@
 
 #include <string>
 
-
 namespace splat {
 
 void writePly(const std::string& filename, const PlyData& plyData);
