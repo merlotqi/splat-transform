@@ -24,3 +24,11 @@
  */
 
 #pragma once
+
+#include <splat/data_table.h>
+
+namespace splat {
+
+std::unique_ptr<DataTable> readSpz(const std::string& filename);
+
+} // namespace splat

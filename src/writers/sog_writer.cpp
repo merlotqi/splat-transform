@@ -61,7 +61,7 @@ static const std::array<std::string, 45> shNames = {"f_rest_0",  "f_rest_1",  "f
 
                                                     "f_rest_40", "f_rest_41", "f_rest_42", "f_rest_43", "f_rest_44"};
 
-static std::vector<std::array<float, 2>> calcMinMax(const DataTable& dataTable,
+static std::vector<std::array<float, 2>> calcMinMax(const DataTable* dataTable,
                                                     const std::vector<std::string>& columnNames,
                                                     const std::vector<uint32_t>& indices) {
   const size_t numCols = columnNames.size();
@@ -71,7 +71,7 @@ static std::vector<std::array<float, 2>> calcMinMax(const DataTable& dataTable,
 
   std::vector<const Column*> targetColumns;
   for (const auto& name : columnNames) {
-    targetColumns.push_back(&dataTable.getColumnByName(name));
+    targetColumns.push_back(&dataTable->getColumnByName(name));
   }
 
   for (uint32_t idx : indices) {
@@ -89,23 +89,25 @@ static std::vector<std::array<float, 2>> calcMinMax(const DataTable& dataTable,
 
 static float logTransform(float value) { return std::copysign(1.0f, value) * std::logf(std::abs(value) + 1.0f); }
 
-static std::tuple<DataTable, DataTable> cluster1d(const DataTable& dataTable, int iterations) {
-  const auto numColumns = dataTable.getNumColumns();
-  const auto numRows = dataTable.getNumRows();
+static std::tuple<std::unique_ptr<DataTable>, std::unique_ptr<DataTable>> cluster1d(const DataTable* dataTable,
+                                                                                    int iterations) {
+  const auto numColumns = dataTable->getNumColumns();
+  const auto numRows = dataTable->getNumRows();
 
   // construct 1d points from the columns of data
   std::vector<float> data(numRows * numColumns, 0.f);
   for (size_t i = 0; i < numColumns; ++i) {
-    const auto& colData = dataTable.getColumn(i).as<float>();
+    const auto& colData = dataTable->getColumn(i).asSpan<float>();
     std::copy(colData.begin(), colData.end(), data.begin() + (i * numRows));
   }
 
-  DataTable src({{"data", std::move(data)}});
+    auto src = std::make_unique<DataTable>();
+  src->addColumn({"data", std::move(data)});
 
-  auto [centroids, labels] = kmeans(src, 256, iterations);
+  auto [centroids, labels] = kmeans(src.release(), 256, iterations);
 
   // order centroids smallest to largest
-  std::vector<float> centroidsData = centroids.getColumn(0).as<float>();
+  auto centroidsData = centroids->getColumn(0).asSpan<float>();
   std::vector<size_t> order(centroidsData.size());
   std::iota(order.begin(), order.end(), 0);
   std::sort(order.begin(), order.end(), [&](size_t a, size_t b) { return centroidsData[a] < centroidsData[b]; });
@@ -127,7 +129,7 @@ static std::tuple<DataTable, DataTable> cluster1d(const DataTable& dataTable, in
   }
 
   std::vector<Column> resultColumns;
-  auto names = dataTable.getColumnNames();
+  auto names = dataTable->getColumnNames();
   for (size_t i = 0; i < numColumns; i++) {
     std::vector<uint8_t> colData(numRows);
     for (size_t j = 0; j < numRows; j++) {
@@ -136,18 +138,18 @@ static std::tuple<DataTable, DataTable> cluster1d(const DataTable& dataTable, in
     resultColumns.push_back({names[i], std::move(colData)});
   }
 
-  return {std::move(centroids), DataTable(resultColumns)};
+  return {std::move(centroids), std::make_unique<DataTable>(resultColumns)};
 }
 
-void writeSog(const std::string& filename, DataTable& dataTable, const std::string& outputFilename,
+void writeSog(const std::string& filename, DataTable* dataTable, const std::string& outputFilename,
               const Options& options) {
   const auto isBundle = absl::EndsWith(absl::AsciiStrToLower(filename), ".sog");
   std::unique_ptr<ZipWriter> zipWriter = isBundle ? std::make_unique<ZipWriter>(outputFilename) : nullptr;
 
   // generateIndices
-  std::vector<uint32_t> indices(dataTable.getNumRows());
+  std::vector<uint32_t> indices(dataTable->getNumRows());
   std::iota(indices.begin(), indices.end(), 0);
-  generateOrdering(dataTable, indices);
+  generateOrdering(dataTable, absl::MakeSpan(indices));
 
   const size_t numRows = indices.size();
   const size_t width = ceil(sqrt(numRows) / 4) * 4;
@@ -166,15 +168,15 @@ void writeSog(const std::string& filename, DataTable& dataTable, const std::stri
     }
   };
 
-  auto writeTableData = [&](const std::string& filename, const DataTable& table, size_t w, size_t h) {
+  auto writeTableData = [&](const std::string& filename, const DataTable* table, size_t w, size_t h) {
     std::vector<uint8_t> data(w * h * channels, 0);
-    const size_t numColumns = table.getNumColumns();
+    const size_t numColumns = table->getNumColumns();
     for (size_t i = 0; i < indices.size(); i++) {
       uint32_t idx = indices[i];
-      data[i * channels + 0] = table.getColumn(0).getValue<uint8_t>(idx);
-      data[i * channels + 1] = numColumns > 1 ? table.getColumn(1).getValue<uint8_t>(idx) : 0;
-      data[i * channels + 2] = numColumns > 2 ? table.getColumn(2).getValue<uint8_t>(idx) : 0;
-      data[i * channels + 3] = numColumns > 3 ? table.getColumn(3).getValue<uint8_t>(idx) : 255;
+      data[i * channels + 0] = table->getColumn(0).getValue<uint8_t>(idx);
+      data[i * channels + 1] = numColumns > 1 ? table->getColumn(1).getValue<uint8_t>(idx) : 0;
+      data[i * channels + 2] = numColumns > 2 ? table->getColumn(2).getValue<uint8_t>(idx) : 0;
+      data[i * channels + 3] = numColumns > 3 ? table->getColumn(3).getValue<uint8_t>(idx) : 255;
     }
     writeWebp(filename, data, w, h);
   };
@@ -186,7 +188,7 @@ void writeSog(const std::string& filename, DataTable& dataTable, const std::stri
     auto meansMinMax = calcMinMax(dataTable, meansNames, indices);
     std::vector<int> meansColumnIdxs;
     for (const auto& name : meansNames) {
-      meansColumnIdxs.push_back(dataTable.getColumnIndex(name));
+      meansColumnIdxs.push_back(dataTable->getColumnIndex(name));
     }
     Row row;
 
@@ -200,7 +202,7 @@ void writeSog(const std::string& filename, DataTable& dataTable, const std::stri
         return static_cast<uint16_t>(std::clamp(normalized * 65535.0f, 0.0f, 65535.0f));
       };
 
-      dataTable.getRow(indices[i], row, meansColumnIdxs);
+      dataTable->getRow(indices[i], row, meansColumnIdxs);
       uint16_t x = process(row["x"], 0);
       uint16_t y = process(row["y"], 1);
       uint16_t z = process(row["z"], 2);
@@ -236,13 +238,13 @@ void writeSog(const std::string& filename, DataTable& dataTable, const std::stri
     static std::vector<std::string> quatsNames = {"rot_0", "rot_1", "rot_2", "rot_3"};
     std::vector<int> quatsColumnIdxs;
     for (const auto& name : quatsNames) {
-      quatsColumnIdxs.push_back(dataTable.getColumnIndex(name));
+      quatsColumnIdxs.push_back(dataTable->getColumnIndex(name));
     }
     std::array<float, 4> q = {0.0, 0.0, 0.0, 0.0};
 
     Row row;
     for (size_t i = 0; i < indices.size(); i++) {
-      dataTable.getRow(indices[i], row, quatsColumnIdxs);
+      dataTable->getRow(indices[i], row, quatsColumnIdxs);
       q[0] = row["rot_0"];
       q[1] = row["rot_1"];
       q[2] = row["rot_2"];
@@ -278,26 +280,28 @@ void writeSog(const std::string& filename, DataTable& dataTable, const std::stri
   };
 
   auto writeScales = [&]() {
-    auto&& [centroids, labels] = cluster1d(dataTable.clone({"scale_0, scale_1, scale_2"}), options.iterations);
+    auto&& [centroids, labels] =
+        cluster1d(dataTable->clone({"scale_0, scale_1, scale_2"}).release(), options.iterations);
 
-    writeTableData("scales.webp", labels, width, height);
+    writeTableData("scales.webp", labels.release(), width, height);
 
-    return centroids.getColumn(0).as<float>();
+    return centroids->getColumn(0).asVector<float>();
   };
 
   auto writeColors = [&]() {
-    auto&& [centroids, labels] = cluster1d(dataTable.clone({"f_dc_0", "f_dc_1", "f_dc_2"}), options.iterations);
+    auto&& [centroids, labels] =
+        cluster1d(dataTable->clone({"f_dc_0", "f_dc_1", "f_dc_2"}).release(), options.iterations);
 
     // generate and store sigmoid(opacity) [0..1]
-    const auto& opacity = dataTable.getColumnByName("opacity").as<float>();
+    const auto& opacity = dataTable->getColumnByName("opacity").asSpan<float>();
     std::vector<uint8_t> opacityData(opacity.size());
     for (size_t i = 0; i < numRows; i++) {
       opacityData[i] = std::max(0.0f, std::min(255.0f, sigmoid(opacity[i]) * 255.0f));
     }
-    labels.addColumn({"opacity", std::move(opacityData)});
+    labels->addColumn({"opacity", std::move(opacityData)});
 
-    writeTableData("sh0.webp", labels, width, height);
-    return centroids.getColumn(0).as<float>();
+    writeTableData("sh0.webp", labels.release(), width, height);
+    return centroids->getColumn(0).asVector<float>();
   };
 
   auto writeSH = [&](int shBands) -> Meta::SHN {
@@ -314,22 +318,22 @@ void writeSog(const std::string& filename, DataTable& dataTable, const std::stri
     // lot of duplicate data when it's unneeded (which is currently never). so that
     // means k-means is clustering the full dataset, instead of the rows referenced in
     // indices.
-    auto shDataTable = dataTable.clone(shColumnNames);
+    auto shDataTable = dataTable->clone(shColumnNames);
     int paletteSize =
         std::min(64, static_cast<int>(std::pow(2, std::floor(std::log2(indices.size() / 1024.0f))))) * 1024;
 
-    auto&& [centroids, labels] = kmeans(shDataTable, paletteSize, options.iterations);
+    auto&& [centroids, labels] = kmeans(shDataTable.release(), paletteSize, options.iterations);
 
     // construct a codebook for all spherical harmonic coefficients
-    auto&& codebook = cluster1d(centroids, options.iterations);
+    auto&& codebook = cluster1d(centroids.get(), options.iterations);
 
     // write centroids
-    size_t numRowsCentroids = centroids.getNumRows();
+    size_t numRowsCentroids = centroids->getNumRows();
     size_t ceilRows = static_cast<size_t>(std::ceil(numRowsCentroids / 64.0f));
     std::vector<uint8_t> centroidsBuf(64 * shCoeffs * ceilRows * 4, 0);
     Row centroidsRow;
-    for (size_t i = 0; i < centroids.getNumRows(); i++) {
-      std::get<1>(codebook).getRow(i, centroidsRow);
+    for (size_t i = 0; i < centroids->getNumRows(); i++) {
+      std::get<1>(codebook)->getRow(i, centroidsRow);
       for (size_t j = 0; j < shCoeffs; ++j) {
         uint8_t x = static_cast<uint8_t>(centroidsRow[shColumnNames[shCoeffs * 0 + j]]);
         uint8_t y = static_cast<uint8_t>(centroidsRow[shColumnNames[shCoeffs * 1 + j]]);
@@ -358,14 +362,14 @@ void writeSog(const std::string& filename, DataTable& dataTable, const std::stri
 
     return {paletteSize,
             shBands,
-            std::get<0>(codebook).getColumn(0).as<float>(),
+            std::get<0>(codebook)->getColumn(0).asVector<float>(),
             {"shN_centroids.webp", "shN_labels.webp"}};
   };
 
   // main
   int missingIdx = -1;
   for (int i = 0; i < (int)shNames.size(); ++i) {
-    if (!dataTable.hasColumn(shNames[i])) {
+    if (!dataTable->hasColumn(shNames[i])) {
       missingIdx = i;
       break;
     }

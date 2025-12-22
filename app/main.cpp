@@ -276,25 +276,26 @@ static std::string getOutputFormat(std::string filename) {
   throw std::runtime_error("Unsupported output file type: " + std::string(filename));
 }
 
-static std::vector<DataTable> readFile(const std::string& filename, const Options& options,
+static std::vector<std::unique_ptr<DataTable>> readFile(const std::string& filename, const Options& options,
                                        const std::vector<Param>& params) {
-  return std::vector<DataTable>();
+  std::vector<std::unique_ptr<DataTable>> results;
+  return results;
 }
 
-static void writeFile(const std::string& filename, const DataTable& dataTable, DataTable* envDataTable,
+static void writeFile(const std::string& filename, const DataTable* dataTable, DataTable* envDataTable,
                       const Options& options) {}
 
-static bool isGSDataTable(const DataTable& dataTable) {
+static bool isGSDataTable(const DataTable* dataTable) {
   static std::vector<std::string> required_columns = {
       "x",      "y",      "z",      "rot_0', 'rot_1', 'rot_2', 'rot_3", "scale_0", "scale_1", "scale_2", "f_dc_0",
       "f_dc_1", "f_dc_2", "opacity"};
 
   bool gs = std::all_of(required_columns.begin(), required_columns.end(),
-                        [&](const std::string& c) { return dataTable.hasColumn(c); });
+                        [&](const std::string& c) { return dataTable->hasColumn(c); });
   return gs;
 }
 
-static DataTable combine(const std::vector<DataTable>& dataTables) { return DataTable(); }
+static std::unique_ptr<DataTable> combine(const std::vector<std::unique_ptr<DataTable>>& dataTables) { return nullptr; }
 
 int main(int argc, char** argv) {
   std::chrono::time_point startTime = std::chrono::high_resolution_clock::now();
@@ -333,7 +334,7 @@ int main(int argc, char** argv) {
 
   // invalid args or show help
   if (files.size() < 2 || options.help) {
-    LOG_ERROR(usage);
+    LOG_ERROR(usage.c_str());
     std::exit(1);
   }
 
@@ -347,12 +348,12 @@ int main(int argc, char** argv) {
     std::error_code ec;
     fs::create_directories(outputFilename.parent_path(), ec);
     if (ec) {
-      LOG_ERROR("Failed to create directory: {}", ec.message());
+      LOG_ERROR("Failed to create directory: %s", ec.message());
       std::exit(1);
     }
   } else {
     if (fs::exists(outputFilename)) {
-      LOG_ERROR("File '{}' already exists. Use -w option to overwrite.", outputFilename.string());
+      LOG_ERROR("File '%s' already exists. Use -w option to overwrite.", outputFilename.string());
       std::exit(1);
     }
 
@@ -365,7 +366,7 @@ int main(int argc, char** argv) {
 
       for (const auto& file : filesToCheck) {
         if (fs::exists(file)) {
-          LOG_ERROR("File '{}' already exists. Use -w option to overwrite.", file.string());
+          LOG_ERROR("File '%s' already exists. Use -w option to overwrite.", file.string());
           std::exit(1);
         }
       }
@@ -373,51 +374,52 @@ int main(int argc, char** argv) {
   }
 
   try {
-    std::vector<DataTable> inputDataTables;
+    std::vector<std::unique_ptr<DataTable>> inputDataTables;
 
     for (const auto& inputArg : inputArgs) {
       std::vector<Param> params;
 
-      std::vector<DataTable> dts = readFile(inputArg.filename, options, params);
+      std::vector<std::unique_ptr<DataTable>> dts = readFile(inputArg.filename, options, params);
 
-      for (auto& dt : dts) {
-        if (dt.getNumRows() == 0 || !isGSDataTable(dt)) {
+      for (auto&& dt : dts) {
+        if (dt->getNumRows() == 0 || !isGSDataTable(dt.get())) {
           throw std::runtime_error("Unsupported data in file: " + inputArg.filename);
         }
 
-        dt = processDataTable(dt, inputArg.processActions);
-        inputDataTables.push_back(dt);
+        dt = processDataTable(dt.release(), inputArg.processActions);
+        inputDataTables.emplace_back(dt.release());
       }
     }
 
-    std::vector<DataTable> envDataTables;
-    std::vector<DataTable> nonEnvDataTables;
+    std::vector<std::unique_ptr<DataTable>> envDataTables;
+    std::vector<std::unique_ptr<DataTable>> nonEnvDataTables;
 
     // special-case the environment dataTable
-    for (const auto& dt : inputDataTables) {
-      if (dt.hasColumn("lod") && dt.getColumnByName("lod").every<int>(-1)) envDataTables.push_back(dt);
-      if (!dt.hasColumn("lod") || (dt.hasColumn("lod") && dt.getColumnByName("lod").some<int>(-1)))
-        nonEnvDataTables.push_back(dt);
+    for ( auto&& dt : inputDataTables) {
+      if (dt->hasColumn("lod") && dt->getColumnByName("lod").every<float>(-1.0f)) envDataTables.emplace_back(dt.release());
+      if (!dt->hasColumn("lod") || (dt->hasColumn("lod") && dt->getColumnByName("lod").some<float>(-1.0f)))
+        nonEnvDataTables.emplace_back(dt.release());
     }
 
     // combine inputs into a single output dataTable
-    DataTable dataTable;
+    std::unique_ptr<DataTable> dataTable;
     if (!nonEnvDataTables.empty()) {
-      dataTable = processDataTable(combine(nonEnvDataTables), outputArg.processActions);
+      dataTable.reset(processDataTable(combine(nonEnvDataTables).release(), outputArg.processActions).release());
     }
 
-    if (dataTable.getNumRows() == 0) {
+    if (!dataTable || dataTable->getNumRows() == 0) {
       throw std::runtime_error("No splats to write");
     }
 
-    DataTable envDataTable;
+    std::unique_ptr<DataTable> envDataTable;
     if (!envDataTables.empty()) {
-      envDataTable = processDataTable(combine(envDataTables), outputArg.processActions);
+      envDataTable = processDataTable(combine(envDataTables).release(), outputArg.processActions);
     }
 
-    LOG_INFO("Loaded %d gaussians", dataTable.getNumRows());
+    LOG_INFO("Loaded %d gaussians", dataTable->getNumRows());
 
-    writeFile(outputFilename.string(), dataTable, &envDataTable, options);
+    writeFile(outputFilename.string(), dataTable.release(), envDataTable ? envDataTable.release() : nullptr,
+              options);
 
   } catch (const std::exception& e) {
     LOG_ERROR(e.what());

@@ -25,20 +25,10 @@
 
 #pragma once
 
-#include <math.h>
 #include <splat/data_table.h>
-
-#include <array>
-#include <cstdint>
-#include <filesystem>
-#include <iostream>
-#include <map>
-#include <optional>
-#include <string>
-#include <vector>
 
 namespace splat {
 
-DataTable read_sog(std::filesystem::path file, const std::string& sourceName);
+std::unique_ptr<DataTable> read_sog(const std::string& file, const std::string& sourceName);
 
-}  // namespace splat
+} // namespace splat

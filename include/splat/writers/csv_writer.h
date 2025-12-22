@@ -25,12 +25,12 @@
 
 #pragma once
 
-#include <splat/data_table.h>
-
 #include <string>
 
 namespace splat {
 
-void writeCSV(const std::string& path, const DataTable& dataTable);
+class DataTable;
+
+void writeCSV(const std::string& path, DataTable *dataTable);
 
 }  // namespace splat

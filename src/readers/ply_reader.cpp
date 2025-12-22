@@ -61,6 +61,7 @@ static Column createColumn(const std::string& name, ColumnType type, size_t coun
     case ColumnType::FLOAT64:
       return {name, std::vector<double>(count)};
   }
+  return {};
 }
 
 /**
@@ -140,7 +141,7 @@ static PlyHeader parseHeader(const std::vector<uint8_t>& data) {
   return header;
 }
 
-PlyData readPly(const std::string& filename) {
+std::unique_ptr<PlyData> readPly(const std::string& filename) {
   // open the file for binary input
   std::ifstream file(filename, std::ios::binary | std::ios::in);
   if (!file.is_open()) {
@@ -220,9 +221,13 @@ PlyData readPly(const std::string& filename) {
         }
       }
     }
-    elements.push_back({element.name, DataTable(columns)});
+    elements.push_back({element.name, std::make_unique<DataTable>(columns)});
   }
-  return PlyData{header.comments, elements};
+
+  auto result = std::make_unique<PlyData>();
+  result->comments = std::move(header.comments);
+  result->elements = std::move(elements);
+  return result;
 }
 
 }  // namespace splat

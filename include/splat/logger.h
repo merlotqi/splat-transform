@@ -25,14 +25,14 @@
 
 #pragma once
 
-#include <absl/strings/str_format.h>
-
+#include <cstdarg>
+#include <cstdio>
 #include <filesystem>
 #include <iostream>
 #include <mutex>
 #include <string>
 #include <string_view>
-
+#include <vector>
 
 namespace splat {
 
@@ -47,22 +47,32 @@ class Logger {
 
   Logger() = default;
 
-  template <typename... Args>
-  void log_internal(std::string_view prefix, std::string_view file, int line, std::string_view format, Args&&... args) {
+void log_internal(const char* prefix, const char* file, int line, const char* format, va_list args) {
     if (level == logLevel::silent) return;
 
-    std::lock_guard<std::mutex> lock(log_mutex);
+    va_list args_copy;
+    va_copy(args_copy, args);
+    int len = std::vsnprintf(nullptr, 0, format, args_copy);
+    va_end(args_copy);
 
-    std::string formatted_msg;
-    if constexpr (sizeof...(args) == 0) {
-      formatted_msg = std::string(format);
-    } else {
-      formatted_msg = absl::StrFormat(std::string(format), std::forward<Args>(args)...);
+    if (len < 0) return;
+
+    std::vector<char> buf(len + 1);
+    std::vsnprintf(buf.data(), buf.size(), format, args);
+    std::string formatted_msg(buf.data());
+
+    std::string_view file_sv(file);
+    size_t last_slash = file_sv.find_last_of("/\\");
+    if (last_slash != std::string_view::npos) {
+      file_sv.remove_prefix(last_slash + 1);
     }
 
-    std::filesystem::path file_path(file);
-    std::cout << "[" << prefix << "] " << file_path.filename().string() << ":" << line << " > " << formatted_msg
-              << std::endl;
+    {
+      std::lock_guard<std::mutex> lock(log_mutex);
+      std::printf("[%s] %.*s:%d > %s\n", prefix, static_cast<int>(file_sv.size()), file_sv.data(), line,
+                  formatted_msg.c_str());
+      std::fflush(stdout);
+    }
   }
 
  public:
@@ -76,19 +86,37 @@ class Logger {
 
   void setQuiet(bool quiet) { level = quiet ? logLevel::silent : logLevel::normal; }
 
-  template <typename... Args>
-  void info(const char* file, int line, std::string_view format, Args&&... args) {
-    log_internal("INFO", file, line, format, std::forward<Args>(args)...);
+#if defined(__GNUC__) || defined(__clang__)
+  __attribute__((format(printf, 4, 5)))
+#endif
+  void
+  info(const char* file, int line, const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    log_internal("INFO", file, line, format, args);
+    va_end(args);
   }
 
-  template <typename... Args>
-  void warn(const char* file, int line, std::string_view format, Args&&... args) {
-    log_internal("WARN", file, line, format, std::forward<Args>(args)...);
+#if defined(__GNUC__) || defined(__clang__)
+  __attribute__((format(printf, 4, 5)))
+#endif
+  void
+  warn(const char* file, int line, const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    log_internal("WARN", file, line, format, args);
+    va_end(args);
   }
 
-  template <typename... Args>
-  void error(const char* file, int line, std::string_view format, Args&&... args) {
-    log_internal("ERROR", file, line, format, std::forward<Args>(args)...);
+#if defined(__GNUC__) || defined(__clang__)
+  __attribute__((format(printf, 4, 5)))
+#endif
+  void
+  error(const char* file, int line, const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    log_internal("ERROR", file, line, format, args);
+    va_end(args);
   }
 };
 

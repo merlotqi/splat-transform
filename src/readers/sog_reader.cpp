@@ -94,7 +94,7 @@ static inline float sigmoidInv(float y) {
   return log(e / (1 - e));
 }
 
-DataTable read_sog(std::filesystem::path file, const std::string& sourceName) {
+std::unique_ptr<DataTable> read_sog(std::filesystem::path file, const std::string& sourceName) {
   std::map<std::string, std::vector<uint8_t>> entries;
   const std::string lowerName = absl::AsciiStrToLower(sourceName);
   if (absl::EndsWith(lowerName, ".sog")) {
@@ -312,7 +312,7 @@ DataTable read_sog(std::filesystem::path file, const std::string& sourceName) {
     }
   }
 
-  return DataTable(columns);
+  return std::make_unique<DataTable>(columns);
 }
 
 }  // namespace splat

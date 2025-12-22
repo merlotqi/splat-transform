@@ -32,25 +32,26 @@
 
 namespace splat {
 
-static DataTable filter(const DataTable& dataTable, std::function<bool(const Row&, size_t)> predicate) {
+static std::unique_ptr<DataTable> filter(const DataTable* dataTable,
+                                         std::function<bool(const Row&, size_t)> predicate) {
   std::vector<uint32_t> indices;
-  const size_t numRows = dataTable.getNumRows();
+  const size_t numRows = dataTable->getNumRows();
   indices.reserve(numRows);
 
   size_t index = 0;
   Row row;
-  for (size_t i = 0; i < dataTable.getNumRows(); i++) {
-    dataTable.getRow(i, row);
+  for (size_t i = 0; i < dataTable->getNumRows(); i++) {
+    dataTable->getRow(i, row);
     if (predicate && predicate(row, i)) {
       indices.push_back(static_cast<uint32_t>(i));
     }
   }
 
-  return dataTable.permuteRows(indices);
+  return dataTable->permuteRows(indices);
 }
 
-DataTable processDataTable(DataTable& dataTable, const std::vector<ProcessAction>& processActions) {
-  return DataTable();
+std::unique_ptr<DataTable> processDataTable(DataTable* dataTable, const std::vector<ProcessAction>& processActions) {
+  return nullptr;
 }
 
 }  // namespace splat

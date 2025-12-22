@@ -166,7 +166,7 @@ bool DataTable::removeColumn(const std::string& name) {
   return true;
 }
 
-DataTable DataTable::clone(const std::vector<std::string>& columnNames) const {
+std::unique_ptr<DataTable> DataTable::clone(const std::vector<std::string>& columnNames) const {
   std::vector<Column> cloned_cols;
   if (columnNames.empty()) {
     cloned_cols.reserve(columns.size());
@@ -186,10 +186,10 @@ DataTable DataTable::clone(const std::vector<std::string>& columnNames) const {
       }
     }
   }
-  return DataTable(cloned_cols);
+  return std::make_unique<DataTable>(cloned_cols);
 }
 
-DataTable DataTable::permuteRows(const std::vector<uint32_t>& indices) const {
+std::unique_ptr<DataTable> DataTable::permuteRows(const std::vector<uint32_t>& indices) const {
   std::vector<Column> new_columns;
   new_columns.reserve(columns.size());
   size_t new_length = indices.size();
@@ -215,7 +215,7 @@ DataTable DataTable::permuteRows(const std::vector<uint32_t>& indices) const {
     new_columns.emplace_back(Column{old_col.name, std::move(new_data)});
   }
 
-  return DataTable(std::move(new_columns));
+  return std::make_unique<DataTable>(new_columns);
 }
 
 /**
@@ -263,22 +263,23 @@ uint32_t encodeMorton3(uint32_t x, uint32_t y, uint32_t z) {
  * @param indices A vector of indices (row numbers) to be sorted. MODIFIED IN PLACE.
  * @return The spatially sorted vector of indices (reference to the modified input).
  */
-std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32_t>& indices) {
+void generateOrdering(const DataTable* dataTable, absl::Span<uint32_t> indices) {
+  assert(dataTable);
   if (indices.empty()) {
-    return indices;
+    return;
   }
 
   // Helper to safely retrieve coordinate values using the DataTable interface
   auto getVal = [&](const std::string& name, size_t index) -> float {
-    Column col = dataTable.getColumnByName(name);
+    Column col = dataTable->getColumnByName(name);
     return col.getValue(index);
   };
 
   // Define the recursive function using std::function
   // The indices vector passed to 'generate' represents the current sub-array to be sorted.
-  std::function<void(std::vector<uint32_t>&)> generate;
+  std::function<void(absl::Span<uint32_t>)> generate;
 
-  generate = [&](std::vector<uint32_t>& currentIndices) {
+  generate = [&](absl::Span<uint32_t> currentIndices) {
     if (currentIndices.empty()) {
       return;
     }
@@ -361,7 +362,7 @@ std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32
 
     // 5. Apply the sorting to the 'currentIndices' vector (permute in place)
     // Since we are sorting a vector *in place*, we must copy the source indices first.
-    std::vector<uint32_t> tmpIndices = currentIndices;
+    std::vector<uint32_t> tmpIndices(currentIndices.begin(), currentIndices.end());
     for (size_t i = 0; i < currentIndices.size(); ++i) {
       currentIndices[i] = tmpIndices[order[i]];
     }
@@ -379,14 +380,8 @@ std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32
 
       // If the bucket size is greater than the threshold, recurse
       if (end - start > BUCKET_THRESHOLD) {
-        // Create a sub-vector (C++ equivalent of indices.subarray(start, end))
-        std::vector<uint32_t> sub_indices(currentIndices.begin() + start, currentIndices.begin() + end);
-
         // Recursive call
-        generate(sub_indices);
-
-        // Copy the sorted sub_indices back into the main vector
-        std::copy(sub_indices.begin(), sub_indices.end(), currentIndices.begin() + start);
+        generate(currentIndices.subspan(start, end - start));
       }
 
       start = end;
@@ -395,8 +390,6 @@ std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32
 
   // Initial call to the recursive sorting function
   generate(indices);
-
-  return indices;
 }
 
 // Pre-define SH coefficient column names (f_rest_0 to f_rest_44)
@@ -416,8 +409,10 @@ const std::vector<std::string> shNames = []() {
  * @param s Global uniform scale factor (float).
  * @throws std::runtime_error if dataTable operations fail.
  */
-void transform(DataTable& dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s) {
-  // 1. Pre-calculate global transformation matrices and SH rotation utility
+void transform(DataTable* dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s) {
+  assert(dataTable);
+    
+    // 1. Pre-calculate global transformation matrices and SH rotation utility
 
   // Mat4: Global Transformation Matrix (TRS)
   // Eigen uses Column-Major by default. PlayCanvas's setTRS results in a matrix that,
@@ -432,18 +427,18 @@ void transform(DataTable& dataTable, const Eigen::Vector3f& t, const Eigen::Quat
 
   // 2. Determine which components exist in the DataTable (Optimization)
 
-  const bool hasTranslation = dataTable.hasColumn("x") && dataTable.hasColumn("y") && dataTable.hasColumn("z");
-  const bool hasRotation = dataTable.hasColumn("rot_0") && dataTable.hasColumn("rot_1") &&
-                           dataTable.hasColumn("rot_2") && dataTable.hasColumn("rot_3");
+  const bool hasTranslation = dataTable->hasColumn("x") && dataTable->hasColumn("y") && dataTable->hasColumn("z");
+  const bool hasRotation =    dataTable->hasColumn("rot_0") && dataTable->hasColumn("rot_1") &&
+                              dataTable->hasColumn("rot_2") && dataTable->hasColumn("rot_3");
   const bool hasScale =
-      dataTable.hasColumn("scale_0") && dataTable.hasColumn("scale_1") && dataTable.hasColumn("scale_2");
+      dataTable->hasColumn("scale_0") && dataTable->hasColumn("scale_1") && dataTable->hasColumn("scale_2");
 
   // Determine SH bands and coefficient count
   // The original logic finds the first missing f_rest_i column to infer the band count.
   // Index: 0-8 (9 coeffs, L0+L1), 0-23 (24 coeffs, L0-L2), 0-44 (45 coeffs, L0-L3)
   int missingIndex = -1;
   for (int i = 0; i < 45; ++i) {
-    if (!dataTable.hasColumn(shNames[i])) {
+    if (!dataTable->hasColumn(shNames[i])) {
       missingIndex = i;
       break;
     }
@@ -486,9 +481,10 @@ void transform(DataTable& dataTable, const Eigen::Vector3f& t, const Eigen::Quat
   std::vector<float> shCoeffs(shCoeffsPerChannel);
 
   // 3. Iterate and Transform Rows
-  for (size_t i = 0; i < dataTable.getNumRows(); ++i) {
+  Row row;
+  for (size_t i = 0; i < dataTable->getNumRows(); ++i) {
     // Use a temporary map to hold row data for read/write
-    Row row = dataTable.getRow(i);
+    dataTable->getRow(i, row);
 
     // --- A. Translation (Position) ---
     if (hasTranslation) {
@@ -563,7 +559,7 @@ void transform(DataTable& dataTable, const Eigen::Vector3f& t, const Eigen::Quat
     }
 
     // --- E. Final Update ---
-    dataTable.setRow(i, row);
+    dataTable->setRow(i, row);
   }
 }
 

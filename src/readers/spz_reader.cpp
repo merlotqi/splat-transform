@@ -24,3 +24,9 @@
  */
 
 #include <splat/readers/spz_reader.h>
+
+namespace splat {
+
+std::unique_ptr<DataTable> readSpz(const std::string& filename) { return nullptr; }
+
+}  // namespace splat

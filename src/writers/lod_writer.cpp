@@ -55,7 +55,7 @@ struct MetaLod {
 struct MetaNode {
   Aabb bound;
   std::vector<MetaNode> children;  // optional
-  std::map<int, MetaLod> lods;
+  std::map<float, MetaLod> lods;
 };
 
 struct LodMeta {
@@ -70,19 +70,19 @@ static void boundUnion(Aabb& result, const Aabb& a, const Aabb& b) {
   result.max = a.max.cwiseMax(b.max);
 }
 
-static Aabb calcBound(const DataTable& dataTable, const std::vector<size_t>& indices) {
+static Aabb calcBound(const DataTable* dataTable, const std::vector<uint32_t>& indices) {
   // 1. Get references to columns to avoid massive memory copying
   // Ensure .as<float>() returns a const reference: const std::vector<float>&
-  const auto& x = dataTable.getColumnByName("x").as<float>();
-  const auto& y = dataTable.getColumnByName("y").as<float>();
-  const auto& z = dataTable.getColumnByName("z").as<float>();
-  const auto& rx = dataTable.getColumnByName("rot_1").as<float>();
-  const auto& ry = dataTable.getColumnByName("rot_2").as<float>();
-  const auto& rz = dataTable.getColumnByName("rot_3").as<float>();
-  const auto& rw = dataTable.getColumnByName("rot_0").as<float>();
-  const auto& sx = dataTable.getColumnByName("scale_0").as<float>();
-  const auto& sy = dataTable.getColumnByName("scale_1").as<float>();
-  const auto& sz = dataTable.getColumnByName("scale_2").as<float>();
+  const auto& x =  dataTable->getColumnByName("x").asSpan<float>();
+  const auto& y =  dataTable->getColumnByName("y").asSpan<float>();
+  const auto& z =  dataTable->getColumnByName("z").asSpan<float>();
+  const auto& rx = dataTable->getColumnByName("rot_1").asSpan<float>();
+  const auto& ry = dataTable->getColumnByName("rot_2").asSpan<float>();
+  const auto& rz = dataTable->getColumnByName("rot_3").asSpan<float>();
+  const auto& rw = dataTable->getColumnByName("rot_0").asSpan<float>();
+  const auto& sx = dataTable->getColumnByName("scale_0").asSpan<float>();
+  const auto& sy = dataTable->getColumnByName("scale_1").asSpan<float>();
+  const auto& sz = dataTable->getColumnByName("scale_2").asSpan<float>();
 
   // Initialize overall bounding box with infinity
   Eigen::Vector3f overallMin(std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
@@ -90,7 +90,7 @@ static Aabb calcBound(const DataTable& dataTable, const std::vector<size_t>& ind
   Eigen::Vector3f overallMax(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(),
                              -std::numeric_limits<float>::infinity());
 
-  for (size_t index : indices) {
+  for (uint32_t index : indices) {
     Eigen::Vector3f p(x[index], y[index], z[index]);
 
     Eigen::Quaternionf r(rw[index], rx[index], ry[index], rz[index]);
@@ -125,8 +125,8 @@ static Aabb calcBound(const DataTable& dataTable, const std::vector<size_t>& ind
   return {overallMin, overallMax};
 }
 
-static std::map<int, std::vector<uint32_t>> binIndices(BTreeNode* parent, const std::vector<uint32_t>& lod) {
-  std::map<int, std::vector<uint32_t>> result;
+static std::map<float, std::vector<uint32_t>> binIndices(BTreeNode* parent, absl::Span<const float> lod) {
+  std::map<float, std::vector<uint32_t>> result;
 
   std::function<void(BTreeNode*)> recurse = [&](BTreeNode* node) {
     if (!node->indices.empty()) {
@@ -153,7 +153,7 @@ static std::map<int, std::vector<uint32_t>> binIndices(BTreeNode* parent, const 
   return result;
 }
 
-void writeLod(const std::string& filename, const DataTable& dataTable, DataTable* envDataTable,
+void writeLod(const std::string& filename, const DataTable* dataTable, DataTable* envDataTable,
               const std::string& outputFilename, Options options) {
   fs::path outputDir = fs::path(outputFilename).parent_path();
 
@@ -165,20 +165,20 @@ void writeLod(const std::string& filename, const DataTable& dataTable, DataTable
     fs::path pathname = outputDir / "env" / "meta.json";
     fs::create_directories(pathname.parent_path());
     std::cout << "writing " << pathname.string() << "..." << std::endl;
-    writeSog(pathname.string(), *envDataTable, pathname.string(), options);
+    writeSog(pathname.string(), envDataTable, pathname.string(), options);
   }
 
   // construct a kd-tree based on centroids from all lods
-  auto centroidsTable = dataTable.clone({"x", "y", "z"});
+  auto centroidsTable = dataTable->clone({"x", "y", "z"});
 
-  BTree btree(centroidsTable);
+  BTree btree(centroidsTable.release());
   const size_t binSize = options.lodChunkCount * 1024;
   const int binDim = options.lodChunkExtent;
 
-  std::map<size_t, std::vector<std::vector<std::vector<size_t>>>> lodFiles;
-  auto lodColumn = dataTable.getColumnByName("lod").as<float>();
+  std::map<float, std::vector<std::vector<std::vector<uint32_t>>>> lodFiles;
+  const auto &lodColumn = dataTable->getColumnByName("lod").asSpan<float>();
   std::vector<std::string> filenames;
-  size_t lodLevels = 0;
+  float lodLevels = 0;
 
   std::function<MetaNode(BTreeNode*)> build = [&](BTreeNode* node) -> MetaNode {
     if (node->indices.empty() && (node->count > binSize || node->aabb.largestDim() > binDim)) {
@@ -193,8 +193,7 @@ void writeLod(const std::string& filename, const DataTable& dataTable, DataTable
 
       return mNode;
     }
-
-    std::map<size_t, MetaLod> lods;
+    std::map<float, MetaLod> lods;
     auto bins = binIndices(node, lodColumn);
 
     for (auto& [lodValue, indices] : bins) {
@@ -235,7 +234,7 @@ void writeLod(const std::string& filename, const DataTable& dataTable, DataTable
 
     auto bound = calcBound(dataTable, allIndices);
 
-    return {bound, lods};
+    return {bound, {}, lods};
   };
 
   MetaNode rootMeta = build(btree.root.get());
@@ -287,14 +286,14 @@ void writeLod(const std::string& filename, const DataTable& dataTable, DataTable
       size_t offset = 0;
       for (size_t j = 0; j < fileUnit.size(); j++) {
         std::copy(fileUnit[j].begin(), fileUnit[j].end(), indices.begin() + offset);
-        generateOrdering(dataTable, indices.data() + offset, fileUnit[j].size());
+        generateOrdering(dataTable, absl::Span<uint32_t>(&indices[offset], fileUnit[j].size()));
         offset += fileUnit[j].size();
       }
 
       // construct a new table from the ordered data
-      DataTable unitDataTable = dataTable.permuteRows(indices);
+      auto&& unitDataTable = dataTable->permuteRows(indices);
 
-      writeSog(pathname.string(), unitDataTable, pathname.string(), options);
+      writeSog(pathname.string(), unitDataTable.release(), pathname.string(), options);
     }
   }
 }

@@ -35,7 +35,7 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
-
+#include <absl/types/span.h>
 
 namespace splat {
 
@@ -61,90 +61,56 @@ using TypedArray = std::variant<std::vector<int8_t>,    // Int8Array
                                 std::vector<float>,     // Float32Array
                                 std::vector<double>     // Float64Array
                                 >;
-
-template <typename T>
-constexpr size_t getTypedArrayIndex() {
-  return std::variant<std::vector<int8_t>, std::vector<uint8_t>, std::vector<int16_t>, std::vector<uint16_t>,
-                      std::vector<int32_t>, std::vector<uint32_t>, std::vector<float>, std::vector<double>>(
-             std::in_place_type<std::vector<T>>)
-      .index();
-}
-
 struct Column {
   std::string name;
   TypedArray data;
 
-  ColumnType getType() const {
-    switch (data.index()) {
-      case 0:
-        return ColumnType::INT8;
-      case 1:
-        return ColumnType::UINT8;
-      case 2:
-        return ColumnType::INT16;
-      case 3:
-        return ColumnType::UINT16;
-      case 4:
-        return ColumnType::INT32;
-      case 5:
-        return ColumnType::UINT32;
-      case 6:
-        return ColumnType::FLOAT32;
-      case 7:
-        return ColumnType::FLOAT64;
-      default:
-        throw std::runtime_error("Unknown TypedArray variant index.");
-    }
-  }
+  ColumnType getType() const { return static_cast<ColumnType>(data.index()); }
 
   size_t length() const {
-    return std::visit([](const auto& arg) -> size_t { return arg.size(); }, data);
+    return std::visit([](const auto& vec) -> size_t { return vec.size(); }, data);
   }
 
   template <typename T>
-  const std::vector<T>& as() const {
+  const std::vector<T>& asVector() const {
     return std::get<std::vector<T>>(data);
   }
 
   template <typename T>
-  std::vector<T>& as() {
+  std::vector<T>& asVector() {
     return std::get<std::vector<T>>(data);
+  }
+
+  template <typename T>
+  const absl::Span<const T> asSpan() const {
+    return absl::MakeConstSpan(asVector<T>());
+  }
+
+  template <typename T>
+  absl::Span<T> asSpan() {
+    return absl::MakeSpan(asVector<T>());
   }
 
   template <typename T>
   T getValue(size_t index) const {
-    if (index >= length()) {
-      throw std::out_of_range("Index out of range in getValue.");
-    }
+    if (index >= length()) throw std::out_of_range("Index out of range");
 
-    if constexpr (std::is_same_v<T, std::string>) {
-      return std::visit(
-          [index](const auto& vec) -> std::string {
-            using Q = typename std::decay_t<decltype(vec)>::value_type;
+    return std::visit(
+        [index](const auto& vec) -> T {
+          using Q = typename std::decay_t<decltype(vec)>::value_type;
+          if constexpr (std::is_same_v<T, std::string>) {
             return std::to_string(vec[index]);
-          },
-          data);
-
-    } else {
-      return std::visit(
-          [index](const auto& vec) -> T {
-            using Q = typename std::decay_t<decltype(vec)>::value_type;
-            // Compile-time check: Ensure the internal type is convertible to T
-            if constexpr (!std::is_convertible_v<Q, T>) {
-              throw std::runtime_error("Internal type cannot be safely converted to requested type T.");
-            }
-            // Note: Range/precision loss checks for the *internal* value (e.g., int32_t to int8_t)
-            // are omitted here, as the focus is on the T return type.
+          } else {
             return static_cast<T>(vec[index]);
-          },
-          data);
-    }
+          }
+        },
+        data);
   }
 
   template <typename T>
   void setValue(size_t index, T value) {
     if (index >= length()) {
-      throw std::out_of_range("Column index out of range for setValue.");
+      if (index >= length()) throw std::out_of_range("Index out of range");
     }
 
     auto visitor = [index, value](auto& vec) {
@@ -254,31 +220,24 @@ struct Column {
     return std::visit([](auto& vec) -> uint8_t* { return reinterpret_cast<uint8_t*>(vec.data()); }, data);
   }
 
-  void fillBuffer(float* dest) const {
-    std::visit(
-        [dest](const auto& vec) {
-          for (size_t i = 0; i < vec.size(); i++) {
-            dest[i] = static_cast<float>(vec[i]);
-          }
-        },
-        data);
-  }
-
   template <typename T>
   bool every(T value) const {
     return std::visit(
-        [value](const auto& vec) -> bool {
+        [&](const auto& vec) -> bool {
           using Q = typename std::decay_t<decltype(vec)>::value_type;
-          if constexpr (!std::is_convertible_v<T, Q>) {
-            throw std::runtime_error("Requested type cannot be safely compared to column's internal type.");
+
+          Q target;
+          if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, const char*>) {
+            target = parseString<Q>(value);
+          } else {
+            target = static_cast<Q>(value);
           }
 
-          if constexpr (std::is_floating_point_v<Q> || std::is_floating_point_v<T>) {
-            const auto epsilon = static_cast<Q>(1e-10);
-            return std::all_of(vec.begin(), vec.end(),
-                               [value, epsilon](Q x) { return std::abs(x - static_cast<Q>(value)) < epsilon; });
+          if constexpr (std::is_floating_point_v<Q>) {
+            const Q eps = static_cast<Q>(1e-10);
+            return std::all_of(vec.begin(), vec.end(), [target, eps](Q x) { return std::abs(x - target) < eps; });
           } else {
-            return std::all_of(vec.begin(), vec.end(), [value](Q x) { return x == static_cast<Q>(value); });
+            return std::all_of(vec.begin(), vec.end(), [target](Q x) { return x == target; });
           }
         },
         data);
@@ -287,47 +246,43 @@ struct Column {
   template <typename T>
   bool some(T value) const {
     return std::visit(
-        [value](const auto& vec) -> bool {
+        [&](const auto& vec) -> bool {
           using Q = typename std::decay_t<decltype(vec)>::value_type;
 
-          try {
-            Q converted_value;
-
-            if constexpr (std::is_same_v<Q, int8_t> || std::is_same_v<Q, int16_t> || std::is_same_v<Q, int32_t>) {
-              long long temp = std::stoll(value);
-              if (temp > static_cast<long long>(std::numeric_limits<Q>::max()) ||
-                  temp < static_cast<long long>(std::numeric_limits<Q>::min())) {
-                throw std::range_error("String value out of range");
-              }
-              converted_value = static_cast<Q>(temp);
-            } else if constexpr (std::is_same_v<Q, uint8_t> || std::is_same_v<Q, uint16_t> ||
-                                 std::is_same_v<Q, uint32_t>) {
-              unsigned long long temp = std::stoull(value);
-              if (temp > static_cast<unsigned long long>(std::numeric_limits<Q>::max())) {
-                throw std::range_error("String value out of range");
-              }
-              converted_value = static_cast<Q>(temp);
-            } else if constexpr (std::is_same_v<Q, float>) {
-              converted_value = std::stof(value);
-            } else if constexpr (std::is_same_v<Q, double>) {
-              converted_value = std::stod(value);
-            } else {
-              throw std::runtime_error("Unsupported type for string conversion");
-            }
-
-            if constexpr (std::is_floating_point_v<Q>) {
-              const auto epsilon = static_cast<Q>(1e-10);
-              return std::all_of(vec.begin(), vec.end(),
-                                 [converted_value, epsilon](Q x) { return std::abs(x - converted_value) < epsilon; });
-            } else {
-              return std::all_of(vec.begin(), vec.end(), [converted_value](Q x) { return x == converted_value; });
-            }
-          } catch (const std::exception& e) {
-            throw std::runtime_error(std::string("String conversion failed: ") + e.what());
+          Q target;
+          if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, const char*>) {
+            target = parseString<Q>(value);
+          } else {
+            target = static_cast<Q>(value);
+          }
+          if constexpr (std::is_floating_point_v<Q>) {
+            const Q eps = static_cast<Q>(1e-10);
+            return std::any_of(vec.begin(), vec.end(), [target, eps](Q x) { return std::abs(x - target) < eps; });
+          } else {
+            return std::any_of(vec.begin(), vec.end(), [target](Q x) { return x == target; });
           }
         },
         data);
   }
+
+  template <typename Q, typename T>
+  Q parseString(T value) const {
+    std::string s;
+    if constexpr (std::is_same_v<T, const char*>)
+      s = value;
+    else
+      s = value;
+
+    try {
+      if constexpr (std::is_floating_point_v<Q>) return static_cast<Q>(std::stod(s));
+      if constexpr (std::is_signed_v<Q>) return static_cast<Q>(std::stoll(s));
+      if constexpr (std::is_unsigned_v<Q>) return static_cast<Q>(std::stoull(s));
+    } catch (...) {
+      throw std::runtime_error("Column comparison: String conversion failed");
+    }
+    return Q{};
+  }
+
 };
 
 class DataTable {
@@ -337,10 +292,10 @@ class DataTable {
   DataTable() = default;
   DataTable(const std::vector<Column>& columns);
 
-  DataTable(const DataTable& other) = default;
-  DataTable& operator=(const DataTable& other) = default;
-  DataTable(DataTable&& other) = default;
-  DataTable& operator=(DataTable&& other) = default;
+  DataTable(const DataTable& other) = delete;
+  DataTable& operator=(const DataTable& other) = delete;
+  DataTable(DataTable&& other) noexcept = default;
+  DataTable& operator=(DataTable&& other) noexcept = default;
 
   size_t getNumRows() const;
   Row getRow(size_t index, const std::vector<int>& columnIdx = {}) const;
@@ -360,70 +315,12 @@ class DataTable {
   void addColumn(const Column& column);
   bool removeColumn(const std::string& name);
 
-  DataTable clone(const std::vector<std::string>& columnNames = {}) const;
-  DataTable permuteRows(const std::vector<uint32_t>& indices) const;
-
-  template <typename T>
-  const std::vector<T>& getRawColumnData(const std::string& name) const {
-    const Column& col = getColumnByName(name);
-
-    try {
-      return std::get<std::vector<T>>(col.data);
-    } catch (const std::bad_variant_access&) {
-      throw std::runtime_error(
-          "Column type mismatch for '" + name + "'. Expected type index " +
-          std::to_string(
-              std::variant<std::vector<int8_t>, std::vector<uint8_t>, std::vector<int16_t>, std::vector<uint16_t>,
-                           std::vector<int32_t>, std::vector<uint32_t>, std::vector<float>, std::vector<double>>(
-                  std::in_place_type<std::vector<T>>)
-                  .index()) +
-          ", got index " + std::to_string(col.data.index()));
-    } catch (...) {
-      throw std::runtime_error("Unknown error while getting raw column data for '" + name + "'.");
-    }
-  }
-
-  template <typename T>
-  const std::vector<T>& getRawColumnData(size_t index) const {
-    const Column& col = getColumn(index);
-
-    try {
-      return std::get<std::vector<T>>(col.data);
-    } catch (const std::bad_variant_access&) {
-      throw std::runtime_error(
-          "Column type mismatch for '" + col.name + "'. Expected type index " +
-          std::to_string(
-              std::variant<std::vector<int8_t>, std::vector<uint8_t>, std::vector<int16_t>, std::vector<uint16_t>,
-                           std::vector<int32_t>, std::vector<uint32_t>, std::vector<float>, std::vector<double>>(
-                  std::in_place_type<std::vector<T>>)
-                  .index()) +
-          ", got index " + std::to_string(col.data.index()));
-    } catch (...) {
-      throw std::runtime_error("Unknown error while getting raw column data for '" + col.name + "'.");
-    }
-  }
+  std::unique_ptr<DataTable> clone(const std::vector<std::string>& columnNames = {}) const;
+  std::unique_ptr<DataTable> permuteRows(const std::vector<uint32_t>& indices) const;
 };
 
-std::vector<uint32_t>& generateOrdering(DataTable& dataTable, std::vector<uint32_t>& indices);
+void generateOrdering(const DataTable* dataTable, absl::Span<uint32_t> indices);
 
-void transform(DataTable& dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s);
+void transform(DataTable* dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s);
 
 }  // namespace splat
-
-template const std::vector<int8_t>& splat::DataTable::getRawColumnData<int8_t>(size_t) const;
-template const std::vector<uint8_t>& splat::DataTable::getRawColumnData<uint8_t>(size_t) const;
-template const std::vector<int16_t>& splat::DataTable::getRawColumnData<int16_t>(size_t) const;
-template const std::vector<uint16_t>& splat::DataTable::getRawColumnData<uint16_t>(size_t) const;
-template const std::vector<int32_t>& splat::DataTable::getRawColumnData<int32_t>(size_t) const;
-template const std::vector<uint32_t>& splat::DataTable::getRawColumnData<uint32_t>(size_t) const;
-template const std::vector<float>& splat::DataTable::getRawColumnData<float>(size_t) const;
-template const std::vector<double>& splat::DataTable::getRawColumnData<double>(size_t) const;
-
-template const std::vector<int8_t>& splat::DataTable::getRawColumnData<int8_t>(const std::string&) const;
-template const std::vector<uint8_t>& splat::DataTable::getRawColumnData<uint8_t>(const std::string&) const;
-template const std::vector<int16_t>& splat::DataTable::getRawColumnData<int16_t>(const std::string&) const;
-template const std::vector<uint16_t>& splat::DataTable::getRawColumnData<uint16_t>(const std::string&) const;
-template const std::vector<int32_t>& splat::DataTable::getRawColumnData<int32_t>(const std::string&) const;
-template const std::vector<uint32_t>& splat::DataTable::getRawColumnData<uint32_t>(const std::string&) const;
-template const std::vector<float>& splat::DataTable::getRawColumnData<float>(const std::string&) const;
-template const std::vector<double>& splat::DataTable::getRawColumnData<double>(const std::string&) const;

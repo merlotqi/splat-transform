@@ -30,7 +30,7 @@
 
 namespace splat {
 
-void writeSog(const std::string& filename, DataTable& dataTable, const std::string& outputFilename,
+void writeSog(const std::string& filename, DataTable* dataTable, const std::string& outputFilename,
               const Options& options);
 
 }  // namespace splat

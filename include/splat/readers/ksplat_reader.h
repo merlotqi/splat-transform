@@ -29,6 +29,6 @@
 
 namespace splat {
 
-DataTable readKsplat(const std::string& filename);
+std::unique_ptr<DataTable> readKsplat(const std::string& filename);
 
 }  // namespace splat

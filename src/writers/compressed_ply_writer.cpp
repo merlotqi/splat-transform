@@ -72,9 +72,9 @@ static std::array<std::string, 45> shNames = {"f_rest_0",  "f_rest_1",  "f_rest_
 
 static constexpr auto CHUNK_SIZE = 256ULL;
 
-void writeCompressedPly(const std::string& filename, DataTable dataTable) {
+void writeCompressedPly(const std::string& filename, DataTable *dataTable) {
   auto it =
-      std::find_if(shNames.begin(), shNames.end(), [&](const std::string& name) { return !dataTable.hasColumn(name); });
+      std::find_if(shNames.begin(), shNames.end(), [&](const std::string& name) { return !dataTable->hasColumn(name); });
 
   int missingIdx = (it == shNames.end()) ? -1 : std::distance(shNames.begin(), it);
   int shBands = 0;
@@ -94,7 +94,7 @@ void writeCompressedPly(const std::string& filename, DataTable dataTable) {
   };
   const int outputSHCoeffs = (shBands == 0) ? 0 : (shBands * shBands + 2 * shBands);
 
-  const size_t numSplats = dataTable.getNumRows();
+  const size_t numSplats = dataTable->getNumRows();
   const size_t numChunks = ceil(numSplats / CHUNK_SIZE);
 
   std::string shHeader = {};
@@ -125,11 +125,11 @@ void writeCompressedPly(const std::string& filename, DataTable dataTable) {
   std::vector<uint32_t> splatIData(numChunks * vertexProps.size(), 0);
   std::vector<uint8_t> shData(numSplats * outputSHCoeffs * 3, 0);
   // sort splats into some kind of order (morton order rn)
-  std::vector<uint32_t> sortIndices(dataTable.getNumRows(), 0);
+  std::vector<uint32_t> sortIndices(dataTable->getNumRows(), 0);
   for (size_t i = 0; i < sortIndices.size(); ++i) {
     sortIndices[i] = i;
   }
-  generateOrdering(dataTable, sortIndices);
+  generateOrdering(dataTable, absl::MakeSpan(sortIndices));
 
   Row row;
   CompressedChunk chunk;
@@ -139,7 +139,7 @@ void writeCompressedPly(const std::string& filename, DataTable dataTable) {
       const uint32_t index = sortIndices[i * CHUNK_SIZE + j];
 
       // read splat data
-      dataTable.getRow(index, row);
+      dataTable->getRow(index, row);
 
       // quantize and write sh data
       chunk.set(j, row);

@@ -31,6 +31,6 @@
 
 namespace splat {
 
-DataTable readSplat(const std::string& filename);
+std::unique_ptr<DataTable> readSplat(const std::string& filename);
 
 }  // namespace splat

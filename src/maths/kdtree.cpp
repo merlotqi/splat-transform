@@ -24,20 +24,22 @@
  */
 
 #include <splat/maths/kdtree.h>
+#include <splat/data_table.h>
 
 #include <numeric>
 
 namespace splat {
 
-KdTree::KdTree(const DataTable& table) : centroids(table) {
-  std::vector<size_t> indices(centroids.getNumRows());
+KdTree::KdTree(DataTable *table) : centroids(table) {
+  assert(table);
+  std::vector<size_t> indices(centroids->getNumRows());
   std::iota(indices.begin(), indices.end(), 0);
   this->root = build(indices, 0, indices.size(), 0);
 }
 
 std::tuple<int, float, size_t> KdTree::findNearest(const std::vector<float>& point,
                                                    std::function<bool(size_t)> filterFunc) {
-  if (!root || centroids.getNumColumns() == 0) {
+  if (!root || centroids->getNumColumns() == 0) {
     return {-1, std::numeric_limits<float>::infinity(), 0};
   }
 
@@ -45,12 +47,12 @@ std::tuple<int, float, size_t> KdTree::findNearest(const std::vector<float>& poi
   int mini = -1;
   size_t cnt = 0;
 
-  const size_t numColumns = centroids.getNumColumns();
+  const size_t numColumns = centroids->getNumColumns();
 
   auto calcDistance = [&](size_t index) -> float {
     float l = 0.0f;
     for (size_t i = 0; i < numColumns; ++i) {
-      float v = centroids.columns[i].getValue<float>(index) - point[i];
+      float v = centroids->getColumn(i).getValue<float>(index) - point[i];
       l += v * v;
     }
     return l;
@@ -68,7 +70,7 @@ std::tuple<int, float, size_t> KdTree::findNearest(const std::vector<float>& poi
 
     const size_t axis = depth % numColumns;
 
-    float node_split_value = centroids.columns[axis].getValue<float>(node->index);
+    float node_split_value = centroids->getColumn(axis).getValue<float>(node->index);
     const float distance_on_axis = point[axis] - node_split_value;
 
     auto next = (distance_on_axis > 0) ? node->right.get() : node->left.get();
@@ -106,8 +108,8 @@ std::unique_ptr<KdTreeNode> KdTree::build(std::vector<size_t>& indices, size_t s
     return nullptr;
   }
 
-  const size_t axis = depth % centroids.getNumColumns();
-  const auto values_column = centroids.columns[axis];
+  const size_t axis = depth % centroids->getNumColumns();
+  const auto values_column = centroids->getColumn(axis);
 
   std::sort(indices.begin(), indices.end(), [&values_column](size_t a, size_t b) {
     return values_column.getValue<float>(a) < values_column.getValue<float>(b);

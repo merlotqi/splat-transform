@@ -63,8 +63,8 @@ void writePly(const std::string& filename, const PlyData& plyData) {
     header.emplace_back("comment " + c);
   }
   for (auto&& element : plyData.elements) {
-    header.emplace_back("element " + element.name + std::to_string(element.dataTable.getNumRows()));
-    for (auto&& column : element.dataTable.columns) {
+    header.emplace_back("element " + element.name + std::to_string(element.dataTable->getNumRows()));
+    for (auto&& column : element.dataTable->columns) {
       header.emplace_back("property " + columnTypeToPlyType(column.getType()) + " " + column.name);
     }
   }
@@ -83,7 +83,7 @@ void writePly(const std::string& filename, const PlyData& plyData) {
 
   for (size_t i = 0; i < plyData.elements.size(); ++i) {
     const auto& table = plyData.elements[i].dataTable;
-    const auto& columns = table.columns;
+    const auto& columns = table->columns;
     std::vector<const uint8_t*> buffers;
     std::vector<size_t> sizes;
     for (const auto& column : columns) {
@@ -94,11 +94,11 @@ void writePly(const std::string& filename, const PlyData& plyData) {
 
     // write to file in chunks of 1024 rows
     const size_t chunkSize = 1024;
-    const size_t numChunks = ceil(table.getNumRows() / chunkSize);
+    const size_t numChunks = ceil(table->getNumRows() / chunkSize);
     std::vector<uint8_t> chunkData(chunkSize * rowSize);
 
     for (size_t c = 0; c < numChunks; ++c) {
-      const auto numRows = std::min(chunkSize, table.getNumRows() - c * chunkSize);
+      const auto numRows = std::min(chunkSize, table->getNumRows() - c * chunkSize);
 
       size_t offset = 0;
 

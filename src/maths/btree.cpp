@@ -24,6 +24,7 @@
  */
 
 #include <splat/maths/btree.h>
+#include <splat/data_table.h>
 
 #include <numeric>
 
@@ -38,7 +39,7 @@ namespace splat {
  * @param k The index (0-based) of the element to select (e.g., k=indices.size()/2 for median).
  * @return The value of the k-th element in the original index array (before partitioning).
  */
-uint32_t quickselect(const std::vector<float>& data, std::vector<uint32_t>& idx, size_t k) {
+static uint32_t quickselect(absl::Span<const float> data, std::vector<uint32_t>& idx, size_t k) {
   // Utility functions to handle value access and index swapping
   auto valAt = [&](size_t p) -> float {
     // idx[p] contains the original index, which is used to look up the actual value in data.
@@ -169,9 +170,9 @@ float AABB::largestDim() const {
  * @param indices The indices of the rows to include in the AABB calculation.
  * @return A reference to the updated Aabb object.
  */
-AABB& AABB::fromCentroids(const DataTable& centroids, const std::vector<uint32_t>& indices) {
-  for (size_t i = 0; i < centroids.getNumColumns(); i++) {
-    const auto data = centroids.getColumn(i);
+AABB& AABB::fromCentroids(const DataTable* centroids, const std::vector<uint32_t>& indices) {
+  for (size_t i = 0; i < centroids->getNumColumns(); i++) {
+    const auto data = centroids->getColumn(i);
     float m = std::numeric_limits<float>::infinity();
     float n = -std::numeric_limits<float>::infinity();
 
@@ -189,8 +190,9 @@ AABB& AABB::fromCentroids(const DataTable& centroids, const std::vector<uint32_t
 // Leaf size threshold
 static constexpr size_t LEAF_SIZE_THRESHOLD = 256;
 
-BTree::BTree(const DataTable& centroids) : centroids(centroids) {
-  const size_t numRows = centroids.getNumRows();
+BTree::BTree(DataTable* centroids) : centroids(centroids) {
+  assert(centroids);
+  const size_t numRows = centroids->getNumRows();
 
   // 1. Initialize the index array (0, 1, 2, ..., numRows-1)
   std::vector<uint32_t> indices(numRows);
@@ -237,7 +239,7 @@ std::unique_ptr<BTreeNode> BTree::recurse(std::vector<uint32_t> indices) {
 
   // Get the data array for the splitting dimension
   // Assumes column data structure is consistent (e.g., floatData for X, Y, Z)
-  const auto& values = centroids.getRawColumnData<float>(col);
+  const auto& values = centroids->getColumn(col).asSpan<float>();
 
   // Partition the 'indices' vector in place around the median (k = mid)
   // This sorts the indices based on the values in 'values'

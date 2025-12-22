@@ -77,6 +77,6 @@ struct Lod {
 using ProcessAction =
     std::variant<Translate, Rotate, Scale, FilterNaN, FilterByValue, FilterBands, FilterBox, FilterSphere, Param, Lod>;
 
-DataTable processDataTable(DataTable& dataTable, const std::vector<ProcessAction>& processActions);
+std::unique_ptr<DataTable> processDataTable(DataTable* dataTable, const std::vector<ProcessAction>& processActions);
 
 }  // namespace splat

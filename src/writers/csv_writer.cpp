@@ -25,27 +25,29 @@
 
 #include <absl/strings/str_join.h>
 #include <splat/writers/csv_writer.h>
+#include <splat/data_table.h>
 
 #include <fstream>
 
 
 namespace splat {
 
-void writeCSV(const std::string& path, const DataTable& dataTable) {
-  const size_t len = dataTable.getNumRows();
+void writeCSV(const std::string& path, DataTable *dataTable) {
+  assert(dataTable);
+  const size_t len = dataTable->getNumRows();
 
   // write header
   std::ofstream file;
   file.open(path);
-  file << absl::StrJoin(dataTable.getColumnNames(), ",") << std::endl;
+  file << absl::StrJoin(dataTable->getColumnNames(), ",") << std::endl;
 
   for (size_t i = 0; i < len; ++i) {
     std::string row;
-    for (size_t c = 0; c < dataTable.columns.size(); c++) {
+    for (size_t c = 0; c < dataTable->getNumColumns(); c++) {
       if (c) {
         row += ",";
       }
-      row += dataTable.columns[c].getValue<std::string>(i);
+      row += dataTable->getColumn(c).getValue<std::string>(i);
     }
     file << row << std::endl;
   }

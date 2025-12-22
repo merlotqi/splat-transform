@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <splat/data_table.h>
-
 #include <functional>
 #include <memory>
 
@@ -42,14 +40,16 @@ struct KdTreeNode {
       : index(index), count(count), left(std::move(left)), right(std::move(right)) {}
 };
 
+class DataTable;
+
 class KdTree {
-  const DataTable& centroids;
+  DataTable* centroids;
   std::unique_ptr<KdTreeNode> root;
 
   std::unique_ptr<KdTreeNode> build(std::vector<size_t>& indices, size_t start, size_t end, size_t depth);
 
  public:
-  KdTree(const DataTable& table);
+  KdTree(DataTable* table);
 
   enum {
     index,

@@ -30,7 +30,7 @@
 
 namespace splat {
 
-void writeLod(const std::string& filename, const DataTable& table, DataTable* envDataTable,
+void writeLod(const std::string& filename, const DataTable *table, DataTable* envDataTable,
               const std::string& outputFilename, Options options);
 
 }  // namespace splat

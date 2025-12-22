@@ -31,6 +31,6 @@
 
 namespace splat {
 
-PlyData readPly(const std::string& filename);
+std::unique_ptr<PlyData> readPly(const std::string& filename);
 
 }  // namespace splat

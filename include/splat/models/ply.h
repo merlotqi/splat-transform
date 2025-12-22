@@ -48,7 +48,7 @@ struct PlyHeader {
 
 struct PlyElementData {
   std::string name;
-  DataTable dataTable;
+  std::unique_ptr<DataTable> dataTable;
 };
 
 struct PlyData {

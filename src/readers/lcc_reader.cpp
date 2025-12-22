@@ -24,3 +24,12 @@
  */
 
 #include <splat/readers/lcc_reader.h>
+
+namespace splat {
+
+    std::vector<std::unique_ptr<DataTable>> readLcc(const std::string& filename, const std::string& sourceName,
+                                                const Options options) {
+  return {};
+}
+
+}  // namespace splat
