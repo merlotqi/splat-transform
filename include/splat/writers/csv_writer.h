@@ -31,6 +31,6 @@ namespace splat {
 
 class DataTable;
 
-void writeCSV(const std::string& path, DataTable *dataTable);
+void writeCSV(const std::string& path, DataTable* dataTable);
 
 }  // namespace splat

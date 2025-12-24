@@ -17,6 +17,7 @@ find_package(Eigen3 CONFIG REQUIRED)
 find_package(WebP REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(absl REQUIRED)
+find_package(ZLIB REQUIRED)
 
 include(GenerateExportHeader)
 
@@ -25,7 +26,7 @@ add_library(splat STATIC)
 add_subdirectory(include)
 add_subdirectory(src)
 
-target_link_libraries(splat Eigen3::Eigen ${WebP_LIBRARIES} nlohmann_json::nlohmann_json ${CUDA_RUNTIME_LIBRARY} absl::base)
+target_link_libraries(splat Eigen3::Eigen ${WebP_LIBRARIES} nlohmann_json::nlohmann_json ${CUDA_RUNTIME_LIBRARY} absl::base ZLIB::ZLIB)
 target_include_directories(splat PUBLIC ${WebP_INCLUDE_DIRS})
 if(WIN32)
     target_compile_definitions(splat PUBLIC _USE_MATH_DEFINES)

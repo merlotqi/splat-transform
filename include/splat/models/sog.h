@@ -30,7 +30,6 @@
 #include <string>
 #include <vector>
 
-
 namespace splat {
 
 struct Meta {

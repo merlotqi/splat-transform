@@ -23,10 +23,11 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
-#include <splat/maths/btree.h>
 #include <splat/data_table.h>
+#include <splat/maths/btree.h>
 
 #include <numeric>
+
 
 namespace splat {
 

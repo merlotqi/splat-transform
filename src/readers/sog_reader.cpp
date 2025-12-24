@@ -40,7 +40,6 @@
 #include <string>
 #include <vector>
 
-
 namespace splat {
 
 static std::array<std::vector<uint16_t>, 3> decodeMeans(const std::vector<uint8_t>& lo, const std::vector<uint8_t>& hi,

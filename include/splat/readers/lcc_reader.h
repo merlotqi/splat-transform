@@ -33,4 +33,4 @@ namespace splat {
 std::vector<std::unique_ptr<DataTable>> readLcc(const std::string& filename, const std::string& sourceName,
                                                 const Options options);
 
-} // namespace splat
+}  // namespace splat

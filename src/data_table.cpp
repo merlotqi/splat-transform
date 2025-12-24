@@ -411,8 +411,8 @@ const std::vector<std::string> shNames = []() {
  */
 void transform(DataTable* dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s) {
   assert(dataTable);
-    
-    // 1. Pre-calculate global transformation matrices and SH rotation utility
+
+  // 1. Pre-calculate global transformation matrices and SH rotation utility
 
   // Mat4: Global Transformation Matrix (TRS)
   // Eigen uses Column-Major by default. PlayCanvas's setTRS results in a matrix that,
@@ -428,8 +428,8 @@ void transform(DataTable* dataTable, const Eigen::Vector3f& t, const Eigen::Quat
   // 2. Determine which components exist in the DataTable (Optimization)
 
   const bool hasTranslation = dataTable->hasColumn("x") && dataTable->hasColumn("y") && dataTable->hasColumn("z");
-  const bool hasRotation =    dataTable->hasColumn("rot_0") && dataTable->hasColumn("rot_1") &&
-                              dataTable->hasColumn("rot_2") && dataTable->hasColumn("rot_3");
+  const bool hasRotation = dataTable->hasColumn("rot_0") && dataTable->hasColumn("rot_1") &&
+                           dataTable->hasColumn("rot_2") && dataTable->hasColumn("rot_3");
   const bool hasScale =
       dataTable->hasColumn("scale_0") && dataTable->hasColumn("scale_1") && dataTable->hasColumn("scale_2");
 

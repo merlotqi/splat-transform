@@ -31,4 +31,4 @@ namespace splat {
 
 std::unique_ptr<DataTable> readSpz(const std::string& filename);
 
-} // namespace splat
+}  // namespace splat

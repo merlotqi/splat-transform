@@ -35,7 +35,6 @@
 #include <numeric>
 #include <optional>
 
-
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
@@ -73,9 +72,9 @@ static void boundUnion(Aabb& result, const Aabb& a, const Aabb& b) {
 static Aabb calcBound(const DataTable* dataTable, const std::vector<uint32_t>& indices) {
   // 1. Get references to columns to avoid massive memory copying
   // Ensure .as<float>() returns a const reference: const std::vector<float>&
-  const auto& x =  dataTable->getColumnByName("x").asSpan<float>();
-  const auto& y =  dataTable->getColumnByName("y").asSpan<float>();
-  const auto& z =  dataTable->getColumnByName("z").asSpan<float>();
+  const auto& x = dataTable->getColumnByName("x").asSpan<float>();
+  const auto& y = dataTable->getColumnByName("y").asSpan<float>();
+  const auto& z = dataTable->getColumnByName("z").asSpan<float>();
   const auto& rx = dataTable->getColumnByName("rot_1").asSpan<float>();
   const auto& ry = dataTable->getColumnByName("rot_2").asSpan<float>();
   const auto& rz = dataTable->getColumnByName("rot_3").asSpan<float>();
@@ -176,7 +175,7 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
   const int binDim = options.lodChunkExtent;
 
   std::map<float, std::vector<std::vector<std::vector<uint32_t>>>> lodFiles;
-  const auto &lodColumn = dataTable->getColumnByName("lod").asSpan<float>();
+  const auto& lodColumn = dataTable->getColumnByName("lod").asSpan<float>();
   std::vector<std::string> filenames;
   float lodLevels = 0;
 

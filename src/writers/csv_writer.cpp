@@ -24,15 +24,14 @@
  */
 
 #include <absl/strings/str_join.h>
-#include <splat/writers/csv_writer.h>
 #include <splat/data_table.h>
+#include <splat/writers/csv_writer.h>
 
 #include <fstream>
 
-
 namespace splat {
 
-void writeCSV(const std::string& path, DataTable *dataTable) {
+void writeCSV(const std::string& path, DataTable* dataTable) {
   assert(dataTable);
   const size_t len = dataTable->getNumRows();
 

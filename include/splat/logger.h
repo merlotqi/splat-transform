@@ -47,7 +47,7 @@ class Logger {
 
   Logger() = default;
 
-void log_internal(const char* prefix, const char* file, int line, const char* format, va_list args) {
+  void log_internal(const char* prefix, const char* file, int line, const char* format, va_list args) {
     if (level == logLevel::silent) return;
 
     va_list args_copy;
@@ -89,8 +89,7 @@ void log_internal(const char* prefix, const char* file, int line, const char* fo
 #if defined(__GNUC__) || defined(__clang__)
   __attribute__((format(printf, 4, 5)))
 #endif
-  void
-  info(const char* file, int line, const char* format, ...) {
+  void info(const char* file, int line, const char* format, ...) {
     va_list args;
     va_start(args, format);
     log_internal("INFO", file, line, format, args);
@@ -100,8 +99,7 @@ void log_internal(const char* prefix, const char* file, int line, const char* fo
 #if defined(__GNUC__) || defined(__clang__)
   __attribute__((format(printf, 4, 5)))
 #endif
-  void
-  warn(const char* file, int line, const char* format, ...) {
+  void warn(const char* file, int line, const char* format, ...) {
     va_list args;
     va_start(args, format);
     log_internal("WARN", file, line, format, args);
@@ -111,8 +109,7 @@ void log_internal(const char* prefix, const char* file, int line, const char* fo
 #if defined(__GNUC__) || defined(__clang__)
   __attribute__((format(printf, 4, 5)))
 #endif
-  void
-  error(const char* file, int line, const char* format, ...) {
+  void error(const char* file, int line, const char* format, ...) {
     va_list args;
     va_start(args, format);
     log_internal("ERROR", file, line, format, args);

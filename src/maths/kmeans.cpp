@@ -93,8 +93,7 @@ static void calcAverage(const DataTable* dataTable, const std::vector<int>& clus
   }
 }
 
-static void clusterKdTreeCpu(const DataTable* points, DataTable* centroids, std::vector<uint32_t>& labels) 
-{
+static void clusterKdTreeCpu(const DataTable* points, DataTable* centroids, std::vector<uint32_t>& labels) {
   auto kdTree = std::make_unique<KdTree>(centroids);
 
   std::vector<float> point(points->getNumColumns());
@@ -119,7 +118,7 @@ static std::vector<std::vector<int>> groupLabels(const std::vector<uint32_t>& la
   return groups;
 }
 
-std::pair<std::unique_ptr<DataTable>, std::vector<uint32_t>> kmeans(DataTable *points, int k, int iterations) {
+std::pair<std::unique_ptr<DataTable>, std::vector<uint32_t>> kmeans(DataTable* points, int k, int iterations) {
   // too few data points
   if (points->getNumRows() < k) {
     std::vector<uint32_t> labels(points->getNumRows(), 0);

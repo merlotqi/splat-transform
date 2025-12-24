@@ -31,4 +31,4 @@ namespace splat {
 
 std::unique_ptr<DataTable> read_sog(const std::string& file, const std::string& sourceName);
 
-} // namespace splat
+}  // namespace splat

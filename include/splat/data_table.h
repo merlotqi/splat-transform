@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <Eigen/Dense>
 #include <algorithm>
 #include <cmath>
@@ -35,7 +37,7 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
-#include <absl/types/span.h>
+
 
 namespace splat {
 
@@ -282,7 +284,6 @@ struct Column {
     }
     return Q{};
   }
-
 };
 
 class DataTable {

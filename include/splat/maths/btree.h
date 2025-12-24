@@ -28,7 +28,6 @@
 #include <memory>
 #include <vector>
 
-
 namespace splat {
 
 class DataTable;
@@ -41,7 +40,7 @@ struct AABB {
 
   int largestAxis() const;
   float largestDim() const;
-  AABB& fromCentroids(const DataTable *centroids, const std::vector<uint32_t>& indices);
+  AABB& fromCentroids(const DataTable* centroids, const std::vector<uint32_t>& indices);
 };
 
 struct BTreeNode {

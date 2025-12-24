@@ -23,14 +23,15 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
-#include <splat/maths/kdtree.h>
 #include <splat/data_table.h>
+#include <splat/maths/kdtree.h>
 
 #include <numeric>
 
+
 namespace splat {
 
-KdTree::KdTree(DataTable *table) : centroids(table) {
+KdTree::KdTree(DataTable* table) : centroids(table) {
   assert(table);
   std::vector<size_t> indices(centroids->getNumRows());
   std::iota(indices.begin(), indices.end(), 0);

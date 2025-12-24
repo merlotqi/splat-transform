@@ -38,7 +38,6 @@
 #include <numeric>
 #include <optional>
 
-
 namespace fs = std::filesystem;
 
 namespace splat {
@@ -101,7 +100,7 @@ static std::tuple<std::unique_ptr<DataTable>, std::unique_ptr<DataTable>> cluste
     std::copy(colData.begin(), colData.end(), data.begin() + (i * numRows));
   }
 
-    auto src = std::make_unique<DataTable>();
+  auto src = std::make_unique<DataTable>();
   src->addColumn({"data", std::move(data)});
 
   auto [centroids, labels] = kmeans(src.release(), 256, iterations);

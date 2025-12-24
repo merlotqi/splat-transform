@@ -32,28 +32,28 @@ namespace splat {
 
 // lod data in data.bin
 struct LccLod {
-  int points;     // number of splats
-  size_t offset;  // offset
-  int size;       // data size
+  int32_t points;  // number of splats
+  int64_t offset;  // offset
+  int32_t size;    // data size
 };
 
 // The scene uses a quadtree for spatial partitioning,
 // with each unit having its own xy index (starting from 0) and multiple layers of lod data
 struct LccUnitInfo {
-  int x;                     // x index
-  int y;                     // y index
+  int16_t x;                 // x index
+  int16_t y;                 // y index
   std::vector<LccLod> lods;  // lods
 };
 
 struct CompressInfo {
-  Eigen::Vector3d scaleMin;     // min scale
-  Eigen::Vector3d scaleMax;     // max scale
-  Eigen::Vector3d shMin;        // min sh
-  Eigen::Vector3d shMax;        // max sh
-  Eigen::Vector3d envScaleMin;  // min environment scale
-  Eigen::Vector3d envScaleMax;  // max environment scale
-  Eigen::Vector3d envShMin;     // min environment sh
-  Eigen::Vector3d envShMax;     // max environment sh
+  Eigen::Vector3f scaleMin;     // min scale
+  Eigen::Vector3f scaleMax;     // max scale
+  Eigen::Vector3f shMin;        // min sh
+  Eigen::Vector3f shMax;        // max sh
+  Eigen::Vector3f envScaleMin;  // min environment scale
+  Eigen::Vector3f envScaleMax;  // max environment scale
+  Eigen::Vector3f envShMin;     // min environment sh
+  Eigen::Vector3f envShMax;     // max environment sh
 };
 
 // parameters used to convert LCC data into GSplatData
