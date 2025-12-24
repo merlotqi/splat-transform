@@ -93,11 +93,11 @@ static inline float sigmoidInv(float y) {
   return log(e / (1 - e));
 }
 
-std::unique_ptr<DataTable> read_sog(std::filesystem::path file, const std::string& sourceName) {
+std::unique_ptr<DataTable> readSog(const std::string& file, const std::string& sourceName) {
   std::map<std::string, std::vector<uint8_t>> entries;
   const std::string lowerName = absl::AsciiStrToLower(sourceName);
   if (absl::EndsWith(lowerName, ".sog")) {
-    ZipReader zr(file.string());
+    ZipReader zr(file);
     const auto list = zr.list();
     for (const auto& e : list) {
       entries.insert({e.name, e.readData()});

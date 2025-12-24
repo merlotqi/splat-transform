@@ -25,10 +25,14 @@
 
 #pragma once
 
-#include <splat/data_table.h>
+#include <splat/models/ply.h>
+
+#include <string>
 
 namespace splat {
 
-std::unique_ptr<DataTable> readSog(const std::string& file, const std::string& sourceName);
+bool isCompressedPly(const PlyData* ply);
+
+std::unique_ptr<DataTable> decompressPly(const PlyData* ply);
 
 }  // namespace splat

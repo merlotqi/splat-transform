@@ -33,4 +33,8 @@ namespace splat {
 
 std::unique_ptr<PlyData> readPly(const std::string& filename);
 
+bool isCompressedPly(const PlyData* ply);
+
+std::unique_ptr<DataTable> decompressPly(const PlyData* ply);
+
 }  // namespace splat

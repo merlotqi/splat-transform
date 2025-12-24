@@ -25,10 +25,23 @@
 
 #pragma once
 
+#include <splat/splat_version.h>
+
 #include <splat/data_table.h>
+#include <splat/types.h>
+#include <splat/logger.h>
 
-namespace splat {
+#include <splat/readers/decompress_ply.h>
+#include <splat/readers/ksplat_reader.h>
+#include <splat/readers/lcc_reader.h>
+#include <splat/readers/ply_reader.h>
+#include <splat/readers/sog_reader.h>
+#include <splat/readers/splat_reader.h>
+#include <splat/readers/spz_reader.h>
 
-std::unique_ptr<DataTable> readSog(const std::string& file, const std::string& sourceName);
-
-}  // namespace splat
+#include <splat/writers/compressed_chunk.h>
+#include <splat/writers/compressed_ply_writer.h>
+#include <splat/writers/csv_writer.h>
+#include <splat/writers/lod_writer.h>
+#include <splat/writers/ply_writer.h>
+#include <splat/writers/sog_writer.h>

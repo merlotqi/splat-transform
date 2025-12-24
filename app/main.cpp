@@ -30,19 +30,17 @@
 #include <absl/strings/numbers.h>
 #include <absl/strings/str_split.h>
 #include <absl/strings/strip.h>
-#include <splat/logger.h>
-#include <splat/readers/ply_reader.h>
-#include <splat/splat_version.h>
-#include <splat/types.h>
-#include <splat/writers/sog_writer.h>
+#include <splat/splat.h>
 
 #include <filesystem>
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
 #include "gpudevice.h"
 #include "process.h"
+
 
 namespace fs = std::filesystem;
 
@@ -69,10 +67,10 @@ Transform and Filter Gaussian Splats
 ====================================
 
 USAGE
-  splat-transform [GLOBAL] input [ACTIONS]  ...  output [ACTIONS]
+  SplatTransform [GLOBAL] input [ACTIONS]  ...  output [ACTIONS]
 
-  • Input files become the working set; ACTIONS are applied in order.
-  • The last file is the output; actions after it modify the final result.
+  # Input files become the working set; ACTIONS are applied in order.
+  # The last file is the output; actions after it modify the final result.
 
 SUPPORTED INPUTS
     .ply   .compressed.ply   .sog   meta.json   .ksplat   .splat   .spz   .mjs   .lcc
@@ -89,7 +87,7 @@ ACTIONS (can be repeated, in any order)
     -B, --filter-box       <x,y,z,X,Y,Z>    Remove Gaussians outside box (min, max corners)
     -S, --filter-sphere    <x,y,z,radius>   Remove Gaussians outside sphere (center, radius)
     -V, --filter-value     <name,cmp,value> Keep splats where <name> <cmp> <value>
-                                              cmp ∈ {lt,lte,gt,gte,eq,neq}
+                                              cmp belong {lt,lte,gt,gte,eq,neq}
     -p, --params           <key=val,...>    Pass parameters to .mjs generator script
     -l, --lod              <n>              Specify the level of detail, n >= 0.
 
@@ -109,19 +107,19 @@ GLOBAL OPTIONS
 
 EXAMPLES
     # Scale then translate
-    splat-transform bunny.ply -s 0.5 -t 0,0,10 bunny-scaled.ply
+    SplatTransform bunny.ply -s 0.5 -t 0,0,10 bunny-scaled.ply
 
     # Merge two files with transforms and compress to SOG format
-    splat-transform -w cloudA.ply -r 0,90,0 cloudB.ply -s 2 merged.sog
+    SplatTransform -w cloudA.ply -r 0,90,0 cloudB.ply -s 2 merged.sog
 
     # Generate unbundled HTML viewer with separate CSS, JS and SOG files
-    splat-transform -U bunny.ply bunny-viewer.html
+    SplatTransform -U bunny.ply bunny-viewer.html
 
     # Generate synthetic splats using a generator script
-    splat-transform gen-grid.mjs -p width=500,height=500,scale=0.1 grid.ply
+    SplatTransform gen-grid.mjs -p width=500,height=500,scale=0.1 grid.ply
 
     # Generate LOD with custom chunk size and node split size
-    splat-transform -O 0,1,2 -C 1024 -X 32 input.lcc output/lod-meta.json
+    SplatTransform -O 0,1,2 -C 1024 -X 32 input.lcc output/lod-meta.json
 )";
 
 static std::tuple<std::vector<File>, Options> parseArguments(int argc, char** argv) {
@@ -158,7 +156,7 @@ static std::tuple<std::vector<File>, Options> parseArguments(int argc, char** ar
   };
 
   absl::SetProgramUsageMessage(
-      "Transform and Filter Gaussian Splats\nUSAGE: splat-transform [GLOBAL] input [ACTIONS] ... output [ACTIONS]");
+      "Transform and Filter Gaussian Splats\nUSAGE: SplatTransform [GLOBAL] input [ACTIONS] ... output [ACTIONS]");
 
   std::vector<char*> remaining_args = absl::ParseCommandLine(argc, argv);
 
@@ -253,6 +251,25 @@ static std::tuple<std::vector<File>, Options> parseArguments(int argc, char** ar
   return {files, options};
 }
 
+static std::string getInputFormat(std::string filename) {
+  if (absl::EndsWithIgnoreCase(filename, ".mjs")) {
+    return "mjs";
+  } else if (absl::EndsWithIgnoreCase(filename, ".ksplat")) {
+    return "ksplat";
+  } else if (absl::EndsWithIgnoreCase(filename, ".splat")) {
+    return "splat";
+  } else if (absl::EndsWithIgnoreCase(filename, ".sog") || absl::EndsWithIgnoreCase(filename, "meta.json")) {
+    return "sog";
+  } else if (absl::EndsWithIgnoreCase(filename, ".ply")) {
+    return "ply";
+  } else if (absl::EndsWithIgnoreCase(filename, ".spz")) {
+    return "spz";
+  } else if (absl::EndsWithIgnoreCase(filename, ".lcc")) {
+    return "lcc";
+  }
+  throw std::runtime_error("Unsupported input file type" + filename);
+}
+
 static std::string getOutputFormat(std::string filename) {
   if (absl::EndsWithIgnoreCase(filename, ".csv")) {
     return "csv";
@@ -277,13 +294,86 @@ static std::string getOutputFormat(std::string filename) {
 }
 
 static std::vector<std::unique_ptr<DataTable>> readFile(const std::string& filename, const Options& options,
-                                       const std::vector<Param>& params) {
+                                                        const std::vector<Param>& params) {
+  const auto inputFormat = getInputFormat(filename);
   std::vector<std::unique_ptr<DataTable>> results;
+
+  LOG_INFO("reading %s...", filename);
+  if (inputFormat == "mjs") {
+    //
+  } else {
+    if (inputFormat == "ksplat") {
+      results.emplace_back(readKsplat(filename));
+    } else if (inputFormat == "splat") {
+      results.emplace_back(readSplat(filename));
+    } else if (inputFormat == "sog") {
+      results.emplace_back(readSog(filename, filename));
+    } else if (inputFormat == "ply") {
+      auto ply = readPly(filename);
+      if (isCompressedPly(ply.get())) {
+        results.emplace_back(decompressPly(ply.release()));
+      } else {
+        if (ply->elements.size() != 1 || ply->elements[0].name != "vertex") {
+          throw std::runtime_error("Unsupported data in file " + filename);
+        }
+        results.emplace_back(ply->elements[0].dataTable.release());
+      }
+    } else if (inputFormat == "spz") {
+      results.emplace_back(readSpz(filename));
+    } else if (inputFormat == "lcc") {
+      results = readLcc(filename, filename, options);
+    }
+  }
+
   return results;
 }
 
-static void writeFile(const std::string& filename, const DataTable* dataTable, DataTable* envDataTable,
-                      const Options& options) {}
+static void writeFile(const std::string& filename, DataTable* dataTable, DataTable* envDataTable,
+                      const Options& options) {
+  auto getRandomHex = [](size_t length) -> std::string {
+    static const char* const lut = "0123456789abcdef";
+    std::string res;
+    res.reserve(length);
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution(0, 15);
+    for (size_t i = 0; i < length; ++i) {
+      res += lut[distribution(generator)];
+    }
+    return res;
+  };
+
+  std::string outputFormat = getOutputFormat(filename);
+
+  std::cout << "writing '" << filename << "'..." << std::endl;
+
+  fs::path targetPath(filename);
+  std::string tmpFilename = "." + targetPath.filename().string() + "." + std::to_string(getpid()) + "." +
+                            std::to_string(std::time(nullptr)) + "." + getRandomHex(6) + ".tmp";
+  fs::path tmpPath = targetPath.parent_path() / tmpFilename;
+
+  try {
+    if (outputFormat == "csv") {
+      writeCSV(tmpPath.string(), dataTable);
+    } else if (outputFormat == "sog") {
+      writeSog(tmpPath.string(), dataTable, filename, options);
+    } else if (outputFormat == "lod") {
+      writeLod(tmpPath.string(), dataTable, envDataTable, filename, options);
+    } else if (outputFormat == "compressed-ply") {
+      writeCompressedPly(tmpPath.string(), dataTable);
+    } else if (outputFormat == "ply") {
+      PlyData ply;
+      ply.elements.push_back({"vertex", dataTable->clone()});
+      writePly(tmpPath.string(), ply);
+    } else if (outputFormat == "html") {
+    }
+  } catch (...) {
+    fs::remove(tmpPath);
+    throw;
+  }
+
+  fs::rename(tmpPath, targetPath);
+}
 
 static bool isGSDataTable(const DataTable* dataTable) {
   static std::vector<std::string> required_columns = {
@@ -303,7 +393,7 @@ int main(int argc, char** argv) {
   auto [files, options] = parseArguments(argc, argv);
 
   Logger::instance().setQuiet(options.quiet);
-  LOG_INFO("splat-transform v%s", std::string(SPLAT_VERSION));
+  LOG_INFO("SplatTransform v%s", splat::version);
 
   // show version and exit
   if (options.version) {
@@ -395,8 +485,9 @@ int main(int argc, char** argv) {
     std::vector<std::unique_ptr<DataTable>> nonEnvDataTables;
 
     // special-case the environment dataTable
-    for ( auto&& dt : inputDataTables) {
-      if (dt->hasColumn("lod") && dt->getColumnByName("lod").every<float>(-1.0f)) envDataTables.emplace_back(dt.release());
+    for (auto&& dt : inputDataTables) {
+      if (dt->hasColumn("lod") && dt->getColumnByName("lod").every<float>(-1.0f))
+        envDataTables.emplace_back(dt.release());
       if (!dt->hasColumn("lod") || (dt->hasColumn("lod") && dt->getColumnByName("lod").some<float>(-1.0f)))
         nonEnvDataTables.emplace_back(dt.release());
     }
@@ -418,8 +509,7 @@ int main(int argc, char** argv) {
 
     LOG_INFO("Loaded %d gaussians", dataTable->getNumRows());
 
-    writeFile(outputFilename.string(), dataTable.release(), envDataTable ? envDataTable.release() : nullptr,
-              options);
+    writeFile(outputFilename.string(), dataTable.release(), envDataTable ? envDataTable.release() : nullptr, options);
 
   } catch (const std::exception& e) {
     LOG_ERROR(e.what());
@@ -428,7 +518,7 @@ int main(int argc, char** argv) {
 
   auto endTime = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = endTime - startTime;
-  LOG_INFO("done in {:.6f}s", elapsed.count());
+  LOG_INFO("done in %.6fs", elapsed.count());
 
   std::exit(0);
 }
