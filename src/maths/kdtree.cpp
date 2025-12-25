@@ -110,7 +110,7 @@ std::unique_ptr<KdTreeNode> KdTree::build(std::vector<size_t>& indices, size_t s
   }
 
   const size_t axis = depth % centroids->getNumColumns();
-  const auto values_column = centroids->getColumn(axis);
+  auto&& values_column = centroids->getColumn(axis);
 
   std::sort(indices.begin(), indices.end(), [&values_column](size_t a, size_t b) {
     return values_column.getValue<float>(a) < values_column.getValue<float>(b);

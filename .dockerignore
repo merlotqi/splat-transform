@@ -1,0 +1,29 @@
+build/
+bin/
+lib/
+out/
+dist/
+
+# CUDA
+*.o
+*.out
+*.so
+*.a
+*.a.static
+*.ptx
+*.cubin
+
+node_modules/
+.venv/
+env/
+__pycache__/
+
+# IDE
+.vscode/
+.idea/
+.cmake/
+CMakeUserPresets.json
+
+# Git
+.git
+.gitignore

@@ -223,7 +223,7 @@ static std::tuple<std::vector<File>, Options> parseArguments(int argc, char** ar
         if (parts.size() != 6) throw std::runtime_error("Invalid filter-box");
 
         float defaults[] = {-INFINITY, -INFINITY, -INFINITY, INFINITY, INFINITY, INFINITY};
-        float values[6];
+        float values[6] = {0};
         for (int j = 0; j < 6; ++j) {
           if (parts[j].empty() || parts[j] == "-")
             values[j] = defaults[j];
@@ -299,30 +299,27 @@ static std::vector<std::unique_ptr<DataTable>> readFile(const std::string& filen
   std::vector<std::unique_ptr<DataTable>> results;
 
   LOG_INFO("reading %s...", filename);
-  if (inputFormat == "mjs") {
-    //
-  } else {
-    if (inputFormat == "ksplat") {
-      results.emplace_back(readKsplat(filename));
-    } else if (inputFormat == "splat") {
-      results.emplace_back(readSplat(filename));
-    } else if (inputFormat == "sog") {
-      results.emplace_back(readSog(filename, filename));
-    } else if (inputFormat == "ply") {
-      auto ply = readPly(filename);
-      if (isCompressedPly(ply.get())) {
-        results.emplace_back(decompressPly(ply.release()));
-      } else {
-        if (ply->elements.size() != 1 || ply->elements[0].name != "vertex") {
-          throw std::runtime_error("Unsupported data in file " + filename);
-        }
-        results.emplace_back(ply->elements[0].dataTable.release());
+
+  if (inputFormat == "ksplat") {
+    results.emplace_back(readKsplat(filename));
+  } else if (inputFormat == "splat") {
+    results.emplace_back(readSplat(filename));
+  } else if (inputFormat == "sog") {
+    results.emplace_back(readSog(filename, filename));
+  } else if (inputFormat == "ply") {
+    auto ply = readPly(filename);
+    if (isCompressedPly(ply.get())) {
+      results.emplace_back(decompressPly(ply.release()));
+    } else {
+      if (ply->elements.size() != 1 || ply->elements[0].name != "vertex") {
+        throw std::runtime_error("Unsupported data in file " + filename);
       }
-    } else if (inputFormat == "spz") {
-      results.emplace_back(readSpz(filename));
-    } else if (inputFormat == "lcc") {
-      results = readLcc(filename, filename, options);
+      results.emplace_back(ply->elements[0].dataTable.release());
     }
+  } else if (inputFormat == "spz") {
+    results.emplace_back(readSpz(filename));
+  } else if (inputFormat == "lcc") {
+    results = readLcc(filename, filename, options);
   }
 
   return results;
