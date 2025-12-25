@@ -73,10 +73,10 @@ USAGE
   # The last file is the output; actions after it modify the final result.
 
 SUPPORTED INPUTS
-    .ply   .compressed.ply   .sog   meta.json   .ksplat   .splat   .spz   .mjs   .lcc
+    .ply   .compressed.ply   .sog   meta.json   .ksplat   .splat   .spz    .lcc
 
 SUPPORTED OUTPUTS
-    .ply   .compressed.ply   .sog   meta.json   .csv   .html
+    .ply   .compressed.ply   .sog   meta.json   .csv
 
 ACTIONS (can be repeated, in any order)
     -t, --translate        <x,y,z>          Translate splats by (x, y, z)
@@ -88,7 +88,6 @@ ACTIONS (can be repeated, in any order)
     -S, --filter-sphere    <x,y,z,radius>   Remove Gaussians outside sphere (center, radius)
     -V, --filter-value     <name,cmp,value> Keep splats where <name> <cmp> <value>
                                               cmp belong {lt,lte,gt,gte,eq,neq}
-    -p, --params           <key=val,...>    Pass parameters to .mjs generator script
     -l, --lod              <n>              Specify the level of detail, n >= 0.
 
 GLOBAL OPTIONS
@@ -114,9 +113,6 @@ EXAMPLES
 
     # Generate unbundled HTML viewer with separate CSS, JS and SOG files
     SplatTransform -U bunny.ply bunny-viewer.html
-
-    # Generate synthetic splats using a generator script
-    SplatTransform gen-grid.mjs -p width=500,height=500,scale=0.1 grid.ply
 
     # Generate LOD with custom chunk size and node split size
     SplatTransform -O 0,1,2 -C 1024 -X 32 input.lcc output/lod-meta.json
@@ -252,9 +248,7 @@ static std::tuple<std::vector<File>, Options> parseArguments(int argc, char** ar
 }
 
 static std::string getInputFormat(std::string filename) {
-  if (absl::EndsWithIgnoreCase(filename, ".mjs")) {
-    return "mjs";
-  } else if (absl::EndsWithIgnoreCase(filename, ".ksplat")) {
+  if (absl::EndsWithIgnoreCase(filename, ".ksplat")) {
     return "ksplat";
   } else if (absl::EndsWithIgnoreCase(filename, ".splat")) {
     return "splat";
