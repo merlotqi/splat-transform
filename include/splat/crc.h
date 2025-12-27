@@ -27,6 +27,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <cstddef>
 
 namespace splat {
 
@@ -38,7 +39,7 @@ class Crc {
  public:
   Crc();
   void reset();
-  void update(const uint8_t* data, size_t length);
+  void update(const uint8_t* data, std::size_t length);
   void update(const std::vector<uint8_t>& data);
   uint32_t value() const;
 };
