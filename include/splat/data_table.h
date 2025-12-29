@@ -109,7 +109,7 @@ struct Column {
   }
 
   template <typename T>
-  void setValue(size_t index, const T& value) {
+  void setValue(size_t index, T value) {
     if (index >= length()) {
       if (index >= length()) throw std::out_of_range("Index out of range");
     }
@@ -120,7 +120,7 @@ struct Column {
 
       if constexpr (std::is_same_v<T, std::string>) {
         // Handle string input
-        const std::string& str_value = value;
+        std::string str_value = value;
         try {
           if constexpr (std::is_same_v<Q, int8_t> || std::is_same_v<Q, int16_t> || std::is_same_v<Q, int32_t>) {
             // For signed integers
