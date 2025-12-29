@@ -40,6 +40,8 @@
 #include <string>
 #include <vector>
 
+#include <omp.h>
+
 namespace splat {
 
 static std::array<std::vector<uint16_t>, 3> decodeMeans(const std::vector<uint8_t>& lo, const std::vector<uint8_t>& hi,
@@ -205,6 +207,7 @@ std::unique_ptr<DataTable> readSog(const std::string& file, const std::string& s
   const auto zMin = mins[2];
   const auto zScale = (maxs[2] - mins[2]) || 1;
 
+#pragma omp parallel for
   for (int i = 0; i < count; ++i) {
     const auto lx = xMin + xScale * (xs[i] / 65535.0f);
     const auto ly = yMin + yScale * (ys[i] / 65535.0f);
@@ -220,6 +223,8 @@ std::unique_ptr<DataTable> readSog(const std::string& file, const std::string& s
   if (qw * qh < count) {
     throw std::runtime_error("SOG quats texture too small for count");
   }
+
+#pragma omp parallel for
   for (int i = 0; i < count; ++i) {
     const auto o = i * 4;
     const auto tag = qr[o + 3];
@@ -244,6 +249,8 @@ std::unique_ptr<DataTable> readSog(const std::string& file, const std::string& s
     throw std::runtime_error("SOG scales texture too small for count");
   }
   const auto sCode = meta.scales.codebook;
+
+#pragma omp parallel for
   for (int i = 0; i < count; ++i) {
     const auto o = i * 4;
     scale0Col.setValue<float>(i, sCode[sl[o]]);
@@ -258,6 +265,8 @@ std::unique_ptr<DataTable> readSog(const std::string& file, const std::string& s
     throw std::runtime_error("SOG sh0 texture too small for count");
   }
   const auto cCode = meta.sh0.codebook;
+
+#pragma omp parallel for
   for (int i = 0; i < count; i++) {
     const auto o = i * 4;
     dc0.setValue<float>(i, cCode[c0[o + 0]]);

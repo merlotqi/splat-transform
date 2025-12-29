@@ -31,11 +31,7 @@
 #include <thrust/device_ptr.h>
 #include <thrust/sort.h>
 
-#include <algorithm>
 #include <cmath>
-#include <numeric>
-#include <vector>
-#include <limits>
 
 namespace splat {
 
@@ -147,122 +143,5 @@ void sortMortonOrder(const DataTable* dataTable, absl::Span<uint32_t> indices) {
   cudaFree(d_minB);
   cudaFree(d_maxB);
 }
-
-//
-//struct AABB {
-//  float mx = std::numeric_limits<float>::max(), Mx = std::numeric_limits<float>::lowest();
-//  float my = std::numeric_limits<float>::max(), My = std::numeric_limits<float>::lowest();
-//  float mz = std::numeric_limits<float>::max(), Mz = std::numeric_limits<float>::lowest();
-//
-//  void merge(float x, float y, float z) {
-//    mx = std::min(mx, x);
-//    Mx = std::max(Mx, x);
-//    my = std::min(my, y);
-//    My = std::max(My, y);
-//    mz = std::min(mz, z);
-//    Mz = std::max(Mz, z);
-//  }
-//
-//  void merge(const AABB& other) {
-//    mx = std::min(mx, other.mx);
-//    Mx = std::max(Mx, other.Mx);
-//    my = std::min(my, other.my);
-//    My = std::max(My, other.my);
-//    mz = std::min(mz, other.mz);
-//    Mz = std::max(Mz, other.mz);
-//  }
-//};
-//
-//static uint32_t encodeMorton3(uint32_t x, uint32_t y, uint32_t z) {
-//    auto part1By2 = [](uint32_t n) -> uint32_t {
-//        n &= 0x000003ff;
-//        n = (n ^ (n << 16)) & 0xff0000ff;
-//        n = (n ^ (n << 8))  & 0x0300f00f;
-//        n = (n ^ (n << 4))  & 0x030c30c3;
-//        n = (n ^ (n << 2))  & 0x09249249;
-//        return n;
-//    };
-//
-//    return (part1By2(z) << 2) + (part1By2(y) << 1) + part1By2(x);
-//}
-//
-//static void sortMortonOrderRecursive(const DataTable& dataTable, absl::Span<uint32_t> indices) {
-//  if (indices.size() < 2) return;
-//
-//  const float* px = reinterpret_cast<const float*>(dataTable.getColumnByName("x").rawPointer());
-//  const float* py = reinterpret_cast<const float*>(dataTable.getColumnByName("y").rawPointer());
-//  const float* pz = reinterpret_cast<const float*>(dataTable.getColumnByName("z").rawPointer());
-//
-//  AABB box = tbb::parallel_reduce(
-//      tbb::blocked_range<size_t>(0, indices.size()), AABB(),
-//      [&](const tbb::blocked_range<size_t>& r, AABB b) {
-//        for (size_t i = r.begin(); i < r.end(); ++i) {
-//          uint32_t idx = indices[i];
-//          b.merge(px[idx], py[idx], pz[idx]);
-//        }
-//        return b;
-//      },
-//      [](AABB a, AABB b) {
-//        a.merge(b);
-//        return a;
-//      });
-//
-//  float xlen = box.Mx - box.mx;
-//  float ylen = box.My - box.my;
-//  float zlen = box.Mz - box.mz;
-//
-//  if (!std::isfinite(xlen) || !std::isfinite(ylen) || !std::isfinite(zlen)) return;
-//  if (xlen <= 0 && ylen <= 0 && zlen <= 0) return;
-//
-//  float xmul = (xlen == 0.0f) ? 0.0f : 1023.0f / xlen;
-//  float ymul = (ylen == 0.0f) ? 0.0f : 1023.0f / ylen;
-//  float zmul = (zlen == 0.0f) ? 0.0f : 1023.0f / zlen;
-//
-//  std::vector<uint32_t> mortonCodes(indices.size());
-//  struct SortItem {
-//    uint32_t index;
-//    uint32_t code;
-//  };
-//  std::vector<SortItem> items(indices.size());
-//
-//  tbb::parallel_for(tbb::blocked_range<size_t>(0, indices.size()), [&](const tbb::blocked_range<size_t>& r) {
-//    for (size_t i = r.begin(); i < r.end(); ++i) {
-//      uint32_t ri = indices[i];
-//      uint32_t ix = static_cast<uint32_t>(std::max(0.0f, std::min(1023.0f, (px[ri] - box.mx) * xmul)));
-//      uint32_t iy = static_cast<uint32_t>(std::max(0.0f, std::min(1023.0f, (py[ri] - box.my) * ymul)));
-//      uint32_t iz = static_cast<uint32_t>(std::max(0.0f, std::min(1023.0f, (pz[ri] - box.mz) * zmul)));
-//
-//      uint32_t code = encodeMorton3(ix, iy, iz);
-//      items[i] = {ri, code};
-//    }
-//  });
-//
-//  tbb::parallel_sort(items.begin(), items.end(), [](const SortItem& a, const SortItem& b) { return a.code < b.code; });
-//
-//  tbb::parallel_for(tbb::blocked_range<size_t>(0, indices.size()), [&](const tbb::blocked_range<size_t>& r) {
-//    for (size_t i = r.begin(); i < r.end(); ++i) {
-//      indices[i] = items[i].index;
-//    }
-//  });
-//
-//  size_t start = 0;
-//  while (start < indices.size()) {
-//    size_t end = start + 1;
-//    while (end < indices.size() && items[end].code == items[start].code) {
-//      ++end;
-//    }
-//
-//    if (end - start > 256) {
-//      sortMortonOrderRecursive(dataTable, indices.subspan(start, end - start));
-//    }
-//    start = end;
-//  }
-//}
-//
-//void sortMortonOrder(const DataTable* dataTable, absl::Span<uint32_t> indices) {
-//    if (dataTable) {
-//        sortMortonOrderRecursive(*dataTable, indices);
-//    }
-//}
 
 }  // namespace splat

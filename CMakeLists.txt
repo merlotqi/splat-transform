@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10...3.26)
+set(CMAKE_CUDA_ARCHITECTURES "75;80;89" CACHE STRING "CUDA architectures")
+
 project(splat-transform 
     VERSION 0.1.0 
     LANGUAGES CXX CUDA
@@ -11,10 +13,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_EXTENSIONS OFF)
-set(CUDA_ARCHITECTURES "75;80;89" CACHE STRING "CUDA architectures")
+
+find_package(OpenMP REQUIRED)
 
 if(UNIX)
-find_package(PkgConfig REQUIRED)
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(WEBP REQUIRED libwebp)
 pkg_check_modules(ABSL REQUIRED absl_base absl_strings absl_any absl_hash)
@@ -28,6 +31,7 @@ set(ALL_DEPS_LIBS
         ${WEBP_LIBRARIES} 
         ${ZLIB_LIBRARIES} 
         ${ABSL_LIBRARIES}
+        OpenMP::OpenMP_CXX
     )
 set(ALL_DEPS_INCS 
         ${EIGEN3_INCLUDE_DIRS} 
@@ -45,7 +49,6 @@ find_package(Eigen3 CONFIG REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(absl REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(TBB CONFIG REQUIRED)
 set(ALL_DEPS_LIBS 
         Eigen3::Eigen 
         nlohmann_json::nlohmann_json 
@@ -53,7 +56,7 @@ set(ALL_DEPS_LIBS
         ZLIB::ZLIB 
         absl::base 
         absl::strings
-        TBB::tbb
+        OpenMP::OpenMP_CXX
         CUDA::cudart
     )
     set(ALL_DEPS_INCS "")
@@ -62,11 +65,10 @@ endif()
 
 include(GenerateExportHeader)
 
-add_library(splat STATIC)
-set_target_properties(splat PROPERTIES
-    CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES}
-)
+add_library(splat STATIC "")
+
 add_library(SPLAT::splat ALIAS splat)
+
 add_subdirectory(include)
 add_subdirectory(src)
 

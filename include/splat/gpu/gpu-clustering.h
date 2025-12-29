@@ -25,13 +25,10 @@
 
 #pragma once
 
-#include <algorithm>
-#include <stdexcept>
-#include <vector>
+#include <splat/data_table.h>
 
 namespace splat {
 
-void gpu_cluster_3d_execute(const std::vector<float>& h_points, const std::vector<float>& h_centroids,
-                            std::vector<uint32_t>& h_labels);
+void gpu_cluster_3d_execute(DataTable* points, const DataTable* centroids, std::vector<uint32_t>& labels);
 
 }  // namespace splat

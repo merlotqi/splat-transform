@@ -23,199 +23,114 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
-#include <iostream>
-#include <splat/gpu/gpu-clustering.cuh>
-#include <cfloat>
 #include <cuda_runtime.h>
+#include <splat/gpu/gpu-clustering.h>
+
+#include <cfloat>
 
 namespace splat {
 
-#define WORKGROUP_SIZE 64
-#define WORKGROUPS_PER_BATCH 1024
-#define BATCH_SIZE (WORKGROUPS_PER_BATCH * WORKGROUP_SIZE)
-#define CHUNK_SIZE 128
+__global__ void cluster_kernel(const float* __restrict__ points, const float* __restrict__ centroids,
+                               unsigned int* __restrict__ results, int numPoints, int numCentroids, int numColumns) {
+  extern __shared__ float sharedCentroids[];
 
-#define CUDA_CHECK(call)                                                                                             \
-  do {                                                                                                               \
-    cudaError_t err = call;                                                                                          \
-    if (err != cudaSuccess) {                                                                                        \
-      std::cerr << "CUDA error at " << __FILE__ << ":" << __LINE__ << " - " << cudaGetErrorString(err) << std::endl; \
-      exit(EXIT_FAILURE);                                                                                            \
-    }                                                                                                                \
-  } while (0)
+  int pointIdx = blockIdx.x * blockDim.x + threadIdx.x;
+  int localIdx = threadIdx.x;
+  const int chunkSize = blockDim.x;
 
-struct Uniforms {
-  uint32_t num_points;
-  uint32_t num_centroids;
-  uint32_t num_columns;
-};
+  float minDistanceSqr = FLT_MAX;
+  unsigned int bestCentroid = 0;
 
-uint32_t round_up(uint32_t value, uint32_t multiple) { return ((value + multiple - 1) / multiple) * multiple; }
-
-__global__ void cluster_kernel_flat_column_major(const float* points, const float* centroids, uint32_t* results,
-                                                 const Uniforms uniforms) {
-  extern __shared__ float shared_chunk[];
-
-  const uint32_t local_id = threadIdx.x;
-  const uint32_t global_id = blockIdx.x * blockDim.x + threadIdx.x;
-  const uint32_t num_columns = uniforms.num_columns;
-  const uint32_t num_points = uniforms.num_points;
-  const uint32_t num_centroids = uniforms.num_centroids;
-
-  float point[10];
-  if (global_id < num_points) {
-    for (uint32_t col = 0; col < num_columns; col++) {
-      point[col] = points[col * num_points + global_id];
+  float currentPoint[64];
+  if (pointIdx < numPoints) {
+    for (int i = 0; i < numColumns; i++) {
+      currentPoint[i] = points[pointIdx * numColumns + i];
     }
   }
 
-  float mind = FLT_MAX;
-  uint32_t mini = 0;
-
-  uint32_t num_chunks = (num_centroids + CHUNK_SIZE - 1) / CHUNK_SIZE;
-
-  for (uint32_t chunk_idx = 0; chunk_idx < num_chunks; chunk_idx++) {
-    uint32_t rows_per_thread = CHUNK_SIZE / WORKGROUP_SIZE;
-    uint32_t chunk_start_row = chunk_idx * CHUNK_SIZE;
-
-    uint32_t src_start_row = chunk_start_row + local_id * rows_per_thread;
-    uint32_t num_rows_to_copy = min(rows_per_thread, num_centroids - src_start_row);
-
-    if (num_rows_to_copy > 0) {
-      uint32_t dst_offset = local_id * rows_per_thread * num_columns;
-
-      for (uint32_t row = 0; row < num_rows_to_copy; row++) {
-        uint32_t src_row = src_start_row + row;
-        uint32_t dst_row_offset = dst_offset + row * num_columns;
-
-        for (uint32_t col = 0; col < num_columns; col++) {
-          shared_chunk[dst_row_offset + col] = centroids[col * num_centroids + src_row];
-        }
+  int numChunks = (numCentroids + chunkSize - 1) / chunkSize;
+  for (int i = 0; i < numChunks; i++) {
+    int centroidToLoad = i * chunkSize + localIdx;
+    if (centroidToLoad < numCentroids) {
+      for (int d = 0; d < numColumns; d++) {
+        sharedCentroids[localIdx * numColumns + d] = centroids[centroidToLoad * numColumns + d];
       }
     }
-
     __syncthreads();
 
-    if (global_id < num_points) {
-      uint32_t chunk_size = min(CHUNK_SIZE, num_centroids - chunk_start_row);
-
-      for (uint32_t c = 0; c < chunk_size; c++) {
-        float distance_sq = 0.0f;
-        uint32_t centroid_offset = c * num_columns;
-
-        for (uint32_t col = 0; col < num_columns; col++) {
-          float diff = point[col] - shared_chunk[centroid_offset + col];
-          distance_sq += diff * diff;
+    if (pointIdx < numPoints) {
+      int currentChunkSize = min(chunkSize, numCentroids - i * chunkSize);
+      for (int c = 0; c < currentChunkSize; c++) {
+        float distSqr = 0.0f;
+        for (int d = 0; d < numColumns; d++) {
+          float diff = currentPoint[d] - sharedCentroids[c * numColumns + d];
+          distSqr += diff * diff;
         }
-
-        if (distance_sq < mind) {
-          mind = distance_sq;
-          mini = chunk_start_row + c;
+        if (distSqr < minDistanceSqr) {
+          minDistanceSqr = distSqr;
+          bestCentroid = i * chunkSize + c;
         }
       }
     }
-
     __syncthreads();
   }
 
-  if (global_id < num_points) {
-    results[global_id] = mini;
+  if (pointIdx < numPoints) {
+    results[pointIdx] = bestCentroid;
   }
 }
 
-void gpu_cluster_3d_execute(const std::vector<float>& h_points_flat, const std::vector<float>& h_centroids_flat,
-                            std::vector<uint32_t>& h_labels) {
-  if (h_points_flat.empty() || h_centroids_flat.empty()) {
-    std::cerr << "Error: Input arrays cannot be empty" << std::endl;
-    return;
-  }
+void gpu_cluster_3d_execute(DataTable* points, const DataTable* centroids, std::vector<uint32_t>& labels) {
+  if (!points || !centroids) return;
 
-  const uint32_t num_points = static_cast<uint32_t>(h_labels.size());
-  const uint32_t num_columns = 3;
+  const int numPoints = static_cast<int>(points->getNumRows());
+  const int numCentroids = static_cast<int>(centroids->getNumRows());
+  const int numColumns = static_cast<int>(points->getNumColumns());
 
-  if (h_points_flat.size() != num_points * num_columns) {
-    std::cerr << "Error: Points array size mismatch. Expected " << num_points * num_columns << " got "
-              << h_points_flat.size() << std::endl;
-    return;
-  }
-
-  const uint32_t num_centroids = static_cast<uint32_t>(h_centroids_flat.size()) / num_columns;
-
-  if (h_centroids_flat.size() % num_columns != 0) {
-    std::cerr << "Error: Centroids array size must be multiple of 3" << std::endl;
-    return;
-  }
-
-  if (num_centroids == 0) {
-    std::cerr << "Error: No centroids provided" << std::endl;
-    return;
-  }
-
-  std::cout << "GPU Clustering: points=" << num_points << ", centroids=" << num_centroids << ", columns=" << num_columns
-            << std::endl;
-
-  const uint32_t num_batches = (num_points + BATCH_SIZE - 1) / BATCH_SIZE;
-
-  float* d_points = nullptr;
-  float* d_centroids = nullptr;
-  uint32_t* d_results = nullptr;
-  uint32_t* d_labels_batch = nullptr;
-
-  try {
-    CUDA_CHECK(cudaMalloc(&d_points, h_points_flat.size() * sizeof(float)));
-    CUDA_CHECK(cudaMalloc(&d_centroids, h_centroids_flat.size() * sizeof(float)));
-    CUDA_CHECK(cudaMalloc(&d_results, BATCH_SIZE * sizeof(uint32_t)));
-    CUDA_CHECK(cudaMalloc(&d_labels_batch, BATCH_SIZE * sizeof(uint32_t)));
-    CUDA_CHECK(
-        cudaMemcpy(d_points, h_points_flat.data(), h_points_flat.size() * sizeof(float), cudaMemcpyHostToDevice));
-
-    CUDA_CHECK(cudaMemcpy(d_centroids, h_centroids_flat.data(), h_centroids_flat.size() * sizeof(float),
-                          cudaMemcpyHostToDevice));
-
-    Uniforms uniforms;
-    uniforms.num_centroids = num_centroids;
-    uniforms.num_columns = num_columns;
-
-    for (uint32_t batch = 0; batch < num_batches; batch++) {
-      uint32_t batch_start = batch * BATCH_SIZE;
-      uint32_t current_batch_size = min(BATCH_SIZE, num_points - batch_start);
-
-      uniforms.num_points = current_batch_size;
-
-      uint32_t num_groups = (current_batch_size + WORKGROUP_SIZE - 1) / WORKGROUP_SIZE;
-
-      size_t shared_mem_size = num_columns * CHUNK_SIZE * sizeof(float);
-
-      cluster_kernel_flat_column_major<<<num_groups, WORKGROUP_SIZE, shared_mem_size>>>(
-          d_points + batch_start, d_centroids, d_results, uniforms);
-
-      CUDA_CHECK(cudaGetLastError());
-
-      CUDA_CHECK(cudaMemcpy(d_labels_batch, d_results, current_batch_size * sizeof(uint32_t), cudaMemcpyDeviceToHost));
-
-      std::copy(d_labels_batch, d_labels_batch + current_batch_size, h_labels.begin() + batch_start);
-
-      std::cout << "  Batch " << batch + 1 << "/" << num_batches << " processed " << current_batch_size << " points"
-                << std::endl;
+  auto interleave = [&](const splat::DataTable* table, int startRow, int rowCount) {
+    std::vector<float> buffer(rowCount * numColumns);
+    for (int c = 0; c < numColumns; ++c) {
+      const auto& column = table->getColumn(c);
+      for (int r = 0; r < rowCount; ++r) {
+        buffer[r * numColumns + c] = column.getValue<float>(startRow + r);
+      }
     }
+    return buffer;
+  };
 
-    CUDA_CHECK(cudaDeviceSynchronize());
+  std::vector<float> h_centroids_interleaved = interleave(centroids, 0, numCentroids);
 
-  } catch (const std::exception& e) {
-    std::cerr << "Error during GPU clustering: " << e.what() << std::endl;
+  float *d_points, *d_centroids;
+  unsigned int* d_results;
+  const int batchSize = 65536;
 
-    if (d_points) cudaFree(d_points);
-    if (d_centroids) cudaFree(d_centroids);
-    if (d_results) cudaFree(d_results);
-    if (d_labels_batch) cudaFree(d_labels_batch);
+  cudaMalloc(&d_centroids, h_centroids_interleaved.size() * sizeof(float));
+  cudaMalloc(&d_points, batchSize * numColumns * sizeof(float));
+  cudaMalloc(&d_results, batchSize * sizeof(unsigned int));
 
-    throw;
+  cudaMemcpy(d_centroids, h_centroids_interleaved.data(), h_centroids_interleaved.size() * sizeof(float),
+             cudaMemcpyHostToDevice);
+
+  for (int offset = 0; offset < numPoints; offset += batchSize) {
+    int currentBatchSize = std::min(batchSize, numPoints - offset);
+
+    std::vector<float> h_points_batch = interleave(points, offset, currentBatchSize);
+
+    cudaMemcpy(d_points, h_points_batch.data(), h_points_batch.size() * sizeof(float), cudaMemcpyHostToDevice);
+
+    int threadsPerBlock = 128;
+    int blocksPerGrid = (currentBatchSize + threadsPerBlock - 1) / threadsPerBlock;
+    size_t sharedMemSize = threadsPerBlock * numColumns * sizeof(float);
+
+    cluster_kernel<<<blocksPerGrid, threadsPerBlock, sharedMemSize>>>(d_points, d_centroids, d_results,
+                                                                      currentBatchSize, numCentroids, numColumns);
+
+    cudaMemcpy(labels.data() + offset, d_results, currentBatchSize * sizeof(unsigned int), cudaMemcpyDeviceToHost);
   }
 
-  if (d_points) cudaFree(d_points);
-  if (d_centroids) cudaFree(d_centroids);
-  if (d_results) cudaFree(d_results);
-  if (d_labels_batch) cudaFree(d_labels_batch);
+  cudaFree(d_points);
+  cudaFree(d_centroids);
+  cudaFree(d_results);
 }
 
 }  // namespace splat

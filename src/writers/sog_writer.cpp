@@ -25,13 +25,15 @@
 
 #include <absl/strings/ascii.h>
 #include <absl/strings/match.h>
+#include <omp.h>
+#include <splat/logger.h>
 #include <splat/maths/kmeans.h>
 #include <splat/maths/maths.h>
+#include <splat/maths/morton-order.h>
 #include <splat/models/sog.h>
 #include <splat/webp-codec.h>
 #include <splat/writers/sog_writer.h>
 #include <splat/zip_writer.h>
-#include <splat/maths/morton-order.h>
 
 #include <cmath>
 #include <filesystem>
@@ -134,7 +136,7 @@ static std::tuple<std::unique_ptr<DataTable>, std::unique_ptr<DataTable>> cluste
     resultColumns.push_back({name, std::vector<uint8_t>(numRows)});
   }
   for (size_t i = 0; i < numColumns; i++) {
-    auto& vec = resultColumns[i].asSpan<uint8_t>();
+    auto&& vec = resultColumns[i].asSpan<uint8_t>();
     size_t startOffset = i * numRows;
     for (size_t r = 0; r < numRows; ++r) {
       vec[r] = static_cast<uint8_t>(labels[startOffset + r]);
@@ -189,12 +191,18 @@ void writeSog(const std::string& filename, DataTable* dataTable, const std::stri
     std::vector<uint8_t> meansU(width * height * channels);
     static std::vector<std::string> meansNames = {"x", "y", "z"};
     auto meansMinMax = calcMinMax(dataTable, meansNames, indices);
+    for (auto&& v : meansMinMax) {
+      v[0] = logTransform(v[0]);
+      v[1] = logTransform(v[1]);
+    }
+
     std::vector<int> meansColumnIdxs;
     for (const auto& name : meansNames) {
       meansColumnIdxs.push_back(dataTable->getColumnIndex(name));
     }
     Row row;
 
+#pragma omp parallel for
     for (size_t i = 0; i < indices.size(); i++) {
       auto process = [&](const float& value, int axisIdx) -> uint16_t {
         float val = logTransform(value);
@@ -245,8 +253,9 @@ void writeSog(const std::string& filename, DataTable* dataTable, const std::stri
     }
     std::array<float, 4> q = {0.0, 0.0, 0.0, 0.0};
 
-    Row row;
+#pragma omp parallel for
     for (size_t i = 0; i < indices.size(); i++) {
+      Row row;
       dataTable->getRow(indices[i], row, quatsColumnIdxs);
       q[0] = row["rot_0"];
       q[1] = row["rot_1"];
@@ -389,13 +398,18 @@ void writeSog(const std::string& filename, DataTable* dataTable, const std::stri
     shBands = 0;
 
   // convert and write attributes
+  LOG_INFO("begin write means");
   std::pair<std::vector<float>, std::vector<float>> meansMinMax = writeMeans();
+  LOG_INFO("begin write quaternions");
   writeQuaternions();
 
+  LOG_INFO("begin write scales");
   std::vector<float> scalesCodebook = writeScales();
+  LOG_INFO("begin write colors");
   std::vector<float> colorsCodebook = writeColors();
   std::optional<Meta::SHN> shN;
   if (shBands > 0) {
+    LOG_INFO("begin write shBands");
     shN = writeSH(shBands);
   }
 
