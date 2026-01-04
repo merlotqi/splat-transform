@@ -39,17 +39,24 @@ namespace splat {
  * @param k The index (0-based) of the element to select (e.g., k=indices.size()/2 for median).
  * @return The value of the k-th element in the original index array (before partitioning).
  */
-static uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> idx, size_t k) {
-  auto valAt = [&](size_t p) { return data[idx[p]]; };
+static uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> idx, size_t k_in) {
+  if (idx.empty()) return 0;
 
-  auto swap = [&](size_t i, size_t j) {
+  int n = static_cast<int>(idx.size());
+  int l = 0;
+  int r = n - 1;
+  int k = static_cast<int>(k_in);
+
+  auto valAt = [&](int p) {
+    auto ix = idx[p];
+    auto v = data[ix];
+    return v;
+  };
+  auto swap = [&](int i, int j) {
     uint32_t t = idx[i];
     idx[i] = idx[j];
     idx[j] = t;
   };
-
-  int l = 0;
-  int r = static_cast<int>(idx.size()) - 1;
 
   while (true) {
     if (r <= l + 1) {
@@ -57,6 +64,7 @@ static uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> i
       return idx[k];
     }
 
+    // Median-of-three
     int mid = (l + r) >> 1;
     swap(mid, l + 1);
     if (valAt(l) > valAt(r)) swap(l, r);
@@ -71,19 +79,19 @@ static uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> i
     while (true) {
       do {
         i++;
-      } while (i <= r && valAt(i) < pivotVal);
+      } while (i < n && valAt(i) < pivotVal);
       do {
         j--;
-      } while (j >= l && valAt(j) > pivotVal);
+      } while (j >= 0 && valAt(j) > pivotVal);
+
       if (j < i) break;
       swap(i, j);
     }
 
     idx[l + 1] = idx[j];
     idx[j] = pivotIdx;
-
-    if (j >= (int)k) r = j - 1;
-    if (j <= (int)k) l = i;
+    if (j >= k) r = j - 1;
+    if (j <= k) l = i;
   }
 }
 
@@ -134,10 +142,10 @@ AABB& AABB::fromCentroids(const DataTable* centroids, absl::Span<const uint32_t>
     float m = std::numeric_limits<float>::infinity();
     float M = -std::numeric_limits<float>::infinity();
 
-    for (auto index : indices) {
-      const float v = data[index];
-      if (v < m) m = v;
-      if (v > M) M = v;
+    for (int i = 0; i < indices.size(); ++i) {
+      auto&& v = data[indices[i]];
+      m = v < m ? v : m;
+      M = v > M ? v : M;
     }
     min[j] = m;
     max[j] = M;
@@ -185,9 +193,7 @@ std::unique_ptr<BTreeNode> BTree::recurse(absl::Span<uint32_t> indices) {
   const int col = aabb.largestAxis();
   const auto& values = centroids->getColumn(col).asSpan<float>();
   const size_t mid = indices.size() >> 1;
-
   quickselect(values, indices, mid);
-
   auto&& left = recurse(indices.subspan(0, mid));
   auto&& right = recurse(indices.subspan(mid));
 

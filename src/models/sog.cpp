@@ -71,6 +71,7 @@ std::string Meta::encodeToJson() const {
   nlohmann::json j;
   j["version"] = version;
   j["count"] = count;
+  j["asset"]["generator"] = asset.generator;
 
   j["means"]["mins"] = means.mins;
   j["means"]["maxs"] = means.maxs;

@@ -23,6 +23,7 @@
  * For more information, visit the project's homepage or contact the author.
  */
 
+#include <splat/models/morton-order.h>
 #include <splat/spatial/btree.h>
 #include <splat/writers/lod_writer.h>
 #include <splat/writers/sog_writer.h>
@@ -117,18 +118,15 @@ static Aabb calcBound(const DataTable* dataTable, const std::vector<uint32_t>& i
 
 static std::map<float, std::vector<uint32_t>> binIndices(BTreeNode* parent, absl::Span<const float> lod) {
   std::map<float, std::vector<uint32_t>> result;
+  if (!parent) return result;
 
   std::function<void(BTreeNode*)> recurse = [&](BTreeNode* node) {
-    if (!node->indices.empty()) {
-      for (size_t i = 0; i < node->indices.size(); i++) {
-        const auto v = node->indices[i];
-        const auto lodValue = lod[v];
+    if (!node) return;
 
-        if (result.count(lodValue)) {
-          result.insert({lodValue, {v}});
-        } else {
-          result[lodValue].push_back(v);
-        }
+    if (!node->indices.empty()) {
+      for (const auto v : node->indices) {
+        const float lodValue = lod[v];
+        result[lodValue].push_back(v);
       }
     } else {
       if (node->left) {
@@ -146,6 +144,10 @@ static std::map<float, std::vector<uint32_t>> binIndices(BTreeNode* parent, absl
 
 void writeLod(const std::string& filename, const DataTable* dataTable, DataTable* envDataTable, bool bundle,
               int iterations, size_t lodChunkCount, size_t lodChunkExtent) {
+  // test
+  lodChunkCount = 64;
+  lodChunkExtent = 16;
+
   fs::path outputDir = fs::path(filename).parent_path();
 
   // ensure top-level output folder exists
@@ -172,7 +174,7 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
   float lodLevels = 0;
 
   std::function<MetaNode(BTreeNode*)> build = [&](BTreeNode* node) -> MetaNode {
-    if (node->indices.empty() && (node->count > binSize || node->aabb.largestDim() > binDim)) {
+    if (node->indices.empty() && (node->count > (size_t)binSize || node->aabb.largestDim() > binDim)) {
       MetaNode mNode;
       mNode.children.push_back(build(node->left.get()));
       mNode.children.push_back(build(node->right.get()));
@@ -188,26 +190,32 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
     auto bins = binIndices(node, lodColumn);
 
     for (auto& [lodValue, indices] : bins) {
-      if (!lodFiles.count(lodValue)) {
+      if (lodFiles.find(lodValue) == lodFiles.end()) {
         lodFiles[lodValue] = {{}};
       }
 
       auto& fileList = lodFiles[lodValue];
-      const auto fileIndex = fileList.size() - 1;
+      int fileIndex = static_cast<int>(fileList.size() - 1);
       auto& lastFile = fileList[fileIndex];
-      size_t fileSize =
-          std::accumulate(lastFile.begin(), lastFile.end(), size_t(0),
-                          [](size_t acc, const std::vector<uint32_t>& curr) { return acc + curr.size(); });
 
-      std::string filename = std::to_string(lodValue) + "_" + std::to_string(fileIndex) + "/meta.json";
+      size_t fileSize = 0;
+      for (const auto& vec : lastFile) {
+        fileSize += vec.size();
+      }
+
+      std::string filename =
+          std::to_string(static_cast<int>(lodValue)) + "_" + std::to_string(fileIndex) + "/meta.json";
 
       auto it = std::find(filenames.begin(), filenames.end(), filename);
+      size_t fileIdxInMeta;
       if (it == filenames.end()) {
-        it = filenames.insert(it, filename);
+        fileIdxInMeta = filenames.size();
+        filenames.push_back(filename);
+      } else {
+        fileIdxInMeta = std::distance(filenames.begin(), it);
       }
-      size_t fileIdxInMeta = std::distance(filenames.begin(), it);
 
-      lods.insert({lodValue, {fileIdxInMeta, fileSize, indices.size()}});
+      lods[lodValue] = {fileIdxInMeta, fileSize, indices.size()};
 
       lastFile.push_back(indices);
 
@@ -252,6 +260,8 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
   meta["lodLevels"] = lodLevels;
   if (envDataTable && envDataTable->getNumRows() > 0) {
     meta["environment"] = "env/meta.json";
+  } else {
+    meta["environment"] = nullptr;
   }
   meta["filenames"] = filenames;
   meta["tree"] = metaToJson(rootMeta);
@@ -267,7 +277,8 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
       auto& fileUnit = fileUnits[i];
       if (fileUnit.empty()) continue;
 
-      fs::path pathname = outputDir / (std::to_string(lodValue) + "_" + std::to_string(i)) / "meta.json";
+      fs::path pathname =
+          outputDir / (std::to_string(static_cast<int>(lodValue)) + "_" + std::to_string(i)) / "meta.json";
       fs::create_directories(pathname.parent_path());
 
       size_t totalIndices =
@@ -278,14 +289,15 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
       size_t offset = 0;
       for (size_t j = 0; j < fileUnit.size(); j++) {
         std::copy(fileUnit[j].begin(), fileUnit[j].end(), indices.begin() + offset);
-        generateOrdering(dataTable, absl::Span<uint32_t>(&indices[offset], fileUnit[j].size()));
+        sortMortonOrder(dataTable, absl::Span<uint32_t>(&indices[offset], fileUnit[j].size()));
         offset += fileUnit[j].size();
       }
 
       // construct a new table from the ordered data
       auto&& unitDataTable = dataTable->permuteRows(indices);
+      std::iota(indices.begin(), indices.end(), 0);
 
-      writeSog(pathname.string(), unitDataTable.release(), bundle, iterations);
+      writeSog(pathname.string(), unitDataTable.release(), bundle, iterations, indices);
     }
   }
 }

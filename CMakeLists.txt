@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10...3.26)
 set(CMAKE_CUDA_ARCHITECTURES "75;80;89" CACHE STRING "CUDA architectures")
 
-project(splat-transform 
-    VERSION 0.1.0 
+project(libSplat 
+    VERSION 1.0.0 
     LANGUAGES CXX CUDA
     DESCRIPTION "Splat Transform")
 

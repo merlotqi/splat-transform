@@ -198,7 +198,7 @@ std::unique_ptr<PlyData> readPly(const std::string& filename) {
 
     // read data in chunks of 1024 rows at a time
     const size_t chunkSize = 1024;
-    const size_t numChunks = ceil(element.count / chunkSize);
+    const size_t numChunks = ceil(static_cast<double>(element.count) / chunkSize);
     std::vector<uint8_t> chunkData(chunkSize * rowSize);
 
     for (size_t c = 0; c < numChunks; ++c) {

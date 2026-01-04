@@ -26,14 +26,14 @@
 #include <absl/strings/ascii.h>
 #include <absl/strings/match.h>
 #include <omp.h>
-#include <splat/utils/logger.h>
-#include <splat/spatial/kmeans.h>
 #include <splat/maths/maths.h>
 #include <splat/models/morton-order.h>
 #include <splat/models/sog.h>
+#include <splat/spatial/kmeans.h>
+#include <splat/utils/logger.h>
 #include <splat/utils/webp-codec.h>
-#include <splat/writers/sog_writer.h>
 #include <splat/utils/zip-writer.h>
+#include <splat/writers/sog_writer.h>
 
 #include <cmath>
 #include <filesystem>
@@ -146,13 +146,19 @@ static std::tuple<std::unique_ptr<DataTable>, std::unique_ptr<DataTable>> cluste
   return {std::move(centroids), std::make_unique<DataTable>(resultColumns)};
 }
 
-void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bundle, int iterations) {
+void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bundle, int iterations,
+              const std::vector<uint32_t>& idxs) {
   std::unique_ptr<ZipWriter> zipWriter = bundle ? std::make_unique<ZipWriter>(outputFilename) : nullptr;
 
   // generateIndices
-  std::vector<uint32_t> indices(dataTable->getNumRows());
-  std::iota(indices.begin(), indices.end(), 0);
-  sortMortonOrder(dataTable, absl::MakeSpan(indices));
+  std::vector<uint32_t> indices;
+  if (idxs.empty()) {
+    indices.assign(dataTable->getNumRows(), 0);
+    std::iota(indices.begin(), indices.end(), 0);
+    sortMortonOrder(dataTable, absl::MakeSpan(indices));
+  } else {
+    indices = idxs;
+  }
 
   const size_t numRows = indices.size();
   const size_t width = ceil(sqrt(static_cast<double>(numRows)) / 4) * 4;
@@ -290,8 +296,7 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
   };
 
   auto writeScales = [&]() {
-    auto&& [centroids, labels] =
-        cluster1d(dataTable->clone({"scale_0", "scale_1", "scale_2"}).release(), iterations);
+    auto&& [centroids, labels] = cluster1d(dataTable->clone({"scale_0", "scale_1", "scale_2"}).release(), iterations);
 
     writeTableData("scales.webp", labels.release(), width, height);
 
@@ -299,8 +304,7 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
   };
 
   auto writeColors = [&]() {
-    auto&& [centroids, labels] =
-        cluster1d(dataTable->clone({"f_dc_0", "f_dc_1", "f_dc_2"}).release(), iterations);
+    auto&& [centroids, labels] = cluster1d(dataTable->clone({"f_dc_0", "f_dc_1", "f_dc_2"}).release(), iterations);
 
     // generate and store sigmoid(opacity) [0..1]
     const auto& opacity = dataTable->getColumnByName("opacity").asSpan<float>();
@@ -413,7 +417,7 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
 
   Meta meta;
   meta.version = 2;
-  meta.asset.generator = "splat-transform v2";
+  meta.asset.generator =  "libsplat v1.0.0";
   meta.count = numRows;
   meta.means.mins = meansMinMax.first;
   meta.means.maxs = meansMinMax.second;
@@ -430,6 +434,8 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
   } else {
     std::ofstream out(fs::path(outputFilename).parent_path() / "meta.json");
     out << meta.encodeToJson();
+    out.flush();
+    out.close();
   }
 }
 

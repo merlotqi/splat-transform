@@ -57,7 +57,7 @@ void writeFile(const std::string& filename, DataTable* dataTable, DataTable* env
       if (!dataTable->hasColumn("lod")) {
         dataTable->addColumn({"lod", std::vector<float>(dataTable->getNumRows())});
       }
-      writeLod(filename, dataTable, envDataTable, options.lodBundle, options.iterations, options.lodChunkCount,
+      writeLod(filename, dataTable, envDataTable, false, options.iterations, options.lodChunkCount,
                options.lodChunkExtent);
     } else if (outputFormat == "compressed-ply") {
       writeCompressedPly(filename, dataTable);

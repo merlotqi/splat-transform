@@ -1,5 +1,10 @@
+Date: 2026-01-04
+Commit: d9b4554
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Bump version to 1.0.0, remove unused options, and refactor write functions for improved clarity and performance
+
 Date: 2025-12-30
-Commit: d11cb20
+Commit: c1abf60
 Author: Merlot.Qi <merlotrain.mc@gmail.com>
 Message: Implement core utilities for 3D Gaussian Splatting: CRC, WebP codec, ZIP reader, and ZIP writer
 
