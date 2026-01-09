@@ -119,11 +119,11 @@ static Aabb calcBound(const DataTable* dataTable, const std::vector<uint32_t>& i
   return {overallMin, overallMax};
 }
 
-static std::map<float, std::vector<uint32_t>> binIndices(BTreeNode* parent, absl::Span<const float> lod) {
+static std::map<float, std::vector<uint32_t>> binIndices(BTree::BTreeNode* parent, absl::Span<const float> lod) {
   std::map<float, std::vector<uint32_t>> result;
   if (!parent) return result;
 
-  std::function<void(BTreeNode*)> recurse = [&](BTreeNode* node) {
+  std::function<void(BTree::BTreeNode*)> recurse = [&](BTree::BTreeNode* node) {
     if (!node) return;
 
     if (!node->indices.empty()) {
@@ -176,7 +176,7 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
   std::vector<std::string> filenames;
   float lodLevels = 0;
 
-  std::function<MetaNode(BTreeNode*)> build = [&](BTreeNode* node) -> MetaNode {
+  std::function<MetaNode(BTree::BTreeNode*)> build = [&](BTree::BTreeNode* node) -> MetaNode {
     if (node->indices.empty() && (node->count > (size_t)binSize || node->aabb.largestDim() > binDim)) {
       MetaNode mNode;
       mNode.children.push_back(build(node->left.get()));

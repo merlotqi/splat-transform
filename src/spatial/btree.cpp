@@ -97,13 +97,13 @@ static uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> i
   }
 }
 
-AABB::AABB(const std::vector<float>& min, const std::vector<float>& max) : min(min), max(max) {}
+BTree::AABB::AABB(const std::vector<float>& min, const std::vector<float>& max) : min(min), max(max) {}
 
 /**
  * @brief Calculates the index (0-based) of the largest axis (dimension) of the AABB.
  * @return The index of the largest axis, or -1 if min/max vectors are empty.
  */
-int AABB::largestAxis() const {
+int BTree::AABB::largestAxis() const {
   const size_t length = min.size();
   if (length == 0) return -1;
   auto maxRange = -std::numeric_limits<float>::infinity();
@@ -122,7 +122,7 @@ int AABB::largestAxis() const {
  * @brief Calculates the length of the AABB along its largest dimension.
  * @return The largest dimension size, or 0 if empty.
  */
-float AABB::largestDim() const {
+float BTree::AABB::largestDim() const {
   const auto a = largestAxis();
   return max[a] - min[a];
 }
@@ -134,7 +134,7 @@ float AABB::largestDim() const {
  * @param indices The indices of the rows to include in the AABB calculation.
  * @return A reference to the updated Aabb object.
  */
-AABB& AABB::fromCentroids(const DataTable* centroids, absl::Span<const uint32_t> indices) {
+BTree::AABB& BTree::AABB::fromCentroids(const DataTable* centroids, absl::Span<const uint32_t> indices) {
   const size_t numColumns = centroids->getNumColumns();
   min.assign(numColumns, std::numeric_limits<float>::infinity());
   max.assign(numColumns, -std::numeric_limits<float>::infinity());
@@ -177,7 +177,7 @@ BTree::BTree(DataTable* centroids) : centroids(centroids) {
  * @param indices The index vector for the current node's elements (passed by move).
  * @return A unique pointer to the newly created BTreeNode.
  */
-std::unique_ptr<BTreeNode> BTree::recurse(absl::Span<uint32_t> indices) {
+std::unique_ptr<BTree::BTreeNode> BTree::recurse(absl::Span<uint32_t> indices) {
   auto node = std::make_unique<BTreeNode>();
 
   AABB aabb;
