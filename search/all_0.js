@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['aabb_0',['AABB',['../structsplat_1_1BTree_1_1AABB.html#a3151154efb38d527dfc736c3594519c1',1,'splat::BTree::AABB']]],
-  ['aabb_1',['aabb',['../structsplat_1_1BTree_1_1BTreeNode.html#a62e5e60f3b743a6b58889aa612118995',1,'splat::BTree::BTreeNode']]],
-  ['aabb_2',['AABB',['../structsplat_1_1BTree_1_1AABB.html',1,'splat::BTree']]],
+  ['aabb_0',['AABB',['../structsplat_1_1BTree_1_1AABB.html#a3151154efb38d527dfc736c3594519c1',1,'splat::BTree::AABB::AABB()'],['../structsplat_1_1Octree_1_1AABB.html#abfa66d4a45c4d1c9204c31fb27599de6',1,'splat::Octree::AABB::AABB()=default'],['../structsplat_1_1Octree_1_1AABB.html#aeb3dbf9dcfdc94dcf1d6b3707fbabdcd',1,'splat::Octree::AABB::AABB(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)']]],
+  ['aabb_1',['aabb',['../structsplat_1_1BTree_1_1BTreeNode.html#a62e5e60f3b743a6b58889aa612118995',1,'splat::BTree::BTreeNode::aabb()'],['../structsplat_1_1Octree_1_1OctreeNode.html#aba16cbcdbdc9507f6e5baffa1f08ca6c',1,'splat::Octree::OctreeNode::aabb()']]],
+  ['aabb_2',['AABB',['../structsplat_1_1BTree_1_1AABB.html',1,'splat::BTree::AABB'],['../structsplat_1_1Octree_1_1AABB.html',1,'splat::Octree::AABB']]],
   ['addcolumn_3',['addColumn',['../classsplat_1_1DataTable.html#ae625ecf2f67c47318e12177f21611af3',1,'splat::DataTable']]],
   ['apply_4',['apply',['../structsplat_1_1RotateSH.html#a72b84fd67b10b072770f0f4cc6443802',1,'splat::RotateSH']]],
   ['asset_5',['asset',['../structsplat_1_1Meta.html#a6bdfb6a4746f5f63fa3bdf704b3f5d36',1,'splat::Meta']]],
