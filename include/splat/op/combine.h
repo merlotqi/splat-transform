@@ -27,14 +27,22 @@
 
 #pragma once
 
-#define SPLAT_VERSION_MAJOR @PROJECT_VERSION_MAJOR @
-#define SPLAT_VERSION_MINOR @PROJECT_VERSION_MINOR @
-#define SPLAT_VERSION_PATCH @PROJECT_VERSION_PATCH @
+#include <memory>
+#include <vector>
 
 namespace splat {
 
-static constexpr const char* version = "@PROJECT_VERSION@";
+class DataTable;
 
-static constexpr const char* splat_info = "@SPLAT_INFO@";
+/**
+ * @brief Merges multiple DataTables into a single combined table.
+ *
+ * Creates a union of columns (by name and type) and concatenates rows.
+ * Input tables are consumed (moved from) during the operation.
+ *
+ * @param dataTables Tables to combine (will be emptied)
+ * @return Merged table, or nullptr if input is empty
+ */
+std::unique_ptr<DataTable> combine(std::vector<std::unique_ptr<DataTable>>& dataTables);
 
 }  // namespace splat

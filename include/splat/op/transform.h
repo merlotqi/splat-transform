@@ -27,14 +27,22 @@
 
 #pragma once
 
-#define SPLAT_VERSION_MAJOR @PROJECT_VERSION_MAJOR @
-#define SPLAT_VERSION_MINOR @PROJECT_VERSION_MINOR @
-#define SPLAT_VERSION_PATCH @PROJECT_VERSION_PATCH @
+#include <Eigen/Dense>
 
 namespace splat {
 
-static constexpr const char* version = "@PROJECT_VERSION@";
+class DataTable;
 
-static constexpr const char* splat_info = "@SPLAT_INFO@";
+/**
+ * @brief Apply transformation to data table
+ * @param dataTable Table to transform
+ * @param t Translation vector
+ * @param r Rotation quaternion
+ * @param s Scale factor
+ *
+ * Applies translation, rotation, and scaling transformation to relevant
+ * columns in the data table.
+ */
+void transform(DataTable* dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s);
 
 }  // namespace splat

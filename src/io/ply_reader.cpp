@@ -28,8 +28,10 @@
 #include <splat/io/ply_reader.h>
 
 #include <algorithm>
+#include <cstring>
 #include <fstream>
 #include <numeric>
+#include <sstream>
 
 namespace splat {
 

@@ -27,6 +27,7 @@
 
 #include <splat/io/ksplat_reader.h>
 
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 

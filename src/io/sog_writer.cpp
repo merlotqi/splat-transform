@@ -29,9 +29,10 @@
 #include <absl/strings/match.h>
 #include <splat/io/sog_writer.h>
 #include <splat/maths/maths.h>
-#include <splat/models/morton-order.h>
 #include <splat/models/sog.h>
+#include <splat/op/morton-order.h>
 #include <splat/spatial/kmeans.h>
+#include <splat/splat_version.h>
 #include <splat/utils/logger.h>
 #include <splat/utils/webp-codec.h>
 #include <splat/utils/zip-writer.h>
@@ -314,7 +315,8 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
     const auto& opacity = dataTable->getColumnByName("opacity").asSpan<float>();
     std::vector<uint8_t> opacityData(opacity.size());
     for (size_t i = 0; i < numRows; i++) {
-      opacityData[i] = std::max(0.0f, std::min(255.0f, sigmoid(opacity[i]) * 255.0f));
+      double v = sigmoid(static_cast<double>(opacity[i])) * 255.0;
+      opacityData[i] = static_cast<uint8_t>(std::max(0.0, std::min(255.0, std::floor(v))));
     }
     labels->addColumn({"opacity", opacityData});
 
@@ -421,7 +423,7 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
 
   Meta meta;
   meta.version = 2;
-  meta.asset.generator = "libsplat v1.0.0";
+  meta.asset.generator = splat::splat_info;
   meta.count = numRows;
   meta.means.mins = meansMinMax.first;
   meta.means.maxs = meansMinMax.second;

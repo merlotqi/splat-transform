@@ -29,7 +29,6 @@
 
 #include <absl/types/span.h>
 
-#include <Eigen/Dense>
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -56,7 +55,7 @@ using Row = std::map<std::string, float>;
 /**
  * @brief Enumeration of supported column data types
  */
-enum class ColumnType : std::uint8_t {
+enum class ColumnType : uint8_t {
   INT8,     ///< Signed 8-bit integer
   UINT8,    ///< Unsigned 8-bit integer
   INT16,    ///< Signed 16-bit integer
@@ -524,35 +523,5 @@ class DataTable {
    */
   std::unique_ptr<DataTable> permuteRows(const std::vector<uint32_t>& indices) const;
 };
-
-/**
- * @brief Generate row ordering based on data table contents
- * @param dataTable Source data table
- * @param indices Output span to fill with ordering indices
- */
-void generateOrdering(const DataTable* dataTable, absl::Span<uint32_t> indices);
-
-/**
- * @brief Apply transformation to data table
- * @param dataTable Table to transform
- * @param t Translation vector
- * @param r Rotation quaternion
- * @param s Scale factor
- *
- * Applies translation, rotation, and scaling transformation to relevant
- * columns in the data table.
- */
-void transform(DataTable* dataTable, const Eigen::Vector3f& t, const Eigen::Quaternionf& r, float s);
-
-/**
- * @brief Merges multiple DataTables into a single combined table.
- * 
- * Creates a union of columns (by name and type) and concatenates rows.
- * Input tables are consumed (moved from) during the operation.
- * 
- * @param dataTables Tables to combine (will be emptied)
- * @return Merged table, or nullptr if input is empty
- */
-std::unique_ptr<DataTable> combine(std::vector<std::unique_ptr<DataTable>>& dataTables);
 
 }  // namespace splat

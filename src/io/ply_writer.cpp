@@ -27,6 +27,7 @@
 
 #include <splat/io/ply_writer.h>
 
+#include <cstring>
 #include <fstream>
 #include <numeric>
 #include <vector>

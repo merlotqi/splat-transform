@@ -27,6 +27,8 @@
 
 #include <splat/io/decompress_ply.h>
 
+#include <Eigen/Dense>
+
 namespace splat {
 
 static constexpr size_t CHUNK_SIZE = 256;

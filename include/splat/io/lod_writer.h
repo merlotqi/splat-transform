@@ -31,7 +31,7 @@
 
 namespace splat {
 
-void writeLod(const std::string& filename, const DataTable* dataTable, DataTable* envDataTable, bool bundle, int iterations,
-              size_t lodChunkCount, size_t lodChunkExtent);
+void writeLod(const std::string& filename, const DataTable* dataTable, DataTable* envDataTable, bool bundle,
+              int iterations, size_t lodChunkCount, size_t lodChunkExtent);
 
 }  // namespace splat

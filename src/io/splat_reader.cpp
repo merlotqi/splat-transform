@@ -28,6 +28,7 @@
 #include <splat/io/splat_reader.h>
 
 #include <algorithm>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <string>

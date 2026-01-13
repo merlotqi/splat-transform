@@ -1,5 +1,5 @@
 {
-  "name": "SplatTransform-Linux",
+  "name": "SplatLib-Linux",
   "build": {
     "dockerfile": "Dockerfile"
   },

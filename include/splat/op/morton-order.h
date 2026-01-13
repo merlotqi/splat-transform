@@ -27,28 +27,32 @@
 
 #pragma once
 
-#include <splat/models/data-table.h>
+#include <absl/types/span.h>
+
+#include <cstdint>
 
 namespace splat {
 
+class DataTable;
+
 /**
  * @brief Sort Gaussian splats in Morton order (Z-order curve) for memory locality
- * 
+ *
  * This function computes a Morton ordering (Z-order curve) of the Gaussian splats
  * based on their 3D positions to improve cache locality and memory access patterns.
  * The Morton code interleaves the bits of the 3D coordinates to create a 1D ordering
  * that preserves spatial proximity in multi-dimensional space.
- * 
- * @param dataTable Pointer to the DataTable containing Gaussian splat data. 
+ *
+ * @param dataTable Pointer to the DataTable containing Gaussian splat data.
  *                  Expected to have at least 'x', 'y', and 'z' columns representing
  *                  the 3D positions of the splats.
  * @param indices Output span that will be filled with the sorted indices in Morton order.
  *                Must be pre-allocated with size equal to the number of rows in dataTable.
- *                On output, indices[i] contains the original index of the i-th splat 
+ *                On output, indices[i] contains the original index of the i-th splat
  *                in Morton order.
- * 
+ *
  * @note The function assumes the position coordinates are normalized or bounded.
- * @note Morton ordering is particularly effective for octree-based rendering and 
+ * @note Morton ordering is particularly effective for octree-based rendering and
  *       improves performance for spatially coherent operations.
  * @note This is a key optimization for real-time Gaussian splatting rendering pipelines.
  */

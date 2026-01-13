@@ -35,8 +35,7 @@
 namespace splat {
 
 class Crc {
- private:
-  uint32_t bits{0xFFFFFFFF};
+  uint32_t bits_{0xFFFFFFFF};
   static const std::array<uint32_t, 256> crc32_table;
 
  public:

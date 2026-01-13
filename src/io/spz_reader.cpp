@@ -28,6 +28,7 @@
 #include <splat/io/spz_reader.h>
 #include <zlib.h>
 
+#include <cstring>
 #include <fstream>
 
 namespace splat {

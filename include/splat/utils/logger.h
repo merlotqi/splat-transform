@@ -43,13 +43,13 @@ enum class logLevel {
 };
 
 class Logger {
-  logLevel level = logLevel::normal;
-  std::mutex log_mutex;
+  logLevel level_ = logLevel::normal;
+  std::mutex log_mutex_;
 
   Logger() = default;
 
   void logInternal(const char* prefix, const char* file, int line, const char* format, va_list args) {
-    if (level == logLevel::silent) {
+    if (level_ == logLevel::silent) {
       return;
     }
 
@@ -73,7 +73,7 @@ class Logger {
     }
 
     {
-      std::lock_guard<std::mutex> lock(log_mutex);
+      std::lock_guard<std::mutex> lock(log_mutex_);
       std::cout << "[" << prefix << "] " << file_sv << ":" << line << " > " << formatted_msg << "\n";
       std::fflush(stdout);
     }
@@ -88,7 +88,7 @@ class Logger {
   Logger(const Logger&) = delete;
   Logger& operator=(const Logger&) = delete;
 
-  void setQuiet(bool quiet) { level = quiet ? logLevel::silent : logLevel::normal; }
+  void setQuiet(bool quiet) { level_ = quiet ? logLevel::silent : logLevel::normal; }
 
 #if defined(__GNUC__) || defined(__clang__)
   __attribute__((format(printf, 4, 5)))

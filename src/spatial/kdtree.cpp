@@ -30,7 +30,6 @@
 
 #include <numeric>
 
-
 namespace splat {
 
 KdTree::KdTree(DataTable* table) : centroids(table) {

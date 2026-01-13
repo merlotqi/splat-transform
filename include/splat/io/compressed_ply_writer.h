@@ -31,6 +31,6 @@
 
 namespace splat {
 
-void writeCompressedPly(const std::string& filename, DataTable *dataTable);
+void writeCompressedPly(const std::string& filename, DataTable* dataTable);
 
 }  // namespace splat

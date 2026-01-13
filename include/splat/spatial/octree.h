@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <array>
 #include <cstddef>
 #include <memory>
@@ -44,8 +46,8 @@ class Octree {
 
     AABB() = default;
     AABB(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
-    void getCenter(float&x, float&y, float&z) const;
-    void contains(float x, float y, float z);
+    void getCenter(float &x, float &y, float &z) const;
+    bool contains(float x, float y, float z) const;
   };
 
   struct OctreeNode {
@@ -62,7 +64,7 @@ class Octree {
   std::unique_ptr<OctreeNode> root;
 
  private:
-  void build();
+  std::unique_ptr<OctreeNode> build(const AABB &aabb, absl::Span<size_t> indices, int depth);
 
   DataTable *dataTable_;
   int maxDepth_;

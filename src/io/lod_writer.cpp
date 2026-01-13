@@ -27,10 +27,11 @@
 
 #include <splat/io/lod_writer.h>
 #include <splat/io/sog_writer.h>
-#include <splat/models/morton-order.h>
+#include <splat/op/morton-order.h>
 #include <splat/spatial/btree.h>
 #include <splat/utils/threadpool.h>
 
+#include <Eigen/Dense>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -38,6 +39,7 @@
 #include <nlohmann/json.hpp>
 #include <numeric>
 #include <optional>
+#include <thread>
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -271,7 +273,11 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
   ofs.flush();
   ofs.close();
 
-  ThreadPool pool(std::thread::hardware_concurrency() * 0.8);
+#ifdef NDEBUG
+  ThreadPool pool(std::thread::hardware_concurrency());
+#else
+  ThreadPool pool(1);
+#endif
 
   // write file units
   for (auto&& [lodValue, fileUnits] : lodFiles) {

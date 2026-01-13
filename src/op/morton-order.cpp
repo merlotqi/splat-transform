@@ -25,7 +25,8 @@
  *
  ***********************************************************************************/
 
-#include <splat/models/morton-order.h>
+#include <splat/models/data-table.h>
+#include <splat/op/morton-order.h>
 
 #include <algorithm>
 #include <cmath>

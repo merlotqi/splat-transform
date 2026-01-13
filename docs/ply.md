@@ -101,13 +101,6 @@ Think of PLY files in 3DGS workflows as you would PSD files for images or projec
 
 The PLY format serves as the lingua franca of the 3DGS ecosystem:
 
-### Universal Compatibility
-
-- **Training Software**: Brush, nerfstudio, Postshot
-- **Editors**: [SuperSplat Editor](../editing/supersplat/index.md)
-- **Converters**: [SplatTransform](../editing/splat-transform.md)
-- **Viewers**: [SuperSplat Viewer](https://github.com/playcanvas/supersplat-viewer), [Model Viewer](https://github.com/playcanvas/model-viewer)
-
 ### Cross-Platform Workflow
 
 - Move assets between different 3DGS training pipelines
@@ -136,9 +129,3 @@ While PLY is excellent for source and interchange purposes, it has significant l
 - **Parse Time**: Text parsing (ASCII PLY) is particularly slow
 - **Memory Usage**: Entire file must be loaded into memory
 - **Initialization**: No progressive loading or streaming capabilities
-
-:::tip
-
-Convert your PLYs to a more efficient run-time format using the [SplatTransform](../editing/splat-transform.md) tool. We currently recommend Self-Organizing Gaussians (AKA SOGS) to achieve the best compression ratios and fastest loading times.
-
-:::

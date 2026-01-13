@@ -31,18 +31,18 @@
 
 namespace splat {
 
-void Crc::reset() { bits = 0xFFFFFFFF; }
+void Crc::reset() { bits_ = 0xFFFFFFFF; }
 
 void Crc::update(const uint8_t* data, std::size_t length) {
   for (std::size_t i = 0; i < length; i++) {
-    auto&& index = static_cast<uint8_t>((bits ^ data[i]) & 0xFF);
-    bits = (bits >> 8) ^ crc32_table.at(index);
+    auto&& index = static_cast<uint8_t>((bits_ ^ data[i]) & 0xFF);
+    bits_ = (bits_ >> 8) ^ crc32_table.at(index);
   }
 }
 
 void Crc::update(const std::vector<uint8_t>& data) { update(data.data(), data.size()); }
 
-uint32_t Crc::value() const { return bits ^ 0xFFFFFFFF; }
+uint32_t Crc::value() const { return bits_ ^ 0xFFFFFFFF; }
 
 // clang-format off
 

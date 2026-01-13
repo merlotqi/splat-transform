@@ -39,7 +39,7 @@ namespace splat {
 
 /**
  * @brief Represents the metadata for a single file entry within the archive.
- * 
+ *
  * This structure stores file metadata used to construct the Central Directory Record (CDR)
  * in a ZIP archive. It tracks essential file information during the creation process.
  */
@@ -52,26 +52,26 @@ struct FileInfo {
 
 /**
  * @brief Synchronous streaming ZIP archive writer
- * 
+ *
  * A RAII-based ZIP archive writer that handles ZIP format encoding for uncompressed (STORED) files
  * using data descriptors. The class manages the entire ZIP file creation process including
  * Local File Headers, file data, Data Descriptors, and Central Directory Records.
- * 
+ *
  * The writer supports:
  * - Creating ZIP archives with multiple files
  * - STORE compression method (no compression)
  * - Data descriptors for streaming writes
  * - Proper ZIP64 format handling for large files
  * - DOS-compatible timestamp encoding
- * 
+ *
  * @note This implementation uses synchronous I/O and is not thread-safe
  * @note Files are written with the STORE method (uncompressed) for simplicity and speed
  * @note CRC-32 checksums are computed during writing for data integrity
  */
 class ZipWriter {
-  std::ofstream file_;  ///< The internal file stream (owned by ZipWriter)
+  std::ofstream file_;           ///< The internal file stream (owned by ZipWriter)
   std::vector<FileInfo> files_;  ///< Metadata for all files in the archive
-  bool file_open_ = false;  ///< Flag indicating if a file is currently being written
+  bool file_open_ = false;       ///< Flag indicating if a file is currently being written
 
   // DOS Date/Time fields, calculated once upon initialization
   uint16_t dosTime_ = 0;  ///< DOS time field (HH:MM:SS encoded)
@@ -97,7 +97,7 @@ class ZipWriter {
 
   /**
    * @brief Write Data Descriptor for the current file
-   * 
+   *
    * Data Descriptor contains CRC-32, compressed size, and uncompressed size
    * for files where these values are not known in advance (streaming writes).
    */
@@ -105,7 +105,7 @@ class ZipWriter {
 
   /**
    * @brief Finalize the current file being written
-   * 
+   *
    * Completes the current file entry by writing the Data Descriptor
    * and updating file metadata.
    */
@@ -121,7 +121,7 @@ class ZipWriter {
 
   /**
    * @brief Destructor - automatically closes the archive if not already closed
-   * 
+   *
    * If the archive is still open, writes the Central Directory and closes the file.
    */
   ~ZipWriter();
@@ -147,7 +147,7 @@ class ZipWriter {
    * @brief Start writing a new file to the archive
    * @param filename Name of the file to add (relative path within the archive)
    * @throws std::runtime_error if a file is already being written or archive is closed
-   * 
+   *
    * Begins a new file entry by writing the Local File Header and preparing
    * to receive file data.
    */
@@ -158,7 +158,7 @@ class ZipWriter {
    * @param data Pointer to the data to write
    * @param length Number of bytes to write
    * @throws std::runtime_error if no file is currently being written
-   * 
+   *
    * The data is written directly to the archive and the CRC-32 is updated.
    */
   void write(const uint8_t* data, size_t length);
@@ -173,7 +173,7 @@ class ZipWriter {
   /**
    * @brief Close the current file being written
    * @throws std::runtime_error if no file is currently being written
-   * 
+   *
    * Finalizes the current file entry and prepares for the next file.
    */
   void close();
@@ -182,7 +182,7 @@ class ZipWriter {
    * @brief Write a text file to the archive
    * @param filename Name of the file within the archive
    * @param content String content to write
-   * 
+   *
    * Convenience method for adding text files. The content is converted to UTF-8.
    */
   void writeFile(const std::string& filename, const std::string& content);
@@ -191,7 +191,7 @@ class ZipWriter {
    * @brief Write a binary file to the archive
    * @param filename Name of the file within the archive
    * @param content Binary data to write
-   * 
+   *
    * Convenience method for adding binary files.
    */
   void writeFile(const std::string& filename, const std::vector<uint8_t>& content);
@@ -200,7 +200,7 @@ class ZipWriter {
    * @brief Write a file from multiple data chunks to the archive
    * @param filename Name of the file within the archive
    * @param content Vector of data chunks to write sequentially
-   * 
+   *
    * Useful for writing large files that are already split into chunks.
    */
   void writeFile(const std::string& filename, const std::vector<std::vector<uint8_t>>& content);
