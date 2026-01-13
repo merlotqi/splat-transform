@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['columntype_479',['ColumnType',['../namespacesplat.html#a58bb781c3c11015c25b484bf29e7ec39',1,'splat']]]
+  ['columntype_481',['ColumnType',['../namespacesplat.html#a382cd5d5a35ce21b5ae92ab9821c849c',1,'splat']]]
 ];

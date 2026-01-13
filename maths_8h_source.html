@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>libSplat: /home/runner/work/SplitLib/SplitLib/include/splat/maths/maths.h Source File</title>
+<title>SplatLib: /home/runner/work/SplatLib/SplatLib/include/splat/maths/maths.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,8 +21,8 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">libSplat
-   &#160;<span id="projectnumber">1.0.0</span>
+   <div id="projectname">SplatLib
+   &#160;<span id="projectnumber">1.1.0</span>
    </div>
   </td>
  </tr>
@@ -105,7 +105,7 @@ $(function() {
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">   50</a></span>&#160;<span class="keyword">inline</span> T <a class="code" href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">sigmoid</a>(T x) {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">return</span> 1.0 / (1.0 + exp(-x));</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">return</span> 1.0 / (1.0 + std::exp(-<span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(x)));</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
 <div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">   70</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">float</span> <a class="code" href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">simple_random</a>() {</div>

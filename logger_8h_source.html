@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>libSplat: /home/runner/work/SplitLib/SplitLib/include/splat/utils/logger.h Source File</title>
+<title>SplatLib: /home/runner/work/SplatLib/SplatLib/include/splat/utils/logger.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,8 +21,8 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">libSplat
-   &#160;<span id="projectnumber">1.0.0</span>
+   <div id="projectname">SplatLib
+   &#160;<span id="projectnumber">1.1.0</span>
    </div>
   </td>
  </tr>
@@ -115,13 +115,13 @@ $(function() {
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
 <div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classsplat_1_1Logger.html">   45</a></span>&#160;<span class="keyword">class </span><a class="code" href="classsplat_1_1Logger.html">Logger</a> {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579">logLevel</a> level = <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579afea087517c26fadd409bd4b9dc642555">logLevel::normal</a>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  std::mutex log_mutex;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579">logLevel</a> level_ = <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579afea087517c26fadd409bd4b9dc642555">logLevel::normal</a>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  std::mutex log_mutex_;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="classsplat_1_1Logger.html">Logger</a>() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordtype">void</span> logInternal(<span class="keyword">const</span> <span class="keywordtype">char</span>* prefix, <span class="keyword">const</span> <span class="keywordtype">char</span>* file, <span class="keywordtype">int</span> line, <span class="keyword">const</span> <span class="keywordtype">char</span>* format, va_list args) {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordflow">if</span> (level == <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579a73be252ca82217b1458a25e6b4e99f15">logLevel::silent</a>) {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordflow">if</span> (level_ == <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579a73be252ca82217b1458a25e6b4e99f15">logLevel::silent</a>) {</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
@@ -145,7 +145,7 @@ $(function() {
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    }</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    {</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      std::lock_guard&lt;std::mutex&gt; lock(log_mutex);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      std::lock_guard&lt;std::mutex&gt; lock(log_mutex_);</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      std::cout &lt;&lt; <span class="stringliteral">&quot;[&quot;</span> &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot;] &quot;</span> &lt;&lt; file_sv &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; line &lt;&lt; <span class="stringliteral">&quot; &gt; &quot;</span> &lt;&lt; formatted_msg &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      std::fflush(stdout);</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
@@ -160,7 +160,7 @@ $(function() {
 <div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="classsplat_1_1Logger.html#a2718a20e6ec6e4a68a904d7dffb43cd3">   88</a></span>&#160;  <a class="code" href="classsplat_1_1Logger.html#a2718a20e6ec6e4a68a904d7dffb43cd3">Logger</a>(<span class="keyword">const</span> <a class="code" href="classsplat_1_1Logger.html">Logger</a>&amp;) = <span class="keyword">delete</span>;</div>
 <div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="classsplat_1_1Logger.html#a034ba0c4e1f4b546170e19285d4800ec">   89</a></span>&#160;  <a class="code" href="classsplat_1_1Logger.html">Logger</a>&amp; <a class="code" href="classsplat_1_1Logger.html#a034ba0c4e1f4b546170e19285d4800ec">operator=</a>(<span class="keyword">const</span> <a class="code" href="classsplat_1_1Logger.html">Logger</a>&amp;) = <span class="keyword">delete</span>;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="classsplat_1_1Logger.html#a50708640aa5ce91bcadc19c629f126ac">   91</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classsplat_1_1Logger.html#a50708640aa5ce91bcadc19c629f126ac">setQuiet</a>(<span class="keywordtype">bool</span> quiet) { level = quiet ? <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579a73be252ca82217b1458a25e6b4e99f15">logLevel::silent</a> : <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579afea087517c26fadd409bd4b9dc642555">logLevel::normal</a>; }</div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="classsplat_1_1Logger.html#a50708640aa5ce91bcadc19c629f126ac">   91</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classsplat_1_1Logger.html#a50708640aa5ce91bcadc19c629f126ac">setQuiet</a>(<span class="keywordtype">bool</span> quiet) { level_ = quiet ? <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579a73be252ca82217b1458a25e6b4e99f15">logLevel::silent</a> : <a class="code" href="namespacesplat.html#a06e7c2f7ae07b287f4c45ed56d387579afea087517c26fadd409bd4b9dc642555">logLevel::normal</a>; }</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">#if defined(__GNUC__) || defined(__clang__)</span></div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  __attribute__((format(printf, 4, 5)))</div>

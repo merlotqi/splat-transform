@@ -1,7 +1,7 @@
-<map id="/home/runner/work/SplitLib/SplitLib/include/splat/models/ply.h" name="/home/runner/work/SplitLib/SplitLib/include/splat/models/ply.h">
-<area shape="rect" id="node1" title=" " alt="" coords="209,5,407,61"/>
-<area shape="rect" id="node2" href="$decompress__ply_8h.html" title=" " alt="" coords="5,109,203,165"/>
-<area shape="rect" id="node3" href="$splat_8h.html" title=" " alt="" coords="209,213,407,269"/>
-<area shape="rect" id="node4" href="$ply__reader_8h.html" title=" " alt="" coords="277,109,475,165"/>
-<area shape="rect" id="node5" href="$ply__writer_8h.html" title=" " alt="" coords="499,109,696,165"/>
+<map id="/home/runner/work/SplatLib/SplatLib/include/splat/models/ply.h" name="/home/runner/work/SplatLib/SplatLib/include/splat/models/ply.h">
+<area shape="rect" id="node1" title=" " alt="" coords="213,5,415,61"/>
+<area shape="rect" id="node2" href="$decompress__ply_8h.html" title=" " alt="" coords="5,109,207,165"/>
+<area shape="rect" id="node3" href="$splat_8h.html" title=" " alt="" coords="213,213,415,269"/>
+<area shape="rect" id="node4" href="$ply__reader_8h.html" title=" " alt="" coords="283,109,484,165"/>
+<area shape="rect" id="node5" href="$ply__writer_8h.html" title=" " alt="" coords="508,109,709,165"/>
 </map>

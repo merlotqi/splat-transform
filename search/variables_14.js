@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['y_476',['y',['../structsplat_1_1LccUnitInfo.html#ac301fd7cc0492b74ab31d95dac18c325',1,'splat::LccUnitInfo']]]
+  ['y_478',['y',['../structsplat_1_1LccUnitInfo.html#ac301fd7cc0492b74ab31d95dac18c325',1,'splat::LccUnitInfo']]]
 ];

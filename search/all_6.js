@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['generateordering_66',['generateOrdering',['../namespacesplat.html#a39edb726eb5c65fd80e6500da3d00dc1',1,'splat']]],
   ['generator_67',['generator',['../structsplat_1_1Meta.html#a84e23f2cd635e533c9a8f9f0a62fd238',1,'splat::Meta']]],
   ['getcenter_68',['getCenter',['../structsplat_1_1Octree_1_1AABB.html#a2ea3b1365bb80f8ca487f0bb783dbcd5',1,'splat::Octree::AABB']]],
-  ['getcolumn_69',['getColumn',['../classsplat_1_1DataTable.html#a8e6b81c135b1fd0d34e2d5dd6e94753a',1,'splat::DataTable::getColumn(size_t index)'],['../classsplat_1_1DataTable.html#a31ca9f5f4500779040e9e69fa723e5ad',1,'splat::DataTable::getColumn(size_t index) const']]],
+  ['getcolumn_69',['getColumn',['../classsplat_1_1DataTable.html#a31ca9f5f4500779040e9e69fa723e5ad',1,'splat::DataTable::getColumn(size_t index) const'],['../classsplat_1_1DataTable.html#a8e6b81c135b1fd0d34e2d5dd6e94753a',1,'splat::DataTable::getColumn(size_t index)']]],
   ['getcolumnbyname_70',['getColumnByName',['../classsplat_1_1DataTable.html#ac0b9ab7d60c222ba69ccb49513db6442',1,'splat::DataTable::getColumnByName(const std::string &amp;name) const'],['../classsplat_1_1DataTable.html#a6e484b0b62c0e67158998fd187bd5a77',1,'splat::DataTable::getColumnByName(const std::string &amp;name)']]],
   ['getcolumnindex_71',['getColumnIndex',['../classsplat_1_1DataTable.html#aed8134ec65e7c5fbd4f96bb973107faf',1,'splat::DataTable']]],
   ['getcolumnnames_72',['getColumnNames',['../classsplat_1_1DataTable.html#a35bda7f9039480e106919b38dbbd6ad9',1,'splat::DataTable']]],

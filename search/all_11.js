@@ -30,7 +30,7 @@ var searchData=
   ['some_197',['some',['../structsplat_1_1Column.html#a2363bc54bf5e8e4cf3908c318859adf7',1,'splat::Column']]],
   ['sortmortonorder_198',['sortMortonOrder',['../namespacesplat.html#a9370a258a80d896424204bb4bd445d87',1,'splat']]],
   ['splat_199',['splat',['../namespacesplat.html',1,'']]],
-  ['splat_20transform_200',['Splat Transform',['../md__home_runner_work_SplitLib_SplitLib_README.html',1,'']]],
+  ['splat_20transform_200',['Splat Transform',['../md__home_runner_work_SplatLib_SplatLib_README.html',1,'']]],
   ['splat_2eh_201',['splat.h',['../splat_8h.html',1,'']]],
   ['splat_5freader_2eh_202',['splat_reader.h',['../splat__reader_8h.html',1,'']]],
   ['spz_5freader_2eh_203',['spz_reader.h',['../spz__reader_8h.html',1,'']]],
