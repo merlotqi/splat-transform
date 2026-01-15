@@ -1,5 +1,25 @@
+Date: 2026-01-15
+Commit: 80af861
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: 1.2.0
+
+Date: 2026-01-14
+Commit: 22aa57d
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: modify ply reader.
+
 Date: 2026-01-13
-Commit: 707b813
+Commit: 3c75df4
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Update splat_version.h.in
+
+Date: 2026-01-13
+Commit: f6de65a
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Fixed the ghosting issue in Splat rendering at the far end.
+
+Date: 2026-01-13
+Commit: 26bfe04
 Author: Merlot.Qi <merlotrain.mc@gmail.com>
 Message: Update project name and version, improve AABB structure, and enhance logging and CRC classes
 
@@ -67,3 +87,178 @@ Date: 2026-01-04
 Commit: 10a4953
 Author: Merlot.Qi <merlotrain.mc@gmail.com>
 Message: Bump version to 1.0.0, remove unused options, and refactor write functions for improved clarity and performance
+
+Date: 2025-12-30
+Commit: c1abf60
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Implement core utilities for 3D Gaussian Splatting: CRC, WebP codec, ZIP reader, and ZIP writer
+
+Date: 2025-12-29
+Commit: ad08b5e
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: remove string case when set value to column.
+
+Date: 2025-12-29
+Commit: f110659
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Update data_table.h
+
+Date: 2025-12-29
+Commit: 3b2a8d1
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Fixed error on Windows platform.
+
+Date: 2025-12-29
+Commit: 2058843
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Refactor GPU Clustering and K-Means Implementation
+
+Date: 2025-12-27
+Commit: 6644e6b
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Implement GPU-based clustering and enhance data processing
+
+Date: 2025-12-27
+Commit: fb65de9
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Subject: build: fix Abseil linking and refactor CMake for cross-platform
+
+Date: 2025-12-27
+Commit: 0f8063e
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: fixed ubuntu22.04 libabsl-dev debian error.
+
+Date: 2025-12-27
+Commit: 49e88ec
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: :fixed size_t error.
+
+Date: 2025-12-27
+Commit: 00dcc32
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: fixed size_t error.
+
+Date: 2025-12-27
+Commit: 10c3d88
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: fixed linux platform error.
+
+Date: 2025-12-26
+Commit: c059547
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Update cmake-multi-platform.yml
+
+Date: 2025-12-26
+Commit: db7af79
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: fix: Correct WebP package configuration in CMakeLists and update vcpkg install command
+
+Date: 2025-12-25
+Commit: 923a7b4
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: feat: Update CMake configuration for CUDA support and enhance main application usage documentation
+
+Date: 2025-12-25
+Commit: 05e4e5a
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Merge branch 'main' of https://github.com/merlotqi/splat-transform
+
+Date: 2025-12-25
+Commit: 0ea230f
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: add dockerfile
+
+Date: 2025-12-24
+Commit: 12b17fa
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: Create cmake-multi-platform.yml
+
+Date: 2025-12-24
+Commit: 9682b4a
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: feat: Implement decompression for PLY files and enhance related functionalities
+
+Date: 2025-12-24
+Commit: e68f18b
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: feat: Add ZLIB dependency and update related files
+
+Date: 2025-12-22
+Commit: 0aceb52
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Refactor DataTable usage across multiple files to use pointers and unique_ptrs
+
+Date: 2025-12-21
+Commit: bc67431
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: refactor: Clean up includes and remove unused headers across multiple files
+
+Date: 2025-12-21
+Commit: 2432d87
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Refactor and enhance the splat library
+
+Date: 2025-12-20
+Commit: 2ca8259
+Author: merlor.qi <merlotrain.mc@gmail.com>
+Message: feat: Enhance DataTable functionality and remove deprecated webp codec files
+
+Date: 2025-12-17
+Commit: 9c2bcfd
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Add sog lod-sog files.
+
+Date: 2025-12-17
+Commit: 8a1110b
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: feat: Add compressed ply writer.
+
+Date: 2025-12-13
+Commit: 0d28724
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Add readers and writers for 3D Gaussian Splatting files
+
+Date: 2025-12-12
+Commit: 1c07df8
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: feat: Update README and add detailed documentation for PLY and SOG formats; enhance download script for parallel file retrieval
+
+Date: 2025-12-11
+Commit: 869bbad
+Author: merlor.qi <merlotrain.mc@gmail.com>
+Message: feat: Refactor Splat file reading functions for improved data handling and performance
+
+Date: 2025-12-11
+Commit: aca61e5
+Author: merlor.qi <merlotrain.mc@gmail.com>
+Message: feat: Enhance PLY reader and model structures; add new maths functions and SOG model support
+
+Date: 2025-12-11
+Commit: 2fb6940
+Author: merlor.qi <merlotrain.mc@gmail.com>
+Message: Refactor WebP codec functions for improved memory management and error handling
+
+Date: 2025-12-10
+Commit: 1618c71
+Author: merlor.qi <merlotrain.mc@gmail.com>
+Message: feat: Implement transformation of Gaussian points in DataTable
+
+Date: 2025-12-09
+Commit: 631efa8
+Author: merlor.qi <merlotrain.mc@gmail.com>
+Message: Add initial implementations for Splat file readers and writers
+
+Date: 2025-12-02
+Commit: 87fa445
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Refactor project structure: update CMake configuration, add serialization and writing modules, implement CRC class, and enhance data handling in CSV and ZIP formats.
+
+Date: 2025-12-02
+Commit: 701b4cc
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Add initial implementation of AABB and BTreeNode structures; include RotateSH for spherical harmonic rotation; update CMake configuration to include new maths module and link Eigen3.
+
+Date: 2025-12-02
+Commit: 47ae1fb
+Author: merlot.qi <merlotrain.mc@gmail.com>
+Message: Initial project setup with CMake configuration, logging, and utility classes; added data structures for reading .splat and .sog files.
