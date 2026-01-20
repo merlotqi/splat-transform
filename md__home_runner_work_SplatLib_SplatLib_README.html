@@ -66,173 +66,292 @@ $(function() {
 <div class="title">SplatLib </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>A C++ library for reading, writing, and processing 3D Gaussian Splatting (splat) files used in real-time neural rendering.</p>
-<p>SplatLib provides comprehensive support for various Gaussian splat formats, enabling efficient conversion, manipulation, and optimization of 3D scene data for applications like web-based real-time rendering and neural graphics.</p>
+<div class="textblock"><p>A modern C++ library for reading, writing, and processing 3D Gaussian Splatting files, designed for real-time neural rendering applications.</p>
+<p>SplatLib provides comprehensive support for various Gaussian splat formats, enabling efficient conversion, manipulation, and optimization of 3D scene data for web-based real-time rendering and neural graphics applications.</p>
 <h1><a class="anchor" id="autotoc_md1"></a>
-Features</h1>
+Core Features</h1>
+<h2><a class="anchor" id="autotoc_md2"></a>
+Multiple Format Support</h2>
 <ul>
-<li><b>Multiple Format Support</b>:<ul>
 <li><b>PLY</b>: Industry-standard uncompressed format for training, editing, and archival storage</li>
 <li><b>SOG</b>: Compressed format optimized for web delivery (15-20× smaller than PLY)</li>
 <li><b>KSPLAT, SPZ, LCC</b>: Additional specialized formats for different use cases</li>
 </ul>
-</li>
-<li><b>GPU Acceleration</b>: CUDA-based processing for high-performance operations including SOG compression and spatial algorithms</li>
-<li><b>Spatial Data Structures</b>:<ul>
-<li>Octree for hierarchical spatial partitioning</li>
-<li>K-D tree for nearest neighbor searches</li>
-<li>B-tree for efficient data organization</li>
-<li>Morton order encoding for spatial coherence</li>
+<h2><a class="anchor" id="autotoc_md3"></a>
+GPU Acceleration</h2>
+<ul>
+<li>CUDA-based high-performance processing</li>
+<li>GPU-accelerated SOG compression and spatial algorithms</li>
+<li>Support for multiple CUDA compute capabilities (7.5, 8.0, 8.9)</li>
 </ul>
-</li>
-<li><b>Mathematical Operations</b>:<ul>
-<li>K-means clustering (CPU and GPU implementations)</li>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Spatial Data Structures</h2>
+<ul>
+<li><b>Octree</b>: Hierarchical spatial partitioning</li>
+<li><b>K-D Tree</b>: Nearest neighbor searches</li>
+<li><b>B-Tree</b>: Efficient data organization</li>
+<li><b>Morton Encoding</b>: Spatial coherence optimization</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md5"></a>
+Mathematical Operations</h2>
+<ul>
+<li>K-means clustering (CPU/GPU dual implementations)</li>
 <li>Spherical harmonic (SH) rotation and manipulation</li>
 <li>Coordinate transformations and data processing</li>
 </ul>
-</li>
-<li><b>Level of Detail (LOD)</b>: Support for multi-resolution Gaussian representations with chunk-based organization</li>
-<li><b>Data Compression</b>: WebP codec integration for efficient texture compression</li>
-<li><b>Parallel Processing</b>: Built-in thread pools and parallel algorithms for multi-core performance</li>
-<li><b>Python Bindings</b>: pybind11-based Python interface for integration with Python workflows</li>
-<li><b>Command-line Tool</b>: <code>SplatTransform</code> utility for format conversion, filtering, and processing</li>
+<h2><a class="anchor" id="autotoc_md6"></a>
+Advanced Features</h2>
+<ul>
+<li><b>Level of Detail (LOD)</b>: Chunk-based organization supporting multi-resolution representations</li>
+<li><b>Data Compression</b>: Integrated WebP codec for efficient texture compression</li>
+<li><b>Parallel Processing</b>: Built-in thread pools and parallel algorithms</li>
+<li><b>Python Bindings</b>: pybind11-based Python interface</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2"></a>
+<h1><a class="anchor" id="autotoc_md7"></a>
+Architecture Design</h1>
+<p>SplatLib follows a modular design with core components organized into the following modules:</p>
+<h2><a class="anchor" id="autotoc_md8"></a>
+include/splat/ - Public API Interface</h2>
+<p>The library is organized into focused modules that provide specific functionality:</p>
+<h3><a class="anchor" id="autotoc_md9"></a>
+io/ - Input/Output Modules</h3>
+<ul>
+<li><code><a class="el" href="ply__reader_8h.html">ply_reader.h</a>/ply_writer.h</code> - PLY format reading/writing</li>
+<li><code><a class="el" href="sog__reader_8h.html">sog_reader.h</a>/sog_writer.h</code> - SOG format reading/writing</li>
+<li><code><a class="el" href="compressed__ply__writer_8h.html">compressed_ply_writer.h</a></code> - Compressed PLY writing</li>
+<li><code><a class="el" href="ksplat__reader_8h.html">ksplat_reader.h</a>/spz_reader.h/lcc_reader.h</code> - Specialized format readers</li>
+<li><code><a class="el" href="csv__writer_8h.html">csv_writer.h</a></code> - CSV format output</li>
+<li><code><a class="el" href="lod__writer_8h.html">lod_writer.h</a></code> - LOD data writing</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md10"></a>
+models/ - Data Models</h3>
+<ul>
+<li><code><a class="el" href="ply_8h.html">ply.h</a></code> - PLY file structure definitions (PlyHeader, PlyElement, PlyData)</li>
+<li><code><a class="el" href="sog_8h.html">sog.h</a></code> - SOG metadata structures (Meta, SHN, etc.)</li>
+<li><code><a class="el" href="data-table_8h.html">data-table.h</a></code> - Generic data table structure supporting multiple column types</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md11"></a>
+spatial/ - Spatial Data Structures</h3>
+<ul>
+<li><code><a class="el" href="octree_8h.html">octree.h</a></code> - Octree implementation for spatial partitioning and queries</li>
+<li><code><a class="el" href="kdtree_8h.html">kdtree.h</a></code> - K-D tree implementation for nearest neighbor searches</li>
+<li><code><a class="el" href="btree_8h.html">btree.h</a></code> - B-tree implementation for efficient data organization</li>
+<li><code><a class="el" href="kmeans_8h.html">kmeans.h</a></code> - K-means clustering (CPU/GPU implementations)</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md12"></a>
+maths/ - Mathematical Utilities</h3>
+<ul>
+<li><code><a class="el" href="maths_8h.html">maths.h</a></code> - Basic mathematical operations</li>
+<li><code><a class="el" href="rotate-sh_8h.html">rotate-sh.h</a></code> - Spherical harmonic rotation operations</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md13"></a>
+op/ - Operations Module</h3>
+<ul>
+<li><code><a class="el" href="transform_8h.html">transform.h</a></code> - Coordinate transformation operations</li>
+<li><code><a class="el" href="combine_8h.html">combine.h</a></code> - Data combination operations</li>
+<li><code><a class="el" href="morton-order_8h.html">morton-order.h</a></code> - Morton spatial encoding</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md14"></a>
+utils/ - Utilities Module</h3>
+<ul>
+<li><code><a class="el" href="logger_8h.html">logger.h</a></code> - Logging infrastructure</li>
+<li><code><a class="el" href="threadpool_8h.html">threadpool.h</a></code> - Thread pool implementation</li>
+<li><code><a class="el" href="webp-codec_8h.html">webp-codec.h</a></code> - WebP image encoding/decoding</li>
+<li><code><a class="el" href="zip-reader_8h.html">zip-reader.h</a>/zip-writer.h</code> - ZIP compression support</li>
+<li><code><a class="el" href="crc_8h.html">crc.h</a></code> - CRC checksum validation</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md15"></a>
+src/ - Implementation Details</h2>
+<ul>
+<li>Mirrors the include/ directory structure with corresponding implementation files</li>
+<li>CUDA implementations located in files like <code>spatial/kmeans.cu</code></li>
+</ul>
+<h1><a class="anchor" id="autotoc_md16"></a>
+Design Principles</h1>
+<ol type="1">
+<li><b>Modularity</b>: Each functional module is self-contained for easy testing and maintenance</li>
+<li><b>Zero-Copy</b>: Prioritizes views and references to avoid unnecessary data copying</li>
+<li><b>Type Safety</b>: Uses strong typing to reduce runtime errors</li>
+<li><b>Performance-First</b>: GPU acceleration, parallel processing, and memory optimization</li>
+<li><b>Extensibility</b>: Plugin-style format support makes adding new file formats straightforward</li>
+</ol>
+<h1><a class="anchor" id="autotoc_md17"></a>
+API Usage Examples</h1>
+<h2><a class="anchor" id="autotoc_md18"></a>
+Basic File I/O</h2>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="splat_8h.html">splat/splat.h</a>&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Read a PLY file</span></div>
+<div class="line"><span class="keyword">auto</span> data = <a class="code" href="namespacesplat.html#a9c5aab9390912cf5d71af220b340f09b">splat::readPly</a>(<span class="stringliteral">&quot;scene.ply&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Write to compressed SOG format</span></div>
+<div class="line"><a class="code" href="namespacesplat.html#afbfc654461a051b75a3356c5376e5e9d">splat::writeSog</a>(<span class="stringliteral">&quot;scene.sog&quot;</span>, *data);</div>
+<div class="ttc" id="anamespacesplat_html_a9c5aab9390912cf5d71af220b340f09b"><div class="ttname"><a href="namespacesplat.html#a9c5aab9390912cf5d71af220b340f09b">splat::readPly</a></div><div class="ttdeci">std::unique_ptr&lt; DataTable &gt; readPly(const std::string &amp;filename)</div><div class="ttdoc">Reads and parses a PLY (Polygon File Format) file from disk.</div></div>
+<div class="ttc" id="anamespacesplat_html_afbfc654461a051b75a3356c5376e5e9d"><div class="ttname"><a href="namespacesplat.html#afbfc654461a051b75a3356c5376e5e9d">splat::writeSog</a></div><div class="ttdeci">void writeSog(const std::string &amp;filename, DataTable *dataTable, bool bundle, int iterations, const std::vector&lt; uint32_t &gt; &amp;indices={})</div></div>
+<div class="ttc" id="asplat_8h_html"><div class="ttname"><a href="splat_8h.html">splat.h</a></div></div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md19"></a>
+Spatial Operations</h2>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="octree_8h.html">splat/spatial/octree.h</a>&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;<a class="code" href="data-table_8h.html">splat/models/data-table.h</a>&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Build spatial index</span></div>
+<div class="line"><span class="keyword">auto</span> octree = std::make_unique&lt;splat::Octree&gt;(data.get(), <span class="comment">/*maxPoints=*/</span>32, <span class="comment">/*maxDepth=*/</span>8);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Query operations</span></div>
+<div class="line"><span class="comment">// ... spatial queries using the octree</span></div>
+<div class="ttc" id="adata-table_8h_html"><div class="ttname"><a href="data-table_8h.html">data-table.h</a></div></div>
+<div class="ttc" id="aoctree_8h_html"><div class="ttname"><a href="octree_8h.html">octree.h</a></div></div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md20"></a>
+Mathematical Operations</h2>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="rotate-sh_8h.html">splat/maths/rotate-sh.h</a>&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;<a class="code" href="transform_8h.html">splat/op/transform.h</a>&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Apply spherical harmonic rotation</span></div>
+<div class="line">Eigen::Matrix3f rotation_matrix = <span class="comment">/* ... */</span>;</div>
+<div class="line"><span class="keyword">auto</span> rotated_sh = splat::rotateSHCoefficients(original_sh, rotation_matrix);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Coordinate transformation</span></div>
+<div class="line"><span class="keyword">auto</span> transformed_data = <a class="code" href="namespacesplat.html#a365a879a34fe2750bdf3dfc693a877e0">splat::transform</a>(*data, transformation_matrix);</div>
+<div class="ttc" id="anamespacesplat_html_a365a879a34fe2750bdf3dfc693a877e0"><div class="ttname"><a href="namespacesplat.html#a365a879a34fe2750bdf3dfc693a877e0">splat::transform</a></div><div class="ttdeci">void transform(DataTable *dataTable, const Eigen::Vector3f &amp;t, const Eigen::Quaternionf &amp;r, float s)</div><div class="ttdoc">Apply transformation to data table.</div></div>
+<div class="ttc" id="arotate-sh_8h_html"><div class="ttname"><a href="rotate-sh_8h.html">rotate-sh.h</a></div></div>
+<div class="ttc" id="atransform_8h_html"><div class="ttname"><a href="transform_8h.html">transform.h</a></div></div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md21"></a>
+Extensibility and Future Development</h1>
+<h2><a class="anchor" id="autotoc_md22"></a>
+Adding New File Formats</h2>
+<p>To add support for a new file format:</p>
+<ol type="1">
+<li><b>Define the data model</b> in <code>include/splat/models/</code><ul>
+<li>Create structures for format-specific metadata</li>
+<li>Define any custom data types needed</li>
+</ul>
+</li>
+<li><b>Implement I/O operations</b> in <code>include/splat/io/</code><ul>
+<li>Create reader/writer header files following existing patterns</li>
+<li>Implement parsing/writing logic in corresponding src/ files</li>
+</ul>
+</li>
+<li><b>Update the main header</b> (<code><a class="el" href="splat_8h.html">include/splat/splat.h</a></code>)<ul>
+<li>Add includes for new headers</li>
+<li>Ensure new functions are properly namespaced</li>
+</ul>
+</li>
+<li><b>Add format detection</b> if needed<ul>
+<li>Extend file type detection logic</li>
+<li>Add format-specific validation</li>
+</ul>
+</li>
+</ol>
+<h2><a class="anchor" id="autotoc_md23"></a>
+Extending Spatial Structures</h2>
+<p>When adding new spatial data structures:</p>
+<ol type="1">
+<li><b>Design the interface</b> in <code>include/splat/spatial/</code><ul>
+<li>Follow patterns established by existing structures (Octree, KdTree)</li>
+<li>Consider memory layout and cache efficiency</li>
+</ul>
+</li>
+<li><b>Implement core algorithms</b> in src/<ul>
+<li>Support both CPU and GPU implementations where applicable</li>
+<li>Include comprehensive error handling</li>
+</ul>
+</li>
+<li><b>Add performance optimizations</b><ul>
+<li>Vectorization for CPU operations</li>
+<li>GPU acceleration for compute-intensive tasks</li>
+<li>Memory pool management for large datasets</li>
+</ul>
+</li>
+</ol>
+<h2><a class="anchor" id="autotoc_md24"></a>
+Mathematical Extensions</h2>
+<p>For new mathematical operations:</p>
+<ol type="1">
+<li><b>Create utility functions</b> in <code>include/splat/maths/</code><ul>
+<li>Use Eigen for matrix operations</li>
+<li>Support both float and double precision</li>
+</ul>
+</li>
+<li><b>Add operation modules</b> in <code>include/splat/op/</code><ul>
+<li>Implement composable operations</li>
+<li>Support batched processing</li>
+</ul>
+</li>
+<li><b>GPU acceleration</b> where beneficial<ul>
+<li>CUDA kernels for compute-intensive operations</li>
+<li>Memory transfer optimization</li>
+</ul>
+</li>
+</ol>
+<h1><a class="anchor" id="autotoc_md25"></a>
 Dependencies</h1>
-<h2><a class="anchor" id="autotoc_md3"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 Required</h2>
 <ul>
-<li><b>CUDA</b> (compute capability 7.5, 8.0, or 8.9) - for GPU acceleration</li>
-<li><b>Eigen3</b> - linear algebra library</li>
-<li><b>WebP</b> - image compression library</li>
+<li><b>CUDA</b> (compute capability 7.5, 8.0, or 8.9) - GPU acceleration</li>
+<li><b>Eigen3</b> - Linear algebra library</li>
+<li><b>WebP</b> - Image compression library</li>
 <li><b>nlohmann_json</b> - JSON parsing</li>
-<li><b>Abseil</b> (absl) - C++ utilities</li>
-<li><b>ZLIB</b> - compression library</li>
+<li><b>Abseil</b> - C++ utilities</li>
+<li><b>ZLIB</b> - Compression library</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md27"></a>
 Optional</h2>
 <ul>
-<li><b>Doxygen</b> - for generating API documentation</li>
-<li><b>pybind11</b> - for Python bindings (if enabled)</li>
+<li><b>Doxygen</b> - API documentation generation</li>
+<li><b>pybind11</b> - Python bindings</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md5"></a>
+<h1><a class="anchor" id="autotoc_md28"></a>
 Building</h1>
 <div class="fragment"><div class="line"># Clone the repository</div>
-<div class="line">git clone https://github.com/merlotqi/SplitLib.git</div>
-<div class="line">cd SplitLib</div>
+<div class="line">git clone https://github.com/merlotqi/SplatLib.git</div>
+<div class="line">cd SplatLib</div>
 <div class="line"> </div>
 <div class="line"># Create build directory</div>
-<div class="line">mkdir build</div>
-<div class="line">cd build</div>
+<div class="line">mkdir build &amp;&amp; cd build</div>
 <div class="line"> </div>
 <div class="line"># Configure with CMake</div>
 <div class="line">cmake .. -DBUILD_SPLAT_TRANSFORM_TOOL=ON -DBUILD_PYTHON_BINDINGS=OFF</div>
 <div class="line"> </div>
 <div class="line"># Build</div>
 <div class="line">make -j$(nproc)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md6"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md29"></a>
 CMake Options</h2>
 <ul>
-<li><code>BUILD_SPLAT_TRANSFORM_TOOL</code>: Build the command-line transform utility (default: OFF)</li>
-<li><code>BUILD_PYTHON_BINDINGS</code>: Build Python bindings (default: OFF)</li>
-<li><code>ENABLE_CLANG_TIDY</code>: Enable clang-tidy static analysis (default: OFF)</li>
+<li><code>BUILD_SPLAT_TRANSFORM_TOOL</code> - Build command-line transform utility (default: OFF)</li>
+<li><code>BUILD_PYTHON_BINDINGS</code> - Build Python bindings (default: OFF)</li>
+<li><code>ENABLE_CLANG_TIDY</code> - Enable clang-tidy static analysis (default: OFF)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md7"></a>
-Platform-specific Notes</h2>
-<ul>
-<li><b>Linux</b>: Uses pkg-config for dependency detection</li>
-<li><b>Windows</b>: Uses find_package for CUDA and other dependencies</li>
-<li>C++17 and CUDA 17 standards are required</li>
-<li>On Windows, <code>_USE_MATH_DEFINES</code> is automatically defined</li>
-</ul>
-<h1><a class="anchor" id="autotoc_md8"></a>
+<h1><a class="anchor" id="autotoc_md30"></a>
 Project Structure</h1>
-<div class="fragment"><div class="line">SplitLib/</div>
-<div class="line">├── include/splat/          # Public header files</div>
-<div class="line">│   ├── splat.h            # Main library header</div>
-<div class="line">│   ├── io/                # File I/O modules</div>
-<div class="line">│   ├── maths/             # Mathematical utilities</div>
-<div class="line">│   ├── models/            # Data models (PLY, SOG, etc.)</div>
-<div class="line">│   ├── op/                # Operations (combine, transform)</div>
-<div class="line">│   ├── spatial/           # Spatial data structures</div>
-<div class="line">│   └── utils/             # Utilities (compression, logging)</div>
-<div class="line">├── src/                   # Source implementations</div>
+<div class="fragment"><div class="line">SplatLib/</div>
+<div class="line">├── include/splat/          # Public API headers</div>
+<div class="line">├── src/                   # Implementation files</div>
 <div class="line">├── python/                # Python bindings</div>
-<div class="line">├── transform/             # Command-line tool</div>
+<div class="line">├── transform/             # Command-line tool (optional)</div>
 <div class="line">├── docs/                  # Documentation</div>
-<div class="line">├── examples/              # Example scripts and data</div>
+<div class="line">├── data/                  # Example data</div>
 <div class="line">├── thirdparty/            # External dependencies</div>
 <div class="line">└── cmake/                 # CMake utilities</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md9"></a>
-Usage</h1>
-<h2><a class="anchor" id="autotoc_md10"></a>
-Command-line Tool</h2>
-<p>The <code>SplatTransform</code> tool provides command-line interface for format conversion and processing:</p>
-<div class="fragment"><div class="line"># Convert PLY to SOG with GPU acceleration</div>
-<div class="line">SplatTransform input.ply output.sog --gpu 0 --iterations 10</div>
-<div class="line"> </div>
-<div class="line"># Process multiple files with LOD</div>
-<div class="line">SplatTransform input1.ply input2.ply output.sog --lod 0.5</div>
-<div class="line"> </div>
-<div class="line"># List available GPUs</div>
-<div class="line">SplatTransform --list-gpus</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md11"></a>
-Library Usage (C++)</h2>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="splat_8h.html">splat/splat.h</a>&gt;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Read a PLY file</span></div>
-<div class="line"><span class="keyword">auto</span> data = <a class="code" href="namespacesplat.html#a9c5aab9390912cf5d71af220b340f09b">splat::readPly</a>(<span class="stringliteral">&quot;scene.ply&quot;</span>);</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Process the data (e.g., apply transformations)</span></div>
-<div class="line"><span class="keyword">auto</span> transformed = <a class="code" href="namespacesplat.html#a365a879a34fe2750bdf3dfc693a877e0">splat::transform</a>(data, transformation_matrix);</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Write to compressed SOG format</span></div>
-<div class="line"><a class="code" href="namespacesplat.html#afbfc654461a051b75a3356c5376e5e9d">splat::writeSog</a>(<span class="stringliteral">&quot;scene.sog&quot;</span>, transformed);</div>
-<div class="ttc" id="anamespacesplat_html_a365a879a34fe2750bdf3dfc693a877e0"><div class="ttname"><a href="namespacesplat.html#a365a879a34fe2750bdf3dfc693a877e0">splat::transform</a></div><div class="ttdeci">void transform(DataTable *dataTable, const Eigen::Vector3f &amp;t, const Eigen::Quaternionf &amp;r, float s)</div><div class="ttdoc">Apply transformation to data table.</div></div>
-<div class="ttc" id="anamespacesplat_html_a9c5aab9390912cf5d71af220b340f09b"><div class="ttname"><a href="namespacesplat.html#a9c5aab9390912cf5d71af220b340f09b">splat::readPly</a></div><div class="ttdeci">std::unique_ptr&lt; DataTable &gt; readPly(const std::string &amp;filename)</div><div class="ttdoc">Reads and parses a PLY (Polygon File Format) file from disk.</div></div>
-<div class="ttc" id="anamespacesplat_html_afbfc654461a051b75a3356c5376e5e9d"><div class="ttname"><a href="namespacesplat.html#afbfc654461a051b75a3356c5376e5e9d">splat::writeSog</a></div><div class="ttdeci">void writeSog(const std::string &amp;filename, DataTable *dataTable, bool bundle, int iterations, const std::vector&lt; uint32_t &gt; &amp;indices={})</div></div>
-<div class="ttc" id="asplat_8h_html"><div class="ttname"><a href="splat_8h.html">splat.h</a></div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md12"></a>
-Python Bindings</h2>
-<div class="fragment"><div class="line">import splat_transform_cpp</div>
-<div class="line"> </div>
-<div class="line"># Example usage (bindings under development)</div>
-<div class="line">result = splat_transform_cpp.add(1, 2)</div>
-<div class="line">print(result)  # 3</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md13"></a>
-Examples</h1>
-<p>Download sample Gaussian splat datasets:</p>
-<div class="fragment"><div class="line">cd examples</div>
-<div class="line">./download.sh</div>
-</div><!-- fragment --><p>This downloads several sample splat files in parallel for testing and development.</p>
-<h1><a class="anchor" id="autotoc_md14"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md31"></a>
 Documentation</h1>
 <ul>
 <li>PLY Format Specification - Industry standard for Gaussian splats</li>
 <li>SOG Format Specification - Compressed format for web delivery</li>
 <li>API Documentation - Library overview and format comparison</li>
 </ul>
-<p>Generate Doxygen documentation:</p>
-<div class="fragment"><div class="line">cd build</div>
-<div class="line">make doc</div>
+<p>Generate Doxygen documentation: </p><div class="fragment"><div class="line">cd build &amp;&amp; make doc</div>
 <div class="line"># Open docs/html/index.html</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md15"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md32"></a>
+Contributing</h1>
+<p>See CONTRIBUTING.md for detailed contribution guidelines.</p>
+<h1><a class="anchor" id="autotoc_md33"></a>
+License</h1>
+<p>Licensed under GNU General Public License v3.0. See [LICENSE](LICENSE) and [COPYRIGHT](COPYRIGHT) for details.</p>
+<h1><a class="anchor" id="autotoc_md34"></a>
 Version</h1>
 <p>Current version: <b>1.2.0</b></p>
-<p>See [ChangeLog](ChangeLog) for detailed version history and updates.</p>
-<h1><a class="anchor" id="autotoc_md16"></a>
-License</h1>
-<p>This project is licensed under the GNU General Public License v3.0 (GPL-3.0).</p>
-<p>See [LICENSE](LICENSE) and [COPYRIGHT](COPYRIGHT) files for details.</p>
-<h1><a class="anchor" id="autotoc_md17"></a>
-Contributing</h1>
-<p>Contributions are welcome! Please ensure code follows the established patterns and includes appropriate tests.</p>
-<h1><a class="anchor" id="autotoc_md18"></a>
-Related Projects</h1>
-<ul>
-<li><a href="https://playcanvas.com/">PlayCanvas</a> - Web-based real-time rendering engine that uses SOG format</li>
-<li><a href="https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/">Gaussian Splatting</a> - Original research implementation </li>
-</ul>
+<p>See [ChangeLog](ChangeLog) for version history. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
