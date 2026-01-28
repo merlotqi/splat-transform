@@ -237,7 +237,7 @@ std::unique_ptr<DataTable> readPly(const std::string& filename) {
   plyData.comments = std::move(header.comments);
   plyData.elements = std::move(elements);
 
-  if(!isCompressedPly(&plyData)) {
+  if(isCompressedPly(&plyData)) {
     return decompressPly(&plyData);
   }
 

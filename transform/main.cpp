@@ -66,7 +66,7 @@ ABSL_FLAG(bool, list_gpus, false, "List available GPU adapters and exit");
 ABSL_FLAG(bool, unbundled, false, "Generate unbundled HTML viewer with separate files");
 
 ABSL_FLAG(int32_t, iterations, 10, "Iterations for SOG SH compression (more=better)");
-ABSL_FLAG(int32_t, lod_chunk_count, 512, "Approximate number of Gaussians per LOD chunk in K");
+ABSL_FLAG(int32_t, lod_chunk_count, 64, "Approximate number of Gaussians per LOD chunk in K");
 ABSL_FLAG(int32_t, lod_chunk_extent, 16, "Approximate size of an LOD chunk in world units (m)");
 
 ABSL_FLAG(std::string, gpu, "-1", "Select device for SOG compression: GPU adapter index | 'cpu'");

@@ -156,7 +156,12 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
 
   // write the environment sog
   if (envDataTable && envDataTable->getNumRows() > 0) {
-    fs::path pathname = outputDir / "env" / "meta.json";
+    fs::path pathname;
+    if (bundle) {
+      pathname = outputDir / "env.sog";
+    } else {
+      pathname = outputDir / "env" / "meta.json";
+    }
     fs::create_directories(pathname.parent_path());
     std::cout << "writing " << pathname.string() << "..." << "\n";
     writeSog(pathname.string(), envDataTable, bundle, iterations);
@@ -204,8 +209,12 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
         fileSize += vec.size();
       }
 
-      std::string filename =
-          std::to_string(static_cast<int>(lodValue)) + "_" + std::to_string(fileIndex) + "/meta.json";
+      std::string filename;
+      if (bundle) {
+        filename = std::to_string(static_cast<int>(lodValue)) + "_" + std::to_string(fileIndex) + ".sog";
+      } else {
+        filename = std::to_string(static_cast<int>(lodValue)) + "_" + std::to_string(fileIndex) + "/meta.json";
+      }
 
       auto it = std::find(filenames.begin(), filenames.end(), filename);
       size_t fileIdxInMeta;
@@ -261,7 +270,7 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
   json meta;
   meta["lodLevels"] = lodLevels;
   if (envDataTable && envDataTable->getNumRows() > 0) {
-    meta["environment"] = "env/meta.json";
+    meta["environment"] = bundle ? "env.sog" : "env/meta.json";
   } else {
     meta["environment"] = nullptr;
   }
@@ -285,9 +294,13 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
       auto& fileUnit = fileUnits[i];
       if (fileUnit.empty()) continue;
 
-      fs::path pathname =
-          outputDir / (std::to_string(static_cast<int>(lodValue)) + "_" + std::to_string(i)) / "meta.json";
-      fs::create_directories(pathname.parent_path());
+      fs::path pathname;
+      if (bundle) {
+        pathname = outputDir / (std::to_string(static_cast<int>(lodValue)) + "_" + std::to_string(i) + ".sog");
+      } else {
+        pathname = outputDir / (std::to_string(static_cast<int>(lodValue)) + "_" + std::to_string(i)) / "meta.json";
+        fs::create_directories(pathname.parent_path());
+      }
 
       while (pool.getQueueSize() > pool.getWorkerCount() * 2) {
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -311,7 +324,6 @@ void writeLod(const std::string& filename, const DataTable* dataTable, DataTable
 
             std::vector<uint32_t> writeIndices(totalIndices);
             std::iota(writeIndices.begin(), writeIndices.end(), 0);
-
             writeSog(this_path, unitDataTable.get(), bundle, iterations, writeIndices);
           });
     }

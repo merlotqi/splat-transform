@@ -114,7 +114,7 @@ static std::tuple<std::unique_ptr<DataTable>, std::unique_ptr<DataTable>> cluste
   auto centroidsData = centroids->getColumn(0).asSpan<float>();
   std::vector<size_t> order(centroidsData.size());
   std::iota(order.begin(), order.end(), 0);
-  std::sort(order.begin(), order.end(), [&](size_t a, size_t b) { return centroidsData[a] < centroidsData[b]; });
+  std::sort(order.begin(), order.end(), [&](size_t a, size_t b) { return centroidsData[a] <= centroidsData[b]; });
 
   // reorder centroids
   std::vector<float> tmp(centroidsData.begin(), centroidsData.end());
@@ -368,7 +368,7 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
 
     writeWebp("shN_centroids.webp", centroidsBuf, 64 * shCoeffs, ceilRows);
 
-    // rite labels
+    // write labels
     std::vector<uint8_t> labelsBuf(width * height * channels, 0);
     for (size_t i = 0; i < indices.size(); ++i) {
       const uint32_t label = labels[indices[i]];
