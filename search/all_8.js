@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['index_82',['index',['../structsplat_1_1KdTreeNode.html#acb39111981408ac84750444a334ffaab',1,'splat::KdTreeNode::index()'],['../classsplat_1_1KdTree.html#aa2197d2367451b3d608b026c27cd3c39ae9f716ef7e6b526ac782bb2bdce906e0',1,'splat::KdTree::index()']]],
+  ['index_82',['index',['../structsplat_1_1KdTree_1_1KdTreeNode.html#a703133b1a71039735d7b3fe2515c0787',1,'splat::KdTree::KdTreeNode::index()'],['../classsplat_1_1KdTree.html#aa2197d2367451b3d608b026c27cd3c39ae9f716ef7e6b526ac782bb2bdce906e0',1,'splat::KdTree::index()']]],
   ['indices_83',['indices',['../structsplat_1_1BTree_1_1BTreeNode.html#aab519f7ef6e1bc70e19fe716456f36c0',1,'splat::BTree::BTreeNode']]],
   ['info_84',['info',['../structsplat_1_1ProcessUnitContext.html#ad753f54688bdb788a27c482be62df228',1,'splat::ProcessUnitContext::info()'],['../classsplat_1_1Logger.html#ad5b7b8e9a30155edc4e5f0de0c99b8b5',1,'splat::Logger::info(const char *file, int line, const char *format,...)']]],
   ['instance_85',['instance',['../classsplat_1_1Logger.html#aa5d5cef44f417e5de69aa30db7043d76',1,'splat::Logger']]],

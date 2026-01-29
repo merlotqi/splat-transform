@@ -11,7 +11,7 @@ var searchData=
   ['readspz_161',['readSpz',['../namespacesplat.html#a5ce2054951931469676ca03b8dea87b3',1,'splat']]],
   ['removecolumn_162',['removeColumn',['../classsplat_1_1DataTable.html#ac5735e121e663fed75f4139408ad99ec',1,'splat::DataTable']]],
   ['reset_163',['reset',['../classsplat_1_1Crc.html#a0f921bc2b3fa265fd48c79467bdb481d',1,'splat::Crc']]],
-  ['right_164',['right',['../structsplat_1_1KdTreeNode.html#a5b31ce6aa0823300b55b26ae7bdbf2ea',1,'splat::KdTreeNode::right()'],['../structsplat_1_1BTree_1_1BTreeNode.html#a185c16bfa8818ca3319e3c43907cac99',1,'splat::BTree::BTreeNode::right()']]],
+  ['right_164',['right',['../structsplat_1_1KdTree_1_1KdTreeNode.html#a686477fcadfcf19be8ef4e11cb4d60e8',1,'splat::KdTree::KdTreeNode::right()'],['../structsplat_1_1BTree_1_1BTreeNode.html#a185c16bfa8818ca3319e3c43907cac99',1,'splat::BTree::BTreeNode::right()']]],
   ['root_165',['root',['../classsplat_1_1BTree.html#a9bc31992b9b5c35ad506a0e573ac1b61',1,'splat::BTree::root()'],['../classsplat_1_1Octree.html#ac9bcba365a26099b1ab2ebf0be0d0bd5',1,'splat::Octree::root()']]],
   ['rotate_2dsh_2eh_166',['rotate-sh.h',['../rotate-sh_8h.html',1,'']]],
   ['rotatesh_167',['RotateSH',['../structsplat_1_1RotateSH.html#acd702dfdf611f542f989a3113c1f8324',1,'splat::RotateSH::RotateSH()'],['../structsplat_1_1RotateSH.html',1,'splat::RotateSH']]],
