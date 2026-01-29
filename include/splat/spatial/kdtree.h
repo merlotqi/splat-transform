@@ -27,28 +27,26 @@
 
 #pragma once
 
+#include <absl/types/span.h>
+
 #include <functional>
 #include <memory>
 
 namespace splat {
 
-struct KdTreeNode {
-  size_t index;
-  size_t count;
-  std::unique_ptr<KdTreeNode> left;
-  std::unique_ptr<KdTreeNode> right;
-
-  KdTreeNode(size_t index, size_t count, std::unique_ptr<KdTreeNode> left, std::unique_ptr<KdTreeNode> right)
-      : index(index), count(count), left(std::move(left)), right(std::move(right)) {}
-};
-
 class DataTable;
 
 class KdTree {
-  DataTable* centroids;
-  std::unique_ptr<KdTreeNode> root;
+ public:
+  struct KdTreeNode {
+    size_t index;
+    size_t count;
+    std::unique_ptr<KdTreeNode> left;
+    std::unique_ptr<KdTreeNode> right;
 
-  std::unique_ptr<KdTreeNode> build(std::vector<size_t>& indices, size_t start, size_t end, size_t depth);
+    KdTreeNode(size_t index, size_t count, std::unique_ptr<KdTreeNode> left, std::unique_ptr<KdTreeNode> right)
+        : index(index), count(count), left(std::move(left)), right(std::move(right)) {}
+  };
 
  public:
   KdTree(DataTable* table);
@@ -61,6 +59,12 @@ class KdTree {
   };
   std::tuple<int, float, size_t> findNearest(const std::vector<float>& point,
                                              std::function<bool(size_t)> filterFunc = nullptr);
+
+ private:
+  DataTable* centroids;
+  std::unique_ptr<KdTreeNode> root;
+
+  std::unique_ptr<KdTreeNode> build(absl::Span<size_t> indices, size_t depth);
 };
 
 }  // namespace splat

@@ -36,7 +36,7 @@ KdTree::KdTree(DataTable* table) : centroids(table) {
   assert(table);
   std::vector<size_t> indices(centroids->getNumRows());
   std::iota(indices.begin(), indices.end(), 0);
-  this->root = build(indices, 0, indices.size(), 0);
+  this->root = build(absl::MakeSpan(indices), 0);
 }
 
 std::tuple<int, float, size_t> KdTree::findNearest(const std::vector<float>& point,
@@ -97,39 +97,39 @@ std::tuple<int, float, size_t> KdTree::findNearest(const std::vector<float>& poi
   return {mini, mind, cnt};
 }
 
-std::unique_ptr<KdTreeNode> KdTree::build(std::vector<size_t>& indices, size_t start, size_t end, size_t depth) {
-  const size_t length = end - start;
-  if (length == 0) {
+std::unique_ptr<KdTree::KdTreeNode> KdTree::build(absl::Span<size_t> indices, size_t depth) {
+  if (indices.empty()) {
     return nullptr;
   }
 
   const size_t axis = depth % centroids->getNumColumns();
   auto&& values_column = centroids->getColumn(axis);
 
-  std::sort(indices.begin(), indices.end(), [&values_column](size_t a, size_t b) {
+  size_t mid = indices.size() >> 1;
+
+  std::nth_element(indices.begin(), indices.begin() + mid, indices.end(), [&](size_t a, size_t b) {
     return values_column.getValue<float>(a) < values_column.getValue<float>(b);
   });
 
-  const size_t midOffset = length >> 1;
-  const size_t mid = start + midOffset;
+  size_t node_index = indices[mid];
 
   if (indices.size() == 1) {
-    return std::make_unique<KdTreeNode>(indices[0], 1, nullptr, nullptr);
-  } else if (indices.size() == 2) {
-    if (length == 2) {
-      auto right_node = std::make_unique<KdTreeNode>(indices[mid], 1, nullptr, nullptr);
-      return std::make_unique<KdTreeNode>(indices[start], 2, nullptr, std::move(right_node));
-    }
+    return std::make_unique<KdTreeNode>(node_index, 1, nullptr, nullptr);
   }
 
-  auto left = build(indices, start, mid, depth + 1);
-  auto right = build(indices, mid + 1, end, depth + 1);
+  if (indices.size() == 2) {
+    auto left_leaf = std::make_unique<KdTreeNode>(indices[0], 1, nullptr, nullptr);
+    return std::make_unique<KdTreeNode>(node_index, 2, std::move(left_leaf), nullptr);
+  }
 
-  size_t count = 1;
-  count += left ? left->count : 0;
-  count += right ? right->count : 0;
+  auto left = build(indices.subspan(0, mid), depth + 1);
+  auto right = build(indices.subspan(mid + 1), depth + 1);
 
-  return std::make_unique<KdTreeNode>(indices[mid], count, std::move(left), std::move(right));
+  size_t total_count = 1;
+  if (left) total_count += left->count;
+  if (right) total_count += right->count;
+
+  return std::make_unique<KdTreeNode>(node_index, total_count, std::move(left), std::move(right));
 }
 
 }  // namespace splat

@@ -67,7 +67,7 @@ static uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> i
     }
 
     // Median-of-three
-    int mid = (l + r) >> 1;
+    int mid = (l + r) / 2;
     swap(mid, l + 1);
     if (valAt(l) > valAt(r)) swap(l, r);
     if (valAt(l + 1) > valAt(r)) swap(l + 1, r);
@@ -81,10 +81,10 @@ static uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> i
     while (true) {
       do {
         i++;
-      } while (i < n && valAt(i) < pivotVal);
+      } while (i <= r && valAt(i) < pivotVal);
       do {
         j--;
-      } while (j >= 0 && valAt(j) > pivotVal);
+      } while (j >= l && valAt(j) > pivotVal);
 
       if (j < i) break;
       swap(i, j);
@@ -194,7 +194,7 @@ std::unique_ptr<BTree::BTreeNode> BTree::recurse(absl::Span<uint32_t> indices) {
 
   const int col = aabb.largestAxis();
   const auto& values = centroids->getColumn(col).asSpan<float>();
-  const size_t mid = indices.size() >> 1;
+  const size_t mid = indices.size() / 2;
   quickselect(values, indices, mid);
   auto&& left = recurse(indices.subspan(0, mid));
   auto&& right = recurse(indices.subspan(mid));
