@@ -281,7 +281,7 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
       }
 
       // scale by sqrt(2) to fit in [-1, 1] range
-      std::for_each(q.begin(), q.end(), [](float& v) { v *= M_SQRT2; });
+      std::for_each(q.begin(), q.end(), [](float& v) { v *= M_SQRT2f; });
 
       static const int QUAT_IDX_MAP[4][3] = {
           {1, 2, 3},  // maxComp = 0 (x)
