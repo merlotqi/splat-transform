@@ -84,9 +84,9 @@ static inline std::array<float, 4> unpackQuat(uint8_t px, uint8_t py, uint8_t pz
   };
 
   const auto& indices = idx[maxComp];
-  comps[indices[0]] = a / M_SQRT2f;
-  comps[indices[1]] = b / M_SQRT2f;
-  comps[indices[2]] = c / M_SQRT2f;
+  comps[indices[0]] = a / M_SQRT2;
+  comps[indices[1]] = b / M_SQRT2;
+  comps[indices[2]] = c / M_SQRT2;
 
   float t = 1.0f - (comps[0] * comps[0] + comps[1] * comps[1] + comps[2] * comps[2] + comps[3] * comps[3]);
   comps[maxComp] = sqrtf(std::max(0.0f, t));
@@ -96,7 +96,7 @@ static inline std::array<float, 4> unpackQuat(uint8_t px, uint8_t py, uint8_t pz
 
 static inline float sigmoidInv(float y) {
   const float e = std::min(1.0f - 1e-6f, std::max(1e-6f, y));
-  return log(e / (1 - e));
+  return log(e / (1.0 - e));
 }
 
 std::unique_ptr<DataTable> readSog(const std::string& file, const std::string& sourceName) {

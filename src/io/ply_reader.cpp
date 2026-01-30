@@ -34,6 +34,7 @@
 #include <numeric>
 #include <sstream>
 #include <stdexcept>
+
 #include "splat/io/decompress_ply.h"
 #include "splat/models/data-table.h"
 
@@ -237,13 +238,13 @@ std::unique_ptr<DataTable> readPly(const std::string& filename) {
   plyData.comments = std::move(header.comments);
   plyData.elements = std::move(elements);
 
-  if(isCompressedPly(&plyData)) {
+  if (isCompressedPly(&plyData)) {
     return decompressPly(&plyData);
   }
 
-  auto it = std::find_if(plyData.elements.begin(), plyData.elements.end(), [](const PlyElementData& d){return d.name == "vertex";});
-  if(it == plyData.elements.end())
-  {
+  auto it = std::find_if(plyData.elements.begin(), plyData.elements.end(),
+                         [](const PlyElementData& d) { return d.name == "vertex"; });
+  if (it == plyData.elements.end()) {
     throw std::runtime_error("PLY file does not contain vertex element");
   }
 

@@ -281,7 +281,7 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
       }
 
       // scale by sqrt(2) to fit in [-1, 1] range
-      std::for_each(q.begin(), q.end(), [](float& v) { v *= M_SQRT2f; });
+      std::for_each(q.begin(), q.end(), [](float& v) { v *= M_SQRT2; });
 
       static const int QUAT_IDX_MAP[4][3] = {
           {1, 2, 3},  // maxComp = 0 (x)
@@ -355,9 +355,14 @@ void writeSog(const std::string& outputFilename, DataTable* dataTable, bool bund
     for (size_t i = 0; i < centroids->getNumRows(); i++) {
       std::get<1>(codebook)->getRow(i, centroidsRow);
       for (int j = 0; j < shCoeffs; ++j) {
-        uint8_t x = static_cast<uint8_t>(centroidsRow[shColumnNames[shCoeffs * 0 + j]]);
-        uint8_t y = static_cast<uint8_t>(centroidsRow[shColumnNames[shCoeffs * 1 + j]]);
-        uint8_t z = static_cast<uint8_t>(centroidsRow[shColumnNames[shCoeffs * 2 + j]]);
+        // Convert float values to uint8_t (0-255 range)
+        float x_val = centroidsRow[shColumnNames[shCoeffs * 0 + j]];
+        float y_val = centroidsRow[shColumnNames[shCoeffs * 1 + j]];
+        float z_val = centroidsRow[shColumnNames[shCoeffs * 2 + j]];
+
+        uint8_t x = static_cast<uint8_t>(std::clamp(x_val, 0.0f, 255.0f));
+        uint8_t y = static_cast<uint8_t>(std::clamp(y_val, 0.0f, 255.0f));
+        uint8_t z = static_cast<uint8_t>(std::clamp(z_val, 0.0f, 255.0f));
 
         centroidsBuf[i * shCoeffs * 4 + j * 4 + 0] = x;
         centroidsBuf[i * shCoeffs * 4 + j * 4 + 1] = y;
