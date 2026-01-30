@@ -76,11 +76,15 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
+<p>K-dimensional tree for efficient spatial queries on 3D Gaussian splatting data.  
+ <a href="classsplat_1_1KdTree.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="kdtree_8h_source.html">kdtree.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsplat_1_1KdTree_1_1KdTreeNode.html">KdTreeNode</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Node structure representing a single node in the k-d tree.  <a href="structsplat_1_1KdTree_1_1KdTreeNode.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
@@ -90,16 +94,22 @@ Public Types</h2></td></tr>
 , <a class="el" href="classsplat_1_1KdTree.html#aa2197d2367451b3d608b026c27cd3c39a8930d5e5ad4dd6f0d6b3b4028f63d35a">count</a>
 , <a class="el" href="classsplat_1_1KdTree.html#aa2197d2367451b3d608b026c27cd3c39af5e4a985bca604e5cf4b95e258acb9e8">findNearestMaxIndex</a> = 3
  }</td></tr>
+<tr class="memdesc:aa2197d2367451b3d608b026c27cd3c39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indices for the tuple returned by findNearest method.  <a href="classsplat_1_1KdTree.html#aa2197d2367451b3d608b026c27cd3c39">More...</a><br /></td></tr>
 <tr class="separator:aa2197d2367451b3d608b026c27cd3c39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a10daae932a6e0e29c15e658009e95fe1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsplat_1_1KdTree.html#a10daae932a6e0e29c15e658009e95fe1">KdTree</a> (<a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *table)</td></tr>
+<tr class="memdesc:a10daae932a6e0e29c15e658009e95fe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classsplat_1_1KdTree.html" title="K-dimensional tree for efficient spatial queries on 3D Gaussian splatting data.">KdTree</a> from a <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a>.  <a href="classsplat_1_1KdTree.html#a10daae932a6e0e29c15e658009e95fe1">More...</a><br /></td></tr>
 <tr class="separator:a10daae932a6e0e29c15e658009e95fe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c261c5958313a2a73fb8b8eeff492de"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; int, float, size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsplat_1_1KdTree.html#a0c261c5958313a2a73fb8b8eeff492de">findNearest</a> (const std::vector&lt; float &gt; &amp;point, std::function&lt; bool(size_t)&gt; filterFunc=nullptr)</td></tr>
+<tr class="memdesc:a0c261c5958313a2a73fb8b8eeff492de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the nearest neighbor to a given point.  <a href="classsplat_1_1KdTree.html#a0c261c5958313a2a73fb8b8eeff492de">More...</a><br /></td></tr>
 <tr class="separator:a0c261c5958313a2a73fb8b8eeff492de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Enumeration Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>K-dimensional tree for efficient spatial queries on 3D Gaussian splatting data. </p>
+<p>This class implements a k-d tree data structure optimized for finding nearest neighbors in 3D space. It is specifically designed for use with 3D Gaussian splatting data where efficient spatial queries are required for real-time neural rendering applications. </p>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
 <a id="aa2197d2367451b3d608b026c27cd3c39"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa2197d2367451b3d608b026c27cd3c39">&#9670;&nbsp;</a></span>anonymous enum</h2>
 
@@ -111,11 +121,17 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Indices for the tuple returned by findNearest method. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa2197d2367451b3d608b026c27cd3c39ae9f716ef7e6b526ac782bb2bdce906e0"></a>index&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aa2197d2367451b3d608b026c27cd3c39a36529e925182ce3e3ca93ae5e71f49a2"></a>distanceSqr&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aa2197d2367451b3d608b026c27cd3c39a8930d5e5ad4dd6f0d6b3b4028f63d35a"></a>count&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="aa2197d2367451b3d608b026c27cd3c39af5e4a985bca604e5cf4b95e258acb9e8"></a>findNearestMaxIndex&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa2197d2367451b3d608b026c27cd3c39ae9f716ef7e6b526ac782bb2bdce906e0"></a>index&#160;</td><td class="fielddoc"><p>Index of the nearest neighbor in the dataset. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa2197d2367451b3d608b026c27cd3c39a36529e925182ce3e3ca93ae5e71f49a2"></a>distanceSqr&#160;</td><td class="fielddoc"><p>Squared distance to the nearest neighbor. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa2197d2367451b3d608b026c27cd3c39a8930d5e5ad4dd6f0d6b3b4028f63d35a"></a>count&#160;</td><td class="fielddoc"><p>Number of nodes visited during the search. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa2197d2367451b3d608b026c27cd3c39af5e4a985bca604e5cf4b95e258acb9e8"></a>findNearestMaxIndex&#160;</td><td class="fielddoc"><p>Maximum valid index for the tuple. </p>
+</td></tr>
 </table>
 
 </div>
@@ -136,6 +152,15 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Construct a new <a class="el" href="classsplat_1_1KdTree.html" title="K-dimensional tree for efficient spatial queries on 3D Gaussian splatting data.">KdTree</a> from a <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a>. </p>
+<p>The k-d tree is built from the centroids stored in the provided <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a>. The tree construction uses the median of points along alternating dimensions to ensure a balanced tree structure.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">table</td><td>Pointer to the <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a> containing the data points (centroids) The table must not be null and should contain valid data </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -165,6 +190,22 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Find the nearest neighbor to a given point. </p>
+<p>This method performs an efficient nearest neighbor search in the k-d tree. It uses a recursive algorithm that explores the tree while maintaining a bounding sphere to prune unnecessary branches.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">point</td><td>The query point for which to find the nearest neighbor Must have the same dimensionality as the data points in the tree </td></tr>
+    <tr><td class="paramname">filterFunc</td><td>Optional filter function to exclude certain points from consideration Should return true for points that are allowed to be considered </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;int, float, size_t&gt; A tuple containing:<ul>
+<li>The index of the nearest neighbor (or -1 if not found)</li>
+<li>The squared distance to the nearest neighbor</li>
+<li>The number of nodes visited during the search </li>
+</ul>
+</dd></dl>
 
 </div>
 </div>
