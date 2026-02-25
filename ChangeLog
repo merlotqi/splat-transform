@@ -1,5 +1,10 @@
 Date: 2026-02-25
-Commit: 953e03e
+Commit: bc6f615
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: refactor: optimize voxel filter cross-face neighbor lookups
+
+Date: 2026-02-25
+Commit: 6436d82
 Author: Merlot.Qi <merlotrain.mc@gmail.com>
 Message: refactor: simplify GaussianBVH bounds structure and improve AABB computation
 
