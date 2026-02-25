@@ -25,7 +25,7 @@
  *
  ***********************************************************************************/
 
-#include <splat/io/splat-writer.h>
+#include <splat/io/splat_writer.h>
 #include <splat/maths/maths.h>
 #include <splat/models/data-table.h>
 

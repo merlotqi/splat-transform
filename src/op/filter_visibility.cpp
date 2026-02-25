@@ -25,10 +25,9 @@
  *
  ***********************************************************************************/
 
-#pragma once
-
 #include <assert.h>
 #include <splat/models/data-table.h>
+#include <splat/op/filter_visibility.h>
 
 #include <algorithm>
 

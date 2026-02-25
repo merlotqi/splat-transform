@@ -27,7 +27,11 @@
 
 #pragma once
 
+#include <absl/numeric/bits.h>
+
+#include <cassert>
 #include <cmath>
+#include <cstdint>
 
 namespace splat {
 
@@ -71,6 +75,49 @@ inline float simple_random() {
   static unsigned int seed = 42;  ///< Initial seed (can be changed for different sequences)
   seed = (1103515245ULL * seed + 12345) & 0x7FFFFFFF;
   return (float)seed / (float)0x7FFFFFFF;
+}
+
+/** All 64 bits set (as unsigned 32-bit) */
+static constexpr uint32_t SOLID_MASK = 0xFFFFFFFFu;
+
+/**
+ * Solid leaf node marker: childMask = 0xFF, baseOffset = 0.
+ * This is unambiguous because BFS layout guarantees children always come after
+ * their parent, so baseOffset = 0 is never valid for an interior node.
+ */
+static constexpr uint32_t SOLID_LEAF_MARKER = 0xFF000000u;
+
+/**
+ * Check if a voxel mask represents a solid block (all 64 bits set).
+ *
+ * @param lo - Lower 32 bits of mask
+ * @param hi - Upper 32 bits of mask
+ * @returns True if all 64 voxels are solid
+ */
+inline bool isSolid(uint32_t lo, uint32_t hi) { return lo == SOLID_MASK && hi == SOLID_MASK; }
+
+/**
+ * Check if a voxel mask represents an empty block (no bits set).
+ *
+ * @param lo - Lower 32 bits of mask
+ * @param hi - Upper 32 bits of mask
+ * @returns True if all 64 voxels are empty
+ */
+inline bool isEmpty(uint32_t lo, uint32_t hi) { return lo == 0 && hi == 0; }
+
+/**
+ * Get the offset to a child node given a parent's child mask and octant.
+ * Uses absl::popcount to count how many children come before this octant.
+ *
+ * @param mask - 8-bit child mask from parent node
+ * @param octant - Octant index (0-7)
+ * @returns Offset from base child pointer
+ */
+inline size_t getChildOffset(uint8_t mask, int octant) {
+  assert(octant >= 0 && octant < 8 && "Octant must be between 0 and 7");
+  uint8_t prefix = static_cast<uint8_t>((1U << octant) - 1);
+  uint8_t masked = static_cast<uint8_t>(mask & prefix);
+  return absl::popcount(masked);
 }
 
 }  // namespace splat

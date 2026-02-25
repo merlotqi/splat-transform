@@ -30,7 +30,7 @@
 #include <splat/io/sog_writer.h>
 #include <splat/maths/maths.h>
 #include <splat/models/sog.h>
-#include <splat/op/morton-order.h>
+#include <splat/op/morton_order.h>
 #include <splat/spatial/kmeans.h>
 #include <splat/splat_version.h>
 #include <splat/utils/logger.h>

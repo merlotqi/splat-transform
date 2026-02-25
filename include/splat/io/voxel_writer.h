@@ -27,35 +27,33 @@
 
 #pragma once
 
-#include <splat/io/compressed_chunk.h>
-#include <splat/io/compressed_ply_writer.h>
-#include <splat/io/csv_writer.h>
-#include <splat/io/decompress_ply.h>
-#include <splat/io/ksplat_reader.h>
-#include <splat/io/lcc_reader.h>
-#include <splat/io/lod_writer.h>
-#include <splat/io/ply_reader.h>
-#include <splat/io/ply_writer.h>
-#include <splat/io/sog_reader.h>
-#include <splat/io/sog_writer.h>
-#include <splat/io/splat_writer.h>
-#include <splat/io/splat_reader.h>
-#include <splat/io/spz_reader.h>
-#include <splat/maths/maths.h>
-#include <splat/maths/rotate-sh.h>
 #include <splat/models/data-table.h>
-#include <splat/models/lcc.h>
-#include <splat/models/ply.h>
-#include <splat/models/sog.h>
-#include <splat/op/combine.h>
-#include <splat/op/morton_order.h>
-#include <splat/op/transform.h>
-#include <splat/spatial/btree.h>
-#include <splat/spatial/kdtree.h>
-#include <splat/spatial/kmeans.h>
-#include <splat/splat_version.h>
-#include <splat/utils/crc.h>
-#include <splat/utils/logger.h>
-#include <splat/utils/webp-codec.h>
-#include <splat/utils/zip-reader.h>
-#include <splat/utils/zip-writer.h>
+
+namespace splat {
+
+/**
+ * Voxelizes Gaussian splat data and writes the result as a sparse voxel octree.
+ *
+ * This function performs GPU-accelerated voxelization of Gaussian splat data
+ * and outputs two files:
+ * - `filename` (.voxel.json) - JSON metadata including bounds, resolution, and array sizes
+ * - Corresponding .voxel.bin - Binary octree data (nodes + leafData as uint32_t arrays)
+ *
+ * The binary file layout is:
+ * - Bytes 0 to (nodeCount * 4 - 1): nodes array (uint32_t, little-endian)
+ * - Bytes (nodeCount * 4) to end: leafData array (uint32_t, little-endian)
+ *
+ * @param filename - Output filename (without extension) or with .voxel.json extension
+ * @param dataTable - Gaussian splat data to voxelize
+ * @param voxelResolution - Size of each voxel in world units. Default: 0.05
+ * @param opacityCutoff - Opacity threshold for solid voxels - voxels below this are considered empty. Default: 0.5
+ *
+ * @return True if voxelization succeeded, false otherwise
+ *
+ * @note This function requires a GPU that supports compute shaders.
+ *
+ */
+void writeVoxel(const std::string& filename, const DataTable* dataTable, float voxelResolution = 0.05f,
+                float opacityCutoff = 0.5f);
+
+}  // namespace splat

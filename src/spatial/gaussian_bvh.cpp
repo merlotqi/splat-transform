@@ -1,0 +1,158 @@
+/***********************************************************************************
+ *
+ * splat - A C++ library for reading and writing 3D Gaussian Splatting (splat) files.
+ *
+ * This library provides functionality to convert, manipulate, and process
+ * 3D Gaussian splatting data formats used in real-time neural rendering.
+ *
+ * This file is part of splat.
+ *
+ * splat is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * splat is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ * For more information, visit the project's homepage or contact the author.
+ *
+ ***********************************************************************************/
+
+#pragma once
+
+#include <absl/types/span.h>
+#include <assert.h>
+#include <splat/models/data-table.h>
+#include <splat/spatial/gaussian_bvh.h>
+
+#include <limits>
+#include <memory>
+#include <numeric>
+#include <utility>
+
+#include "Eigen/src/Core/Matrix.h"
+
+namespace splat {
+
+extern uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> idx, size_t k_in);
+
+GaussianBVH::GaussianBVH(const DataTable* dataTable, const DataTable* extents) {
+  assert(dataTable);
+  assert(extents);
+
+  x_ = dataTable->getColumnByName("x").asSpan<float>();
+  y_ = dataTable->getColumnByName("y").asSpan<float>();
+  z_ = dataTable->getColumnByName("z").asSpan<float>();
+
+  extentX_ = extents->getColumnByName("extent_x").asSpan<float>();
+  extentY_ = extents->getColumnByName("extent_y").asSpan<float>();
+  extentZ_ = extents->getColumnByName("extent_z").asSpan<float>();
+
+  const size_t numRows = dataTable->getNumRows();
+  std::vector<uint32_t> indices(numRows);
+  std::iota(indices.begin(), indices.end(), 0);
+
+  root_ = buildNode(absl::MakeSpan(indices));
+}
+
+std::vector<uint32_t> GaussianBVH::queryOverlapping(const Eigen::Vector3f& boxMin, const Eigen::Vector3f& boxMax) {
+  return {};
+}
+
+GaussianBVH::BVHBounds GaussianBVH::computeBound(absl::Span<uint32_t> indices) {
+  float minX = std::numeric_limits<float>::infinity();
+  float minY = std::numeric_limits<float>::infinity();
+  float minZ = std::numeric_limits<float>::infinity();
+  float maxX = -std::numeric_limits<float>::infinity();
+  float maxY = -std::numeric_limits<float>::infinity();
+  float maxZ = -std::numeric_limits<float>::infinity();
+
+  for (size_t i = 0; i < indices.size(); ++i) {
+    const auto idx = indices[i];
+    const auto gMinX = x_[idx] - extentX_[idx];
+    const auto gMinY = y_[idx] - extentY_[idx];
+    const auto gMinZ = z_[idx] - extentZ_[idx];
+    const auto gMaxX = x_[idx] + extentX_[idx];
+    const auto gMaxY = y_[idx] + extentY_[idx];
+    const auto gMaxZ = z_[idx] + extentZ_[idx];
+
+    if (gMinX < minX) minX = gMinX;
+    if (gMinY < minY) minY = gMinY;
+    if (gMinZ < minZ) minZ = gMinZ;
+    if (gMaxX > maxX) maxX = gMaxX;
+    if (gMaxY > maxY) maxY = gMaxY;
+    if (gMaxZ > maxZ) maxZ = gMaxZ;
+  }
+
+  return {Eigen::Vector3f(minX, minY, minZ), Eigen::Vector3f(maxX, maxY, maxZ)};
+}
+
+std::unique_ptr<GaussianBVH::BVHNode> GaussianBVH::buildNode(absl::Span<uint32_t> indices) {
+  auto bounds = computeBound(indices);
+
+  // Create leaf node if small enough
+  if (indices.size() <= MAX_LEAF_SIZE) {
+    return std::make_unique<BVHNode>(indices.size(), bounds, std::vector<uint32_t>(indices.begin(), indices.end()));
+  }
+
+  // Find the largest axis to split on (based on centroid positions for better balance)
+  float centroidMinX = std::numeric_limits<float>::infinity(), centroidMaxX = -std::numeric_limits<float>::infinity();
+  float centroidMinY = std::numeric_limits<float>::infinity(), centroidMaxY = -std::numeric_limits<float>::infinity();
+  float centroidMinZ = std::numeric_limits<float>::infinity(), centroidMaxZ = -std::numeric_limits<float>::infinity();
+
+  for (size_t i = 0; i < indices.size(); i++) {
+    const auto idx = indices[i];
+    const auto px = x_[idx];
+    const auto py = y_[idx];
+    const auto pz = z_[idx];
+
+    if (px < centroidMinX) centroidMinX = px;
+    if (px > centroidMaxX) centroidMaxX = px;
+    if (py < centroidMinY) centroidMinY = py;
+    if (py > centroidMaxY) centroidMaxY = py;
+    if (pz < centroidMinZ) centroidMinZ = pz;
+    if (pz > centroidMaxZ) centroidMaxZ = pz;
+  }
+
+  const auto extX = centroidMaxX - centroidMinX;
+  const auto extY = centroidMaxY - centroidMinY;
+  const auto extZ = centroidMaxZ - centroidMinZ;
+
+  // Choose axis with largest extent
+  absl::Span<const float> splitAxis;
+  if (extX >= extY && extX >= extZ) {
+    splitAxis = x_;
+  } else if (extY >= extZ) {
+    splitAxis = y_;
+  } else {
+    splitAxis = z_;
+  }
+
+  // Partition around median
+  const size_t mid = indices.size() / 2;
+  quickselect(splitAxis, indices, mid);
+
+  auto&& left = buildNode(indices.subspan(0, mid));
+  auto&& right = buildNode(indices.subspan(mid));
+
+  size_t rc = 0;
+  rc += left ? left->count : 0;
+  rc += right ? right->count : 0;
+
+  auto node = std::make_unique<BVHNode>();
+  node->count = rc;
+  node->bounds = bounds;
+  node->left = std::move(left);
+  node->right = std::move(right);
+
+  return node;
+}
+
+}  // namespace splat

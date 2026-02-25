@@ -28,7 +28,7 @@
 #include <absl/strings/str_join.h>
 #include <splat/io/compressed_chunk.h>
 #include <splat/io/compressed_ply_writer.h>
-#include <splat/op/morton-order.h>
+#include <splat/op/morton_order.h>
 #include <splat/splat_version.h>
 
 #include <algorithm>

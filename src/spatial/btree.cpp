@@ -41,7 +41,7 @@ namespace splat {
  * @param k The index (0-based) of the element to select (e.g., k=indices.size()/2 for median).
  * @return The value of the k-th element in the original index array (before partitioning).
  */
-static uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> idx, size_t k_in) {
+uint32_t quickselect(absl::Span<const float> data, absl::Span<uint32_t> idx, size_t k_in) {
   if (idx.empty()) return 0;
 
   int n = static_cast<int>(idx.size());

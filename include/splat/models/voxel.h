@@ -27,48 +27,47 @@
 
 #pragma once
 
-#include <absl/types/span.h>
-
-#include <array>
-#include <cstddef>
-#include <memory>
+#include <string>
 #include <vector>
 
 namespace splat {
 
-class DataTable;
+struct VoxelMetadata {
+  /** File format version */
+  std::string version;
 
-class Octree {
- public:
-  struct AABB {
-    std::array<float, 3> min;
-    std::array<float, 3> max;
+  /** Grid bounds aligned to 4x4x4 block boundaries */
+  struct {
+    std::vector<double> min;
+    std::vector<double> max;
+  } gridBounds;
 
-    AABB() = default;
-    AABB(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
-    void getCenter(float &x, float &y, float &z) const;
-    bool contains(float x, float y, float z) const;
-  };
+  /** Original Gaussian scene bounds */
+  struct {
+    std::vector<double> min;
+    std::vector<double> max;
+  } sceneBounds;
 
-  struct OctreeNode {
-    AABB aabb;
-    std::vector<size_t> pointIndices;
-    std::array<std::unique_ptr<OctreeNode>, 8> children;
-    bool isLeaf = true;
-    int depth = 0;
-  };
+  /** Size of each voxel in world units */
+  double voxelResolution{0.0};
 
- public:
-  explicit Octree(DataTable *table, size_t maxPoints = 32, int maxDepth = 8);
+  /** Voxels per leaf dimension (always 4) */
+  int leafSize{4};
 
-  std::unique_ptr<OctreeNode> root;
+  /** Maximum tree depth */
+  int treeDepth{0};
 
- private:
-  std::unique_ptr<OctreeNode> build(const AABB &aabb, absl::Span<size_t> indices, int depth);
+  /** Number of interior nodes */
+  int numInteriorNodes{0};
 
-  DataTable *dataTable_;
-  int maxDepth_;
-  int maxPointPerNodes_;
+  /** Number of mixed leaf nodes */
+  int numMixedLeaves{0};
+
+  /** Total number of Uint32 entries in the nodes array */
+  int nodeCount{0};
+
+  /** Total number of Uint32 entries in the leafData array */
+  int leafDataCount{0};
 };
 
 }  // namespace splat

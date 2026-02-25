@@ -27,7 +27,7 @@
 
 #include <splat/io/lod_writer.h>
 #include <splat/io/sog_writer.h>
-#include <splat/op/morton-order.h>
+#include <splat/op/morton_order.h>
 #include <splat/spatial/btree.h>
 #include <splat/utils/threadpool.h>
 
