@@ -99,25 +99,49 @@ $(function() {
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;cmath&gt;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;absl/numeric/bits.h&gt;</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacesplat.html">splat</a> {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">   50</a></span>&#160;<span class="keyword">inline</span> T <a class="code" href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">sigmoid</a>(T x) {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">return</span> 1.0 / (1.0 + std::exp(-x));</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">   70</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">float</span> <a class="code" href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">simple_random</a>() {</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> seed = 42;  </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  seed = (1103515245ULL * seed + 12345) &amp; 0x7FFFFFFF;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keywordflow">return</span> (<span class="keywordtype">float</span>)seed / (float)0x7FFFFFFF;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;}</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}  <span class="comment">// namespace splat</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &lt;cassert&gt;</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;cmath&gt;</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacesplat.html">splat</a> {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">   54</a></span>&#160;<span class="keyword">inline</span> T <a class="code" href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">sigmoid</a>(T x) {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordflow">return</span> 1.0 / (1.0 + std::exp(-x));</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;}</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">   74</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">float</span> <a class="code" href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">simple_random</a>() {</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> seed = 42;  </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  seed = (1103515245ULL * seed + 12345) &amp; 0x7FFFFFFF;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keywordflow">return</span> (<span class="keywordtype">float</span>)seed / (float)0x7FFFFFFF;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;}</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="namespacesplat.html#a3468c7dd0900735d8f61c1a6bdb0146f">   81</a></span>&#160;<span class="keyword">static</span> constexpr uint32_t <a class="code" href="namespacesplat.html#a3468c7dd0900735d8f61c1a6bdb0146f">SOLID_MASK</a> = 0xFFFFFFFFu;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="line" href="namespacesplat.html#a1316c487551abcdb519cc204af985e21">   88</a></span>&#160;<span class="keyword">static</span> constexpr uint32_t <a class="code" href="namespacesplat.html#a1316c487551abcdb519cc204af985e21">SOLID_LEAF_MARKER</a> = 0xFF000000u;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="namespacesplat.html#ae744e2d1a1ebc871c56abfa225b63452">   97</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="namespacesplat.html#ae744e2d1a1ebc871c56abfa225b63452">isSolid</a>(uint32_t lo, uint32_t hi) { <span class="keywordflow">return</span> lo == <a class="code" href="namespacesplat.html#a3468c7dd0900735d8f61c1a6bdb0146f">SOLID_MASK</a> &amp;&amp; hi == <a class="code" href="namespacesplat.html#a3468c7dd0900735d8f61c1a6bdb0146f">SOLID_MASK</a>; }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00106"></a><span class="lineno"><a class="line" href="namespacesplat.html#a2bd91a7ecdb3d07ca5ebd69924d3f0b0">  106</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> <a class="code" href="namespacesplat.html#a2bd91a7ecdb3d07ca5ebd69924d3f0b0">isEmpty</a>(uint32_t lo, uint32_t hi) { <span class="keywordflow">return</span> lo == 0 &amp;&amp; hi == 0; }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="namespacesplat.html#ae0c4c710a92c411d950f720a41daee06">  116</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">size_t</span> <a class="code" href="namespacesplat.html#ae0c4c710a92c411d950f720a41daee06">getChildOffset</a>(uint8_t mask, <span class="keywordtype">int</span> octant) {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  assert(octant &gt;= 0 &amp;&amp; octant &lt; 8 &amp;&amp; <span class="stringliteral">&quot;Octant must be between 0 and 7&quot;</span>);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  uint8_t prefix = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>((1U &lt;&lt; octant) - 1);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  uint8_t masked = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(mask &amp; prefix);</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  <span class="keywordflow">return</span> absl::popcount(masked);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;}</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}  <span class="comment">// namespace splat</span></div>
 <div class="ttc" id="anamespacesplat_html"><div class="ttname"><a href="namespacesplat.html">splat</a></div><div class="ttdef"><b>Definition:</b> compressed_chunk.h:35</div></div>
-<div class="ttc" id="anamespacesplat_html_a6602a59955c1f74cc96dcb84bd4b3b5b"><div class="ttname"><a href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">splat::sigmoid</a></div><div class="ttdeci">T sigmoid(T x)</div><div class="ttdoc">Sigmoid activation function.</div><div class="ttdef"><b>Definition:</b> maths.h:50</div></div>
-<div class="ttc" id="anamespacesplat_html_af5c99d995d33cde611bffa16444a8839"><div class="ttname"><a href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">splat::simple_random</a></div><div class="ttdeci">float simple_random()</div><div class="ttdoc">Simple deterministic pseudo-random number generator.</div><div class="ttdef"><b>Definition:</b> maths.h:70</div></div>
+<div class="ttc" id="anamespacesplat_html_a1316c487551abcdb519cc204af985e21"><div class="ttname"><a href="namespacesplat.html#a1316c487551abcdb519cc204af985e21">splat::SOLID_LEAF_MARKER</a></div><div class="ttdeci">static constexpr uint32_t SOLID_LEAF_MARKER</div><div class="ttdef"><b>Definition:</b> maths.h:88</div></div>
+<div class="ttc" id="anamespacesplat_html_a2bd91a7ecdb3d07ca5ebd69924d3f0b0"><div class="ttname"><a href="namespacesplat.html#a2bd91a7ecdb3d07ca5ebd69924d3f0b0">splat::isEmpty</a></div><div class="ttdeci">bool isEmpty(uint32_t lo, uint32_t hi)</div><div class="ttdef"><b>Definition:</b> maths.h:106</div></div>
+<div class="ttc" id="anamespacesplat_html_a3468c7dd0900735d8f61c1a6bdb0146f"><div class="ttname"><a href="namespacesplat.html#a3468c7dd0900735d8f61c1a6bdb0146f">splat::SOLID_MASK</a></div><div class="ttdeci">static constexpr uint32_t SOLID_MASK</div><div class="ttdef"><b>Definition:</b> maths.h:81</div></div>
+<div class="ttc" id="anamespacesplat_html_a6602a59955c1f74cc96dcb84bd4b3b5b"><div class="ttname"><a href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">splat::sigmoid</a></div><div class="ttdeci">T sigmoid(T x)</div><div class="ttdoc">Sigmoid activation function.</div><div class="ttdef"><b>Definition:</b> maths.h:54</div></div>
+<div class="ttc" id="anamespacesplat_html_ae0c4c710a92c411d950f720a41daee06"><div class="ttname"><a href="namespacesplat.html#ae0c4c710a92c411d950f720a41daee06">splat::getChildOffset</a></div><div class="ttdeci">size_t getChildOffset(uint8_t mask, int octant)</div><div class="ttdef"><b>Definition:</b> maths.h:116</div></div>
+<div class="ttc" id="anamespacesplat_html_ae744e2d1a1ebc871c56abfa225b63452"><div class="ttname"><a href="namespacesplat.html#ae744e2d1a1ebc871c56abfa225b63452">splat::isSolid</a></div><div class="ttdeci">bool isSolid(uint32_t lo, uint32_t hi)</div><div class="ttdef"><b>Definition:</b> maths.h:97</div></div>
+<div class="ttc" id="anamespacesplat_html_af5c99d995d33cde611bffa16444a8839"><div class="ttname"><a href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">splat::simple_random</a></div><div class="ttdeci">float simple_random()</div><div class="ttdoc">Simple deterministic pseudo-random number generator.</div><div class="ttdef"><b>Definition:</b> maths.h:74</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

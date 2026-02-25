@@ -1,4 +1,6 @@
 <map id="/home/runner/work/SplatLib/SplatLib/include/splat/maths/maths.h" name="/home/runner/work/SplatLib/SplatLib/include/splat/maths/maths.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,207,61"/>
-<area shape="rect" id="node2" href="$splat_8h.html" title=" " alt="" coords="5,109,207,165"/>
+<area shape="rect" id="node1" title=" " alt="" coords="117,5,319,61"/>
+<area shape="rect" id="node2" href="$sparse__octree_8h.html" title=" " alt="" coords="5,109,207,165"/>
+<area shape="rect" id="node4" href="$splat_8h.html" title=" " alt="" coords="231,109,432,165"/>
+<area shape="rect" id="node3" href="$voxel__filter_8h.html" title=" " alt="" coords="5,213,207,269"/>
 </map>

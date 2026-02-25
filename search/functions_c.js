@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['pack_386',['pack',['../classsplat_1_1CompressedChunk.html#a62f9786b4f04eb789843fde95ef58426',1,'splat::CompressedChunk']]],
-  ['parsefromjson_387',['parseFromJson',['../structsplat_1_1Meta.html#a57e714c62a253e91c74bb5a24eee2265',1,'splat::Meta']]],
-  ['parsestring_388',['parseString',['../structsplat_1_1Column.html#a70793710ca7fbeb55eb0bc7867ccbd6d',1,'splat::Column']]],
-  ['permuterows_389',['permuteRows',['../classsplat_1_1DataTable.html#ad98afa53ba8148260d81a63230fbcf09',1,'splat::DataTable']]]
+  ['operator_3d_446',['operator=',['../classsplat_1_1DataTable.html#a6ad228b5bef0b82eee5ecdf919305ee4',1,'splat::DataTable::operator=(const DataTable &amp;other)=delete'],['../classsplat_1_1DataTable.html#abe873aa40d8de4a7b70e159a4eff481f',1,'splat::DataTable::operator=(DataTable &amp;&amp;other) noexcept=default'],['../classsplat_1_1Logger.html#a034ba0c4e1f4b546170e19285d4800ec',1,'splat::Logger::operator=()'],['../classsplat_1_1ZipReader.html#a4397933ea307cfc0b57cef060d1d2808',1,'splat::ZipReader::operator=(const ZipReader &amp;)=delete'],['../classsplat_1_1ZipReader.html#af15e5a820f2f7e574680be1bcbe5d622',1,'splat::ZipReader::operator=(ZipReader &amp;&amp;other) noexcept=default'],['../classsplat_1_1ZipWriter.html#a202d53aa78dce0bacaebe6d6d29b7761',1,'splat::ZipWriter::operator=(const ZipWriter &amp;)=delete'],['../classsplat_1_1ZipWriter.html#a907a7dc2665b05258429cfefd14eca57',1,'splat::ZipWriter::operator=(ZipWriter &amp;&amp;other) noexcept']]]
 ];

@@ -67,7 +67,8 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">splat Namespace Reference</div>  </div>
 </div><!--header-->
@@ -119,6 +120,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsplat_1_1Meta.html">Meta</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Metadata structure for Gaussian Splatting data representation.  <a href="structsplat_1_1Meta.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsplat_1_1VoxelMetadata.html">VoxelMetadata</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsplat_1_1ColumnStats.html">ColumnStats</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistical summary for a single data column.  <a href="structsplat_1_1ColumnStats.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -128,10 +131,18 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsplat_1_1BTree.html">BTree</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bounding Volume Hierarchy (BVH) tree implementation using Axis-Aligned Bounding Boxes (AABBs).  <a href="classsplat_1_1BTree.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsplat_1_1GaussianExtentsResult.html">GaussianExtentsResult</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsplat_1_1GaussianBVH.html">GaussianBVH</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsplat_1_1KdTree.html">KdTree</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">K-dimensional tree for efficient spatial queries on 3D Gaussian splatting data.  <a href="classsplat_1_1KdTree.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsplat_1_1Octree.html">Octree</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsplat_1_1Bounds.html">Bounds</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsplat_1_1SparseOctree.html">SparseOctree</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsplat_1_1Crc.html">Crc</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -205,14 +216,18 @@ Functions</h2></td></tr>
 <tr class="separator:a36751c18195c40aa9ce84448e9c60c29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbfc654461a051b75a3356c5376e5e9d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#afbfc654461a051b75a3356c5376e5e9d">writeSog</a> (const std::string &amp;filename, <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable, bool bundle, int iterations, const std::vector&lt; uint32_t &gt; &amp;indices={})</td></tr>
 <tr class="separator:afbfc654461a051b75a3356c5376e5e9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b7809477624d084e15c34b97faeeda1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a9b7809477624d084e15c34b97faeeda1">writeSplat</a> (const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *datatable, const std::string &amp;filepath)</td></tr>
-<tr class="memdesc:a9b7809477624d084e15c34b97faeeda1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes 3D Gaussian splatting data to a .splat file format.  <a href="namespacesplat.html#a9b7809477624d084e15c34b97faeeda1">More...</a><br /></td></tr>
-<tr class="separator:a9b7809477624d084e15c34b97faeeda1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c7242ade76de864daa0eb64b9d36848"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a7c7242ade76de864daa0eb64b9d36848">readSplat</a> (const std::string &amp;filename)</td></tr>
 <tr class="memdesc:a7c7242ade76de864daa0eb64b9d36848"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads and parses a .splat file containing Gaussian splatting data.  <a href="namespacesplat.html#a7c7242ade76de864daa0eb64b9d36848">More...</a><br /></td></tr>
 <tr class="separator:a7c7242ade76de864daa0eb64b9d36848"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b7809477624d084e15c34b97faeeda1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a9b7809477624d084e15c34b97faeeda1">writeSplat</a> (const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *datatable, const std::string &amp;filepath)</td></tr>
+<tr class="memdesc:a9b7809477624d084e15c34b97faeeda1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes 3D Gaussian splatting data to a .splat file format.  <a href="namespacesplat.html#a9b7809477624d084e15c34b97faeeda1">More...</a><br /></td></tr>
+<tr class="separator:a9b7809477624d084e15c34b97faeeda1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ce2054951931469676ca03b8dea87b3"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a5ce2054951931469676ca03b8dea87b3">readSpz</a> (const std::string &amp;filename)</td></tr>
 <tr class="separator:a5ce2054951931469676ca03b8dea87b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2686ec942666307e6b7bcb92fd52d7e4"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a2686ec942666307e6b7bcb92fd52d7e4">readVoxel</a> (const std::string &amp;filename)</td></tr>
+<tr class="separator:a2686ec942666307e6b7bcb92fd52d7e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab34820a32a7f5d0d6a0657c8b8321601"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#ab34820a32a7f5d0d6a0657c8b8321601">writeVoxel</a> (const std::string &amp;filename, const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable, float voxelResolution=0.05f, float opacityCutoff=0.5f)</td></tr>
+<tr class="separator:ab34820a32a7f5d0d6a0657c8b8321601"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6602a59955c1f74cc96dcb84bd4b3b5b"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a6602a59955c1f74cc96dcb84bd4b3b5b"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">sigmoid</a> (T x)</td></tr>
 <tr class="memdesc:a6602a59955c1f74cc96dcb84bd4b3b5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sigmoid activation function.  <a href="namespacesplat.html#a6602a59955c1f74cc96dcb84bd4b3b5b">More...</a><br /></td></tr>
@@ -220,6 +235,12 @@ Functions</h2></td></tr>
 <tr class="memitem:af5c99d995d33cde611bffa16444a8839"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">simple_random</a> ()</td></tr>
 <tr class="memdesc:af5c99d995d33cde611bffa16444a8839"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simple deterministic pseudo-random number generator.  <a href="namespacesplat.html#af5c99d995d33cde611bffa16444a8839">More...</a><br /></td></tr>
 <tr class="separator:af5c99d995d33cde611bffa16444a8839"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae744e2d1a1ebc871c56abfa225b63452"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#ae744e2d1a1ebc871c56abfa225b63452">isSolid</a> (uint32_t lo, uint32_t hi)</td></tr>
+<tr class="separator:ae744e2d1a1ebc871c56abfa225b63452"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bd91a7ecdb3d07ca5ebd69924d3f0b0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a2bd91a7ecdb3d07ca5ebd69924d3f0b0">isEmpty</a> (uint32_t lo, uint32_t hi)</td></tr>
+<tr class="separator:a2bd91a7ecdb3d07ca5ebd69924d3f0b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0c4c710a92c411d950f720a41daee06"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#ae0c4c710a92c411d950f720a41daee06">getChildOffset</a> (uint8_t mask, int octant)</td></tr>
+<tr class="separator:ae0c4c710a92c411d950f720a41daee06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a207d8f02958f0cda7b5886d6da5696ea"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a207d8f02958f0cda7b5886d6da5696ea">combine</a> (std::vector&lt; std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&gt; &amp;dataTables)</td></tr>
 <tr class="memdesc:a207d8f02958f0cda7b5886d6da5696ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges multiple DataTables into a single combined table.  <a href="namespacesplat.html#a207d8f02958f0cda7b5886d6da5696ea">More...</a><br /></td></tr>
 <tr class="separator:a207d8f02958f0cda7b5886d6da5696ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -228,13 +249,30 @@ Functions</h2></td></tr>
 <tr class="memitem:a9370a258a80d896424204bb4bd445d87"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a9370a258a80d896424204bb4bd445d87">sortMortonOrder</a> (const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable, absl::Span&lt; uint32_t &gt; indices)</td></tr>
 <tr class="memdesc:a9370a258a80d896424204bb4bd445d87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sort Gaussian splats in Morton order (Z-order curve) for memory locality.  <a href="namespacesplat.html#a9370a258a80d896424204bb4bd445d87">More...</a><br /></td></tr>
 <tr class="separator:a9370a258a80d896424204bb4bd445d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf971cb7695dc254563fdd7694df304d"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#adf971cb7695dc254563fdd7694df304d">xyzToMorton</a> (int x, int y, int z)</td></tr>
+<tr class="separator:adf971cb7695dc254563fdd7694df304d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2907b5923ec327bb137eebfa7ae4ae2c"><td class="memItemLeft" align="right" valign="top">std::array&lt; int, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a2907b5923ec327bb137eebfa7ae4ae2c">mortonToXYZ</a> (unsigned int m)</td></tr>
+<tr class="separator:a2907b5923ec327bb137eebfa7ae4ae2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1ffc5784d0e8d693134214bf31c3c96"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsplat_1_1SummaryData.html">SummaryData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#aa1ffc5784d0e8d693134214bf31c3c96">computeSummary</a> (const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable)</td></tr>
 <tr class="separator:aa1ffc5784d0e8d693134214bf31c3c96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a365a879a34fe2750bdf3dfc693a877e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a365a879a34fe2750bdf3dfc693a877e0">transform</a> (<a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable, const Eigen::Vector3f &amp;t, const Eigen::Quaternionf &amp;r, float s)</td></tr>
 <tr class="memdesc:a365a879a34fe2750bdf3dfc693a877e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply transformation to data table.  <a href="namespacesplat.html#a365a879a34fe2750bdf3dfc693a877e0">More...</a><br /></td></tr>
 <tr class="separator:a365a879a34fe2750bdf3dfc693a877e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00c58f1abf4494356213355ca9089561"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a00c58f1abf4494356213355ca9089561">filterAndFillBlocks</a> (const <a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a> &amp;accumulator)</td></tr>
+<tr class="separator:a00c58f1abf4494356213355ca9089561"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cee29b85e8ff6f57925f2287bb89372"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsplat_1_1GaussianExtentsResult.html">GaussianExtentsResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a3cee29b85e8ff6f57925f2287bb89372">computeGaussianExtents</a> (const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable)</td></tr>
+<tr class="separator:a3cee29b85e8ff6f57925f2287bb89372"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a535aec4b0840292ef644ac602f527793"><td class="memItemLeft" align="right" valign="top">std::pair&lt; std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;, std::vector&lt; uint32_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a535aec4b0840292ef644ac602f527793">kmeans</a> (<a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *points, size_t k, size_t iterations)</td></tr>
 <tr class="separator:a535aec4b0840292ef644ac602f527793"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c0b1c0f38ed51c1c576bd1158ac4aeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsplat_1_1SparseOctree.html">SparseOctree</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a5c0b1c0f38ed51c1c576bd1158ac4aeb">buildSparseOctree</a> (const <a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a> &amp;accumulator, const <a class="el" href="structsplat_1_1Bounds.html">Bounds</a> &amp;gridBounds, const <a class="el" href="structsplat_1_1Bounds.html">Bounds</a> &amp;sceneBounds, double voxelResolution)</td></tr>
+<tr class="separator:a5c0b1c0f38ed51c1c576bd1158ac4aeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a3468c7dd0900735d8f61c1a6bdb0146f"><td class="memItemLeft" align="right" valign="top">static constexpr uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a3468c7dd0900735d8f61c1a6bdb0146f">SOLID_MASK</a> = 0xFFFFFFFFu</td></tr>
+<tr class="separator:a3468c7dd0900735d8f61c1a6bdb0146f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1316c487551abcdb519cc204af985e21"><td class="memItemLeft" align="right" valign="top">static constexpr uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a1316c487551abcdb519cc204af985e21">SOLID_LEAF_MARKER</a> = 0xFF000000u</td></tr>
+<tr class="separator:a1316c487551abcdb519cc204af985e21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a034ac2e2d75dce80bc73c9188bff5e18"></a>
@@ -339,6 +377,58 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a5c0b1c0f38ed51c1c576bd1158ac4aeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c0b1c0f38ed51c1c576bd1158ac4aeb">&#9670;&nbsp;</a></span>buildSparseOctree()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structsplat_1_1SparseOctree.html">SparseOctree</a> splat::buildSparseOctree </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a> &amp;&#160;</td>
+          <td class="paramname"><em>accumulator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structsplat_1_1Bounds.html">Bounds</a> &amp;&#160;</td>
+          <td class="paramname"><em>gridBounds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structsplat_1_1Bounds.html">Bounds</a> &amp;&#160;</td>
+          <td class="paramname"><em>sceneBounds</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>voxelResolution</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Build a sparse octree from accumulated voxelization blocks.</p>
+<p>Uses Structure-of-Arrays (SoA) representation and linear scans on sorted Morton codes instead of Maps and per-node objects for performance.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">accumulator</td><td>- <a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a> containing voxelized blocks </td></tr>
+    <tr><td class="paramname">gridBounds</td><td>- Grid bounds aligned to block boundaries </td></tr>
+    <tr><td class="paramname">sceneBounds</td><td>- Original scene bounds </td></tr>
+    <tr><td class="paramname">voxelResolution</td><td>- Size of each voxel in world units </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Sparse octree structure </dd></dl>
+
+</div>
+</div>
 <a id="a207d8f02958f0cda7b5886d6da5696ea"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a207d8f02958f0cda7b5886d6da5696ea">&#9670;&nbsp;</a></span>combine()</h2>
 
@@ -364,6 +454,33 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Merged table, or nullptr if input is empty </dd></dl>
+
+</div>
+</div>
+<a id="a3cee29b85e8ff6f57925f2287bb89372"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cee29b85e8ff6f57925f2287bb89372">&#9670;&nbsp;</a></span>computeGaussianExtents()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structsplat_1_1GaussianExtentsResult.html">GaussianExtentsResult</a> splat::computeGaussianExtents </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *&#160;</td>
+          <td class="paramname"><em>dataTable</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Compute axis-aligned bounding box half-extents for all Gaussians in a <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a>.</p>
+<p>Each Gaussian is an oriented ellipsoid defined by position, rotation (quaternion), and scale (log scale). This function computes the AABB that encloses each rotated ellipsoid and stores only the half-extents. The full AABB can be reconstructed at runtime using: min = position - extent, max = position + extent.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dataTable</td><td>- <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a> containing Gaussian splat data </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structsplat_1_1GaussianExtentsResult.html">GaussianExtentsResult</a> with extents <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a> and scene bounds </dd></dl>
 
 </div>
 </div>
@@ -403,6 +520,82 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a00c58f1abf4494356213355ca9089561"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00c58f1abf4494356213355ca9089561">&#9670;&nbsp;</a></span>filterAndFillBlocks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a> splat::filterAndFillBlocks </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a> &amp;&#160;</td>
+          <td class="paramname"><em>accumulator</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Remove isolated voxels and fill isolated empty voxels within mixed blocks.</p>
+<p>For each mixed block, computes 6 per-direction occupancy masks (in-block via bit shifts + cross-block via adjacent block lookups), then:</p><ul>
+<li>Remove: keeps only voxels with at least one occupied 6-connected neighbor</li>
+<li>Fill: fills empty voxels where all 6 neighbors are occupied</li>
+</ul>
+<p>Blocks that become empty or solid as a consequence are handled automatically.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">accumulator</td><td>- <a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a> with voxelization results </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>New <a class="el" href="structsplat_1_1BlockAccumulator.html">BlockAccumulator</a> with filtered/filled data </dd></dl>
+
+</div>
+</div>
+<a id="ae0c4c710a92c411d950f720a41daee06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0c4c710a92c411d950f720a41daee06">&#9670;&nbsp;</a></span>getChildOffset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t splat::getChildOffset </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>mask</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>octant</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the offset to a child node given a parent's child mask and octant. Uses absl::popcount to count how many children come before this octant.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mask</td><td>- 8-bit child mask from parent node </td></tr>
+    <tr><td class="paramname">octant</td><td>- Octant index (0-7) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Offset from base child pointer </dd></dl>
+
+</div>
+</div>
 <a id="a07152f181a31a582c288178ffc5f9546"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a07152f181a31a582c288178ffc5f9546">&#9670;&nbsp;</a></span>isCompressedPly()</h2>
 
@@ -418,6 +611,96 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2bd91a7ecdb3d07ca5ebd69924d3f0b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bd91a7ecdb3d07ca5ebd69924d3f0b0">&#9670;&nbsp;</a></span>isEmpty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool splat::isEmpty </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>lo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>hi</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Check if a voxel mask represents an empty block (no bits set).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lo</td><td>- Lower 32 bits of mask </td></tr>
+    <tr><td class="paramname">hi</td><td>- Upper 32 bits of mask </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if all 64 voxels are empty </dd></dl>
+
+</div>
+</div>
+<a id="ae744e2d1a1ebc871c56abfa225b63452"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae744e2d1a1ebc871c56abfa225b63452">&#9670;&nbsp;</a></span>isSolid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool splat::isSolid </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>lo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>hi</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Check if a voxel mask represents a solid block (all 64 bits set).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lo</td><td>- Lower 32 bits of mask </td></tr>
+    <tr><td class="paramname">hi</td><td>- Upper 32 bits of mask </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if all 64 voxels are solid </dd></dl>
 
 </div>
 </div>
@@ -452,6 +735,40 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2907b5923ec327bb137eebfa7ae4ae2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2907b5923ec327bb137eebfa7ae4ae2c">&#9670;&nbsp;</a></span>mortonToXYZ()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;int, 3&gt; splat::mortonToXYZ </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>m</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Decode Morton code to block coordinates.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">m</td><td>- Morton code </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>array of [x, y, z] block coordinates </dd></dl>
 
 </div>
 </div>
@@ -744,6 +1061,34 @@ readUInt8 for byte reading </dd></dl>
 
 </div>
 </div>
+<a id="a2686ec942666307e6b7bcb92fd52d7e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2686ec942666307e6b7bcb92fd52d7e4">&#9670;&nbsp;</a></span>readVoxel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classsplat_1_1DataTable.html">DataTable</a>&gt; splat::readVoxel </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Read a .voxel.json file and convert to <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a> (finest/leaf LOD).</p>
+<p>Loads the voxel octree from .voxel.json + .voxel.bin, traverses to the leaf level, and outputs a <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a> in the same Gaussian splat format as voxel-octree-node.mjs at the leaf level. Users can then save to PLY, CSV, or any other format.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fileSystem</td><td>- File system for reading files </td></tr>
+    <tr><td class="paramname">filename</td><td>- Path to .voxel.json (the .voxel.bin must exist alongside it) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a> with voxel block centers as Gaussian splats </dd></dl>
+
+</div>
+</div>
 <a id="a6602a59955c1f74cc96dcb84bd4b3b5b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6602a59955c1f74cc96dcb84bd4b3b5b">&#9670;&nbsp;</a></span>sigmoid()</h2>
 
@@ -853,6 +1198,19 @@ Thread-unsafe: uses static internal state. </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Sorts the provided indices by visibility score (descending order).</p>
+<p>Visibility is computed as: linear_opacity * volume where:</p><ul>
+<li>linear_opacity = sigmoid(opacity) = 1 / (1 + exp(-opacity))</li>
+<li>volume = exp(scale_0) * exp(scale_1) * exp(scale_2)</li>
+</ul>
+<p>After calling this function, indices[0] will contain the index of the most visible splat, indices[1] the second most visible, and so on.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dataTable</td><td>- The <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a> containing splat data. </td></tr>
+    <tr><td class="paramname">indices</td><td>- Array of indices to sort in-place. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1205,6 +1563,165 @@ For performance, the function flushes the output stream every 1000 splats to bal
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacesplat.html#a7c7242ade76de864daa0eb64b9d36848" title="Reads and parses a .splat file containing Gaussian splatting data.">readSplat()</a> for reading .<a class="el" href="namespacesplat.html">splat</a> files </dd>
 <dd>
 <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a> for data structure requirements </dd></dl>
+
+</div>
+</div>
+<a id="ab34820a32a7f5d0d6a0657c8b8321601"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab34820a32a7f5d0d6a0657c8b8321601">&#9670;&nbsp;</a></span>writeVoxel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void splat::writeVoxel </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *&#160;</td>
+          <td class="paramname"><em>dataTable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>voxelResolution</em> = <code>0.05f</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>opacityCutoff</em> = <code>0.5f</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Voxelizes Gaussian splat data and writes the result as a sparse voxel octree.</p>
+<p>This function performs GPU-accelerated voxelization of Gaussian splat data and outputs two files:</p><ul>
+<li><code>filename</code> (.voxel.json) - JSON metadata including bounds, resolution, and array sizes</li>
+<li>Corresponding .voxel.bin - Binary octree data (nodes + leafData as uint32_t arrays)</li>
+</ul>
+<p>The binary file layout is:</p><ul>
+<li>Bytes 0 to (nodeCount * 4 - 1): nodes array (uint32_t, little-endian)</li>
+<li>Bytes (nodeCount * 4) to end: leafData array (uint32_t, little-endian)</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>- Output filename (without extension) or with .voxel.json extension </td></tr>
+    <tr><td class="paramname">dataTable</td><td>- Gaussian splat data to voxelize </td></tr>
+    <tr><td class="paramname">voxelResolution</td><td>- Size of each voxel in world units. Default: 0.05 </td></tr>
+    <tr><td class="paramname">opacityCutoff</td><td>- Opacity threshold for solid voxels - voxels below this are considered empty. Default: 0.5</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if voxelization succeeded, false otherwise</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This function requires a GPU that supports compute shaders. </dd></dl>
+
+</div>
+</div>
+<a id="adf971cb7695dc254563fdd7694df304d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf971cb7695dc254563fdd7694df304d">&#9670;&nbsp;</a></span>xyzToMorton()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t splat::xyzToMorton </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>z</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Encode block coordinates to Morton code (17 bits per axis = 51 bits total). Supports up to 131,072 blocks per axis.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>- Block X coordinate </td></tr>
+    <tr><td class="paramname">y</td><td>- Block Y coordinate </td></tr>
+    <tr><td class="paramname">z</td><td>- Block Z coordinate </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Morton code with interleaved bits: ...z2y2x2 z1y1x1 z0y0x0 </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a1316c487551abcdb519cc204af985e21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1316c487551abcdb519cc204af985e21">&#9670;&nbsp;</a></span>SOLID_LEAF_MARKER</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr uint32_t splat::SOLID_LEAF_MARKER = 0xFF000000u</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Solid leaf node marker: childMask = 0xFF, baseOffset = 0. This is unambiguous because BFS layout guarantees children always come after their parent, so baseOffset = 0 is never valid for an interior node. </p>
+
+</div>
+</div>
+<a id="a3468c7dd0900735d8f61c1a6bdb0146f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3468c7dd0900735d8f61c1a6bdb0146f">&#9670;&nbsp;</a></span>SOLID_MASK</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr uint32_t splat::SOLID_MASK = 0xFFFFFFFFu</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>All 64 bits set (as unsigned 32-bit) </p>
 
 </div>
 </div>
