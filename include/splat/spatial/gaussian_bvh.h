@@ -40,7 +40,10 @@ class DataTable;
 
 class GaussianBVH {
  public:
-  using BVHBounds = std::pair<Eigen::Vector3f, Eigen::Vector3f>;
+  struct BVHBounds {
+    Eigen::Vector3f min;
+    Eigen::Vector3f max;
+  };
 
   struct BVHNode {
     size_t count;
@@ -57,14 +60,16 @@ class GaussianBVH {
  public:
   GaussianBVH(const DataTable* dataTable, const DataTable* extents);
   std::vector<uint32_t> queryOverlapping(const Eigen::Vector3f& boxMin, const Eigen::Vector3f& boxMax);
-  
+
   size_t count() const { return root_ ? root_->count : 0; }
-  BVHBounds sceneBounds() const { return root_ ? root_->bounds : std::pair<Eigen::Vector3f, Eigen::Vector3f>{}; }
+  BVHBounds sceneBounds() const { return root_ ? root_->bounds : BVHBounds(); }
   BVHNode* root() const { return root_.get(); }
 
  private:
   BVHBounds computeBound(absl::Span<uint32_t> indices);
   std::unique_ptr<BVHNode> buildNode(absl::Span<uint32_t> indices);
+  void queryNode(const BVHNode* node, float minX, float minY, float minZ, float maxX, float maxY, float maxZ,
+                 std::vector<uint32_t>& result);
 
  private:
   std::unique_ptr<BVHNode> root_;

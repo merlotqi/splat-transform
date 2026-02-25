@@ -1,5 +1,30 @@
+Date: 2026-02-25
+Commit: 953e03e
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: refactor: simplify GaussianBVH bounds structure and improve AABB computation
+
+Date: 2026-02-25
+Commit: 71593fc
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: refactor: rename hyphenated headers to snake_case and add utility functions
+
+Date: 2026-02-24
+Commit: 37b5075
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: refactor: use string_literals instead of std::string() in compressed_ply_writer
+
+Date: 2026-02-18
+Commit: 5cc42f8
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: fix: correct syntax errors in chunk property validation in PLY decompression
+
+Date: 2026-02-18
+Commit: 2a8731f
+Author: Merlot.Qi <merlotrain.mc@gmail.com>
+Message: feat: update chunk property validation in PLY decompression
+
 Date: 2026-02-06
-Commit: e699615
+Commit: 15279fd
 Author: Merlot.Qi <merlotrain.mc@gmail.com>
 Message: feat: add filter visibility and summary functionality with data structures
 

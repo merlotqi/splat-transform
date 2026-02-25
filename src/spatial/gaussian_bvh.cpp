@@ -25,13 +25,12 @@
  *
  ***********************************************************************************/
 
-#pragma once
-
 #include <absl/types/span.h>
 #include <assert.h>
 #include <splat/models/data-table.h>
 #include <splat/spatial/gaussian_bvh.h>
 
+#include <cstddef>
 #include <limits>
 #include <memory>
 #include <numeric>
@@ -63,7 +62,11 @@ GaussianBVH::GaussianBVH(const DataTable* dataTable, const DataTable* extents) {
 }
 
 std::vector<uint32_t> GaussianBVH::queryOverlapping(const Eigen::Vector3f& boxMin, const Eigen::Vector3f& boxMax) {
-  return {};
+  std::vector<uint32_t> result;
+
+  queryNode(root_.get(), boxMin.x(), boxMin.y(), boxMin.z(), boxMax.x(), boxMax.y(), boxMax.z(), result);
+
+  return result;
 }
 
 GaussianBVH::BVHBounds GaussianBVH::computeBound(absl::Span<uint32_t> indices) {
@@ -153,6 +156,47 @@ std::unique_ptr<GaussianBVH::BVHNode> GaussianBVH::buildNode(absl::Span<uint32_t
   node->right = std::move(right);
 
   return node;
+}
+
+void GaussianBVH::queryNode(const BVHNode* node, float minX, float minY, float minZ, float maxX, float maxY, float maxZ,
+                            std::vector<uint32_t>& result) {
+  auto boundsOverlap = [](const BVHBounds& a, float bMinX, float bMinY, float bMinZ, float bMaxX, float bMaxY,
+                          float bMaxZ) -> bool {
+    return !(a.max.x() < bMinX || a.min.x() > bMaxX || a.max.y() < bMinY || a.min.y() > bMaxY || a.max.z() < bMinZ ||
+             a.min.z() > bMaxZ);
+  };
+
+  // Early exit if node bounds don't overlap query box
+  if (!boundsOverlap(node->bounds, minX, minY, minZ, maxX, maxY, maxZ)) {
+    return;
+  }
+
+  // Leaf node: check each Gaussian individually
+  if (!node->indices.empty()) {
+    for (size_t i = 0; i < node->indices.size(); i++) {
+      const auto idx = node->indices[i];
+      const auto gMinX = x_[idx] - extentX_[idx];
+      const auto gMinY = y_[idx] - extentY_[idx];
+      const auto gMinZ = z_[idx] - extentZ_[idx];
+      const auto gMaxX = x_[idx] + extentX_[idx];
+      const auto gMaxY = y_[idx] + extentY_[idx];
+      const auto gMaxZ = z_[idx] + extentZ_[idx];
+
+      // Check overlap
+      if (!(gMaxX < minX || gMinX > maxX || gMaxY < minY || gMinY > maxY || gMaxZ < minZ || gMinZ > maxZ)) {
+        result.push_back(idx);
+      }
+    }
+    return;
+  }
+
+  // Interior node: recurse into children
+  if (node->left) {
+    queryNode(node->left.get(), minX, minY, minZ, maxX, maxY, maxZ, result);
+  }
+  if (node->right) {
+    queryNode(node->right.get(), minX, minY, minZ, maxX, maxY, maxZ, result);
+  }
 }
 
 }  // namespace splat

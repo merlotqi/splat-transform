@@ -45,8 +45,8 @@ struct GaussianExtentsResult {
 
   /** Scene bounds (union of all Gaussian AABBs) */
   struct {
-    Eigen::Vector3d min;
-    Eigen::Vector3d max;
+    Eigen::Vector3f min;
+    Eigen::Vector3f max;
   } sceneBounds;
   /** Number of Gaussians skipped due to invalid values */
   size_t invalidCount{0};
