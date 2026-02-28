@@ -25,20 +25,26 @@
  *
  ***********************************************************************************/
 
+#include <splat/maths/maths.h>
 #include <splat/models/data-table.h>
 #include <splat/spatial/sparse_octree.h>
+#include <sys/types.h>
 
+#include <algorithm>
+#include <chrono>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <numeric>
 #include <vector>
 
 namespace splat {
 
 namespace block {
 
-static constexpr int empty = 0;
-static constexpr int solid = 1;
-static constexpr int mixed = 2;
+static constexpr uint8_t empty = 0;
+static constexpr uint8_t solid = 1;
+static constexpr uint8_t mixed = 2;
 
 }  // namespace block
 
@@ -51,7 +57,7 @@ struct LevelData {
   std::vector<uint32_t> mortons;
 
   /** Block type for each node (Solid or Mixed) */
-  std::vector<int> types;
+  std::vector<uint8_t> types;
 
   /** For level-0 Mixed nodes: index into mixed.masks. Otherwise -1. */
   std::vector<int32_t> maskIndices;
@@ -76,7 +82,7 @@ struct LevelData {
  * @returns Sparse octree structure in Laine-Karras format.
  */
 static SparseOctree flattenTreeFromLevels(const std::vector<LevelData>& levels, const std::vector<uint32_t> mixedMasks,
-                                          const Bounds& gridBounds, const Bounds& sceneBounds, double voxelResolution,
+                                          const Bounds& gridBounds, const Bounds& sceneBounds, float voxelResolution,
                                           size_t treeDepth) {
   const LevelData& rootLevel = levels.back();
 
@@ -212,12 +218,171 @@ static SparseOctree flattenTreeFromLevels(const std::vector<LevelData>& levels, 
     waveIi = nextWaveIi;
   }
 
-  return {};
+  SparseOctree oct;
+  oct.gridBounds = gridBounds;
+  oct.sceneBounds = sceneBounds;
+  oct.voxelResolution = voxelResolution;
+  oct.leafSize = 4;
+  oct.treeDepth = treeDepth;
+  oct.numInteriorNodes = numInteriorNodes;
+  oct.numMixedLeaves = numMixedLeaves;
+  if (maxNodes) {
+    oct.nodes = nodes;
+  } else {
+    oct.nodes.insert(oct.nodes.begin(), nodes.begin(), nodes.begin() + emitPos);
+  }
+  oct.leafData = leafDataList;
+
+  return oct;
 }
 
 SparseOctree buildSparseOctree(const BlockAccumulator& accumulator, const Bounds& gridBounds, const Bounds& sceneBounds,
-                               double voxelResolution) {
-  return {};
+                               float voxelResolution) {
+  auto tProfile = std::chrono::high_resolution_clock::now();
+
+  auto mixedmorton = accumulator.mixedMorton;
+  auto solid = accumulator.solidMorton;
+  const size_t totalBlocks = mixedmorton.size() + solid.size();
+
+  // --- Phase 1: Combine blocks into SoA arrays and sort by Morton code ---
+  // Avoids creating per-block objects (BlockEntry) — uses parallel arrays.
+
+  std::vector<uint32_t> mortons(totalBlocks);
+  std::vector<uint32_t> types(totalBlocks);
+  std::vector<int32_t> maskIndices(totalBlocks);
+
+  size_t idx = 0;
+  for (int32_t i = 0; i < (int32_t)mixedmorton.size(); ++i) {
+    mortons[idx] = mixedmorton[i];
+    types[idx] = block::mixed;
+    maskIndices[idx] = i;
+    idx++;
+  }
+
+  for (int32_t i = 0; i < (int32_t)solid.size(); ++i) {
+    mortons[idx] = solid[i];
+    types[idx] = block::solid;
+    maskIndices[idx] = -1;
+    idx++;
+  }
+  // Co-sort by Morton code using an index permutation array
+  std::vector<size_t> sortOrder(totalBlocks);
+  std::iota(sortOrder.begin(), sortOrder.end(), 0);
+  std::sort(sortOrder.begin(), sortOrder.end(), [&](size_t a, size_t b) { return mortons[a] - mortons[b]; });
+
+  std::vector<uint32_t> sortedMortons(totalBlocks);
+  std::vector<uint8_t> sortedTypes(totalBlocks);
+  std::vector<int32_t> sortedMaskIndices(totalBlocks);
+  for (size_t i = 0; i < totalBlocks; ++i) {
+    const size_t si = sortOrder[i];
+    sortedMortons[i] = mortons[si];
+    sortedTypes[i] = types[si];
+    sortedMaskIndices[i] = maskIndices[si];
+  }
+
+  const auto tSort = std::chrono::high_resolution_clock::now();
+
+  // --- Phase 2: Build tree bottom-up level by level using linear scan ---
+  // Instead of Map<number, BuildNode> per level, we use sorted parallel
+  // arrays and exploit the fact that sorted Morton codes make parent
+  // grouping a simple linear scan (consecutive entries with the same
+  // floor(morton/8) share a parent).
+
+  // Calculate tree depth based on grid size
+  const Eigen::Vector3f gridSize = gridBounds.max - gridBounds.min;
+  const float blockSize = voxelResolution * 4.0f;
+  const float blocksPerSize = maxs(std::ceil(gridSize.x() / blockSize), std::ceil(gridSize.y() / blockSize),
+                                   std::ceil(gridSize.z() / blockSize));
+  const int treeDepth = std::max(1, (int)std::ceil(std::log2(blocksPerSize)));
+
+  // Store level data for each tree level (level 0 = leaves, higher = toward root)
+  std::vector<LevelData> levels;
+
+  // Current level data starts as the sorted leaf blocks
+  auto curMortons = sortedMortons;
+  auto curTypes = sortedTypes;
+  auto curMaskIndices = sortedMaskIndices;
+  // Leaf level has no child masks (leaves have no children)
+  std::vector<uint8_t> curChildMasks(totalBlocks, 0);
+
+  // Build up level by level
+  int actualDepth = treeDepth;
+  int levelSteps = 8;
+
+  for (int level = 0; level < treeDepth; ++level) {
+    // Save current level before building the next one above
+    levels.push_back({curMortons, curTypes, curMaskIndices, curChildMasks});
+
+    // Build next level using linear scan on sorted data.
+    // Since curMortons is sorted, entries sharing the same parent
+    // (floor(morton/8)) are contiguous — no Map needed.
+    size_t n = curMortons.size();
+    std::vector<uint32_t> nextMortons;
+    std::vector<uint8_t> nextTypes;
+    std::vector<int32_t> nextMaskIndices;
+    std::vector<uint8_t> nextChildMasks;
+
+    size_t i = 0;
+    while (i < n) {
+      auto parentMorton = std::floor(curMortons[i] / 8);
+      int childMask = 0;
+      bool allSolid = true;
+      int childCount = 0;
+
+      // Scan all consecutive entries that share this parent
+      while (i < n && std::floor(curMortons[i] / 8) == parentMorton) {
+        auto octant = curMortons[i] % 8;
+        childMask |= (1 << octant);
+        if (curTypes[i] != block::solid) {
+          allSolid = false;
+        }
+        childCount++;
+        i++;
+      }
+
+      if (allSolid && childCount == 8) {
+        // All 8 children are solid — collapse to solid parent
+        nextMortons.push_back(parentMorton);
+        nextTypes.push_back(block::solid);
+        nextMaskIndices.push_back(-1);
+        nextChildMasks.push_back(0);
+      } else {
+        // Interior node with sparse children
+        nextMortons.push_back(parentMorton);
+        nextTypes.push_back(block::mixed);
+        nextMaskIndices.push_back(-1);
+        nextChildMasks.push_back(childMask);
+      }
+    }
+
+    curMortons = nextMortons;
+    curTypes = nextTypes;
+    curMaskIndices = nextMaskIndices;
+    curChildMasks = nextChildMasks;
+
+    // Break when the tree is empty or has converged to a single root at Morton 0.
+    // We must NOT break early if the single remaining node has a non-zero Morton,
+    // because the reader reconstructs Morton codes starting from root Morton 0.
+    if (curMortons.size() == 0 || (curMortons.size() == 1 && curMortons[0] == 0)) {
+      actualDepth = level + 1;
+      break;
+    }
+  }
+
+  // Save the root level
+  levels.push_back({curMortons, curTypes, curMaskIndices, curChildMasks});
+
+  auto tBuild = std::chrono::high_resolution_clock::now();
+
+  // --- Phase 3: Flatten tree to Laine-Karras format ---
+  // Uses wave-based BFS on level arrays, avoiding BuildNode objects
+  // and the O(n²) queue.shift() of the original approach.
+  SparseOctree result =
+      flattenTreeFromLevels(levels, accumulator.mixedMasks, gridBounds, sceneBounds, voxelResolution, actualDepth);
+
+  auto tFlattern = std::chrono::high_resolution_clock::now();
+
+  return result;
 }
 
 }  // namespace splat

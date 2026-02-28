@@ -120,4 +120,48 @@ inline size_t getChildOffset(uint8_t mask, int octant) {
   return absl::popcount(masked);
 }
 
+/**
+ * @brief Compute the maximum of multiple values
+ *
+ * Uses fold expression to find the maximum value among all arguments.
+ * Works with any comparable type (int, float, double, etc.).
+ *
+ * @tparam T Type of the values
+ * @tparam Ts Types of additional values
+ * @param first First value to compare
+ * @param args Additional values to compare
+ * @return Maximum value among all arguments
+ *
+ * @note This function is useful for finding the maximum dimension or bound
+ *       when working with multiple values in Gaussian splatting operations.
+ */
+template <typename T, typename... Ts>
+T maxs(T first, Ts... args) {
+  T result = first;
+  ((result = (args > result ? args : result)), ...);
+  return result;
+}
+
+/**
+ * @brief Compute the minimum of multiple values
+ *
+ * Uses fold expression to find the minimum value among all arguments.
+ * Works with any comparable type (int, float, double, etc.).
+ *
+ * @tparam T Type of the values
+ * @tparam Ts Types of additional values
+ * @param first First value to compare
+ * @param args Additional values to compare
+ * @return Minimum value among all arguments
+ *
+ * @note This function is useful for finding the minimum dimension or bound
+ *       when working with multiple values in Gaussian splatting operations.
+ */
+template <typename T, typename... Ts>
+T mins(T first, Ts... args) {
+  T result = first;
+  ((result = (args < result ? args : result)), ...);
+  return result;
+}
+
 }  // namespace splat

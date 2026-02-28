@@ -37,8 +37,8 @@ namespace splat {
 class DataTable;
 
 struct Bounds {
-  Eigen::Vector3d min;
-  Eigen::Vector3d max;
+  Eigen::Vector3f min;
+  Eigen::Vector3f max;
 };
 
 struct BlockAccumulator {
@@ -90,7 +90,7 @@ struct SparseOctree {
   Bounds sceneBounds;
 
   /** Size of each voxel in world units */
-  double voxelResolution{0.0};
+  float voxelResolution{0.0f};
 
   /** Voxels per leaf dimension (always 4) */
   int leafSize{0};
@@ -124,6 +124,6 @@ struct SparseOctree {
  * @returns Sparse octree structure
  */
 SparseOctree buildSparseOctree(const BlockAccumulator& accumulator, const Bounds& gridBounds, const Bounds& sceneBounds,
-                               double voxelResolution);
+                               float voxelResolution);
 
 }  // namespace splat
