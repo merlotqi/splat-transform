@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['quatsinfo_328',['QuatsInfo',['../structQuatsInfo.html',1,'']]]
+  ['quatsinfo_327',['QuatsInfo',['../structQuatsInfo.html',1,'']]]
 ];

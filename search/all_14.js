@@ -6,7 +6,6 @@ var searchData=
   ['voxel_5ffilter_2eh_268',['voxel_filter.h',['../voxel__filter_8h.html',1,'']]],
   ['voxel_5freader_2eh_269',['voxel_reader.h',['../voxel__reader_8h.html',1,'']]],
   ['voxel_5fwriter_2eh_270',['voxel_writer.h',['../voxel__writer_8h.html',1,'']]],
-  ['voxelization_2eh_271',['voxelization.h',['../voxelization_8h.html',1,'']]],
-  ['voxelmetadata_272',['VoxelMetadata',['../structsplat_1_1VoxelMetadata.html',1,'splat']]],
-  ['voxelresolution_273',['voxelResolution',['../structsplat_1_1VoxelMetadata.html#aacb237983cf38857c2ce09abd5a6b3ad',1,'splat::VoxelMetadata::voxelResolution()'],['../structsplat_1_1SparseOctree.html#aca84bb233127ebbfa91a7ee67a2be144',1,'splat::SparseOctree::voxelResolution()']]]
+  ['voxelmetadata_271',['VoxelMetadata',['../structsplat_1_1VoxelMetadata.html',1,'splat']]],
+  ['voxelresolution_272',['voxelResolution',['../structsplat_1_1VoxelMetadata.html#aacb237983cf38857c2ce09abd5a6b3ad',1,'splat::VoxelMetadata::voxelResolution()'],['../structsplat_1_1SparseOctree.html#a6c9a0b4fca76a35b702ad6c557853a1a',1,'splat::SparseOctree::voxelResolution()']]]
 ];
