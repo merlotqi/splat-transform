@@ -182,11 +182,11 @@ Basic File I/O</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="splat_8h.html">splat/splat.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Read a PLY file</span></div>
-<div class="line"><span class="keyword">auto</span> data = <a class="code" href="namespacesplat.html#a9c5aab9390912cf5d71af220b340f09b">splat::readPly</a>(<span class="stringliteral">&quot;scene.ply&quot;</span>);</div>
+<div class="line"><span class="keyword">auto</span> data = <a class="code" href="namespacesplat.html#aceb2aa3970670494ed0eb56d613b7e3a">splat::readPly</a>(<span class="stringliteral">&quot;scene.ply&quot;</span>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Write to compressed SOG format</span></div>
 <div class="line"><a class="code" href="namespacesplat.html#afbfc654461a051b75a3356c5376e5e9d">splat::writeSog</a>(<span class="stringliteral">&quot;scene.sog&quot;</span>, *data);</div>
-<div class="ttc" id="anamespacesplat_html_a9c5aab9390912cf5d71af220b340f09b"><div class="ttname"><a href="namespacesplat.html#a9c5aab9390912cf5d71af220b340f09b">splat::readPly</a></div><div class="ttdeci">std::unique_ptr&lt; DataTable &gt; readPly(const std::string &amp;filename)</div><div class="ttdoc">Reads and parses a PLY (Polygon File Format) file from disk.</div></div>
+<div class="ttc" id="anamespacesplat_html_aceb2aa3970670494ed0eb56d613b7e3a"><div class="ttname"><a href="namespacesplat.html#aceb2aa3970670494ed0eb56d613b7e3a">splat::readPly</a></div><div class="ttdeci">std::unique_ptr&lt; DataTable &gt; readPly(const std::filesystem::path &amp;filename)</div><div class="ttdoc">Reads and parses a PLY (Polygon File Format) file from disk.</div></div>
 <div class="ttc" id="anamespacesplat_html_afbfc654461a051b75a3356c5376e5e9d"><div class="ttname"><a href="namespacesplat.html#afbfc654461a051b75a3356c5376e5e9d">splat::writeSog</a></div><div class="ttdeci">void writeSog(const std::string &amp;filename, DataTable *dataTable, bool bundle, int iterations, const std::vector&lt; uint32_t &gt; &amp;indices={})</div></div>
 <div class="ttc" id="asplat_8h_html"><div class="ttname"><a href="splat_8h.html">splat.h</a></div></div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md19"></a>

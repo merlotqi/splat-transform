@@ -194,8 +194,8 @@ Enumerations</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:aca057d27b7f853b0e501bfffb6f7e971"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#aca057d27b7f853b0e501bfffb6f7e971">writeCompressedPly</a> (const std::string &amp;filename, <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable)</td></tr>
 <tr class="separator:aca057d27b7f853b0e501bfffb6f7e971"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0bfa1469594d0e1f3077bcf114fa2b11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a0bfa1469594d0e1f3077bcf114fa2b11">writeCSV</a> (const std::string &amp;path, <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable)</td></tr>
-<tr class="separator:a0bfa1469594d0e1f3077bcf114fa2b11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8693bc195e5539b5117092302a43fa96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a8693bc195e5539b5117092302a43fa96">writeCSV</a> (const std::filesystem::path &amp;path, <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable)</td></tr>
+<tr class="separator:a8693bc195e5539b5117092302a43fa96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07152f181a31a582c288178ffc5f9546"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a07152f181a31a582c288178ffc5f9546">isCompressedPly</a> (const <a class="el" href="structsplat_1_1PlyData.html">PlyData</a> *ply)</td></tr>
 <tr class="separator:a07152f181a31a582c288178ffc5f9546"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa252f193c70195f18e271769fa16e2ad"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#aa252f193c70195f18e271769fa16e2ad">decompressPly</a> (const <a class="el" href="structsplat_1_1PlyData.html">PlyData</a> *ply)</td></tr>
@@ -206,11 +206,11 @@ Functions</h2></td></tr>
 <tr class="separator:a863fe57c851c3c281943fb1f3973de82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77c9b8882c8228988d09532ac3a7e078"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a77c9b8882c8228988d09532ac3a7e078">writeLod</a> (const std::string &amp;filename, const <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *dataTable, <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> *envDataTable, bool bundle, int iterations, size_t lodChunkCount, size_t lodChunkExtent)</td></tr>
 <tr class="separator:a77c9b8882c8228988d09532ac3a7e078"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c5aab9390912cf5d71af220b340f09b"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a9c5aab9390912cf5d71af220b340f09b">readPly</a> (const std::string &amp;filename)</td></tr>
-<tr class="memdesc:a9c5aab9390912cf5d71af220b340f09b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads and parses a PLY (Polygon File Format) file from disk.  <a href="namespacesplat.html#a9c5aab9390912cf5d71af220b340f09b">More...</a><br /></td></tr>
-<tr class="separator:a9c5aab9390912cf5d71af220b340f09b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac139203466e1fd7c045852504ef676a6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#ac139203466e1fd7c045852504ef676a6">writePly</a> (const std::string &amp;filename, const <a class="el" href="structsplat_1_1PlyData.html">PlyData</a> &amp;plyData)</td></tr>
-<tr class="separator:ac139203466e1fd7c045852504ef676a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aceb2aa3970670494ed0eb56d613b7e3a"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#aceb2aa3970670494ed0eb56d613b7e3a">readPly</a> (const std::filesystem::path &amp;filename)</td></tr>
+<tr class="memdesc:aceb2aa3970670494ed0eb56d613b7e3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads and parses a PLY (Polygon File Format) file from disk.  <a href="namespacesplat.html#aceb2aa3970670494ed0eb56d613b7e3a">More...</a><br /></td></tr>
+<tr class="separator:aceb2aa3970670494ed0eb56d613b7e3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fa6e945b7391f1547539867dc15e5ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a8fa6e945b7391f1547539867dc15e5ab">writePly</a> (const std::filesystem::path &amp;filename, const <a class="el" href="structsplat_1_1PlyData.html">PlyData</a> &amp;plyData)</td></tr>
+<tr class="separator:a8fa6e945b7391f1547539867dc15e5ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36751c18195c40aa9ce84448e9c60c29"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsplat_1_1DataTable.html">DataTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacesplat.html#a36751c18195c40aa9ce84448e9c60c29">readSog</a> (const std::string &amp;file, const std::string &amp;sourceName)</td></tr>
 <tr class="memdesc:a36751c18195c40aa9ce84448e9c60c29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads and parses a Gaussian Splatting (.sog) file into a <a class="el" href="classsplat_1_1DataTable.html" title="Tabular data structure with typed columns.">DataTable</a>.  <a href="namespacesplat.html#a36751c18195c40aa9ce84448e9c60c29">More...</a><br /></td></tr>
 <tr class="separator:a36751c18195c40aa9ce84448e9c60c29"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -930,8 +930,8 @@ template&lt;typename T , typename... Ts&gt; </div>
 
 </div>
 </div>
-<a id="a9c5aab9390912cf5d71af220b340f09b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c5aab9390912cf5d71af220b340f09b">&#9670;&nbsp;</a></span>readPly()</h2>
+<a id="aceb2aa3970670494ed0eb56d613b7e3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aceb2aa3970670494ed0eb56d613b7e3a">&#9670;&nbsp;</a></span>readPly()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -939,7 +939,7 @@ template&lt;typename T , typename... Ts&gt; </div>
         <tr>
           <td class="memname">std::unique_ptr&lt;<a class="el" href="classsplat_1_1DataTable.html">DataTable</a>&gt; splat::readPly </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const std::filesystem::path &amp;&#160;</td>
           <td class="paramname"><em>filename</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1443,8 +1443,8 @@ This is a key optimization for real-time Gaussian splatting rendering pipelines.
 
 </div>
 </div>
-<a id="a0bfa1469594d0e1f3077bcf114fa2b11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0bfa1469594d0e1f3077bcf114fa2b11">&#9670;&nbsp;</a></span>writeCSV()</h2>
+<a id="a8693bc195e5539b5117092302a43fa96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8693bc195e5539b5117092302a43fa96">&#9670;&nbsp;</a></span>writeCSV()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1452,7 +1452,7 @@ This is a key optimization for real-time Gaussian splatting rendering pipelines.
         <tr>
           <td class="memname">void splat::writeCSV </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const std::filesystem::path &amp;&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
@@ -1529,8 +1529,8 @@ This is a key optimization for real-time Gaussian splatting rendering pipelines.
 
 </div>
 </div>
-<a id="ac139203466e1fd7c045852504ef676a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac139203466e1fd7c045852504ef676a6">&#9670;&nbsp;</a></span>writePly()</h2>
+<a id="a8fa6e945b7391f1547539867dc15e5ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fa6e945b7391f1547539867dc15e5ab">&#9670;&nbsp;</a></span>writePly()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1538,7 +1538,7 @@ This is a key optimization for real-time Gaussian splatting rendering pipelines.
         <tr>
           <td class="memname">void splat::writePly </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const std::filesystem::path &amp;&#160;</td>
           <td class="paramname"><em>filename</em>, </td>
         </tr>
         <tr>
