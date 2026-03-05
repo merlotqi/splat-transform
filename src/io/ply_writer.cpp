@@ -57,7 +57,7 @@ static std::string columnTypeToPlyType(ColumnType type) {
   }
 }
 
-void writePly(const std::string& filename, const PlyData& plyData) {
+void writePly(const std::filesystem::path& filename, const PlyData& plyData) {
   // header strings
   std::vector<std::string> header;
   header.emplace_back("ply");
@@ -75,7 +75,7 @@ void writePly(const std::string& filename, const PlyData& plyData) {
 
   std::ofstream ofs(filename, std::ios::binary | std::ios::out);
   if (!ofs.is_open()) {
-    throw std::runtime_error("Could not open file for writing");
+    throw std::runtime_error("Could not open file for writing" + filename.u8string());
   }
 
   // write the header

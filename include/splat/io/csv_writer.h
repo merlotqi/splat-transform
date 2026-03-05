@@ -27,12 +27,12 @@
 
 #pragma once
 
-#include <string>
+#include <filesystem>
 
 namespace splat {
 
 class DataTable;
 
-void writeCSV(const std::string& path, DataTable* dataTable);
+void writeCSV(const std::filesystem::path& path, DataTable* dataTable);
 
 }  // namespace splat

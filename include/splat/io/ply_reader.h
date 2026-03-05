@@ -27,8 +27,8 @@
 
 #pragma once
 
+#include <filesystem>
 #include <memory>
-#include <string>
 
 namespace splat {
 
@@ -68,6 +68,6 @@ class DataTable;
  * @see isCompressedPly() For compression detection
  * @see decompressPly() For decompression logic
  */
-std::unique_ptr<DataTable> readPly(const std::string& filename);
+std::unique_ptr<DataTable> readPly(const std::filesystem::path& filename);
 
 }  // namespace splat

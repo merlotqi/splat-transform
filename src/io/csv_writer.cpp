@@ -33,7 +33,7 @@
 
 namespace splat {
 
-void writeCSV(const std::string& path, DataTable* dataTable) {
+void writeCSV(const std::filesystem::path& path, DataTable* dataTable) {
   assert(dataTable);
   const size_t len = dataTable->getNumRows();
 

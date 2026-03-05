@@ -150,11 +150,11 @@ static PlyHeader parseHeader(const std::vector<uint8_t>& data) {
   return header;
 }
 
-std::unique_ptr<DataTable> readPly(const std::string& filename) {
+std::unique_ptr<DataTable> readPly(const std::filesystem::path& filename) {
   // open the file for binary input
   std::ifstream file(filename, std::ios::binary | std::ios::in);
   if (!file.is_open()) {
-    throw std::runtime_error("Could not open file: " + filename);
+    throw std::runtime_error("Could not open file: " + filename.u8string());
   }
 
   // read header --

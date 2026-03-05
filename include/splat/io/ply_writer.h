@@ -28,11 +28,10 @@
 #pragma once
 
 #include <splat/models/ply.h>
-
-#include <string>
+#include <filesystem>
 
 namespace splat {
 
-void writePly(const std::string& filename, const PlyData& plyData);
+void writePly(const std::filesystem::path& filename, const PlyData& plyData);
 
 }  // namespace splat
